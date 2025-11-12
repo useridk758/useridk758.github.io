@@ -38,3 +38,29 @@
     </div>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>useridk758's Website</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Section 1: Hello and Welcome -->
+    <div class="hero-section" id="section1">
+        <h1 class="fade-in-text">HELLO AND WELCOME TO USERIDK758'S WEBSITE!!</h1>
+    </div>
+
+    <!-- Spacer div to allow scrolling -->
+    <div class="spacer"></div>
+
+    <!-- Section 2: GAMES -->
+    <div class="hero-section" id="section2">
+        <h1 class="fade-in-text">GAMES</h1>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
