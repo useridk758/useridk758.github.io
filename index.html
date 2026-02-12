@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>useridk758 | Arcade</title>
+    <title>useridk758 | v4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; margin: 0; overflow-x: hidden; }
         .bento-card { background: #0f0f0f; border: 1px solid #1f1f1f; border-radius: 20px; transition: all 0.3s ease; }
-        .bento-card:hover { transform: translateY(-5px); border-color: #3b82f6; box-shadow: 0 0 25px rgba(59, 130, 246, 0.2); }
+        .bento-card:hover { transform: translateY(-5px); border-color: #3b82f6; box-shadow: 0 0 30px rgba(59, 130, 246, 0.15); }
         .proxy-input { background: #0a0a0a; border: 1px solid #333; outline: none; transition: all 0.3s; }
         .proxy-input:focus { border-color: #3b82f6; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
-        .browser-window { border: 1px solid #333; border-radius: 15px; overflow: hidden; background: #000; margin-top: 2rem; }
+        .browser-window { border: 1px solid #333; border-radius: 15px; overflow: hidden; background: #111; margin-top: 2rem; }
         .browser-bar { background: #1a1a1a; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
     </style>
 </head>
@@ -26,7 +26,7 @@
 
     <div class="text-center mb-10">
         <h1 class="text-6xl font-black italic tracking-tighter uppercase">useridk758 v4</h1>
-        <p class="text-gray-600 text-[10px] mt-2 uppercase tracking-[0.5em]">Secure Gateway</p>
+        <p class="text-gray-600 text-[10px] mt-2 uppercase tracking-[0.5em]">Arcade Terminal</p>
     </div>
 
     <div class="grid grid-cols-3 md:grid-cols-6 gap-4 mb-12 w-full max-w-2xl">
@@ -50,18 +50,22 @@
         <div class="browser-window shadow-2xl">
             <div class="browser-bar">
                 <div class="flex gap-2">
-                    <div onclick="closeFrame()" class="w-3 h-3 bg-red-500 rounded-full cursor-pointer"></div>
+                    <div onclick="closeFrame()" class="w-3 h-3 bg-red-500 rounded-full cursor-pointer hover:scale-110 transition"></div>
                     <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
                     <div class="w-3 h-3 bg-green-500 rounded-full"></div>
                 </div>
-                <span id="urlTitle" class="text-[10px] text-gray-500 font-mono italic"></span>
-                <button onclick="popOut()" class="text-[9px] bg-white text-black px-3 py-1 rounded-full font-bold uppercase hover:bg-blue-600 hover:text-white transition">Emergency Unblock</button>
+                <span id="urlTitle" class="text-[10px] text-gray-500 font-mono italic">Initializing Tunnel...</span>
+                <button onclick="popOut()" class="text-[9px] bg-white text-black px-3 py-1 rounded-full font-bold uppercase hover:bg-blue-600 hover:text-white transition">Pop Out</button>
             </div>
-            <div class="h-[75vh] bg-white">
-                <iframe id="proxyFrame" src="" class="w-full h-full border-none"></iframe>
+            <div class="h-[75vh] bg-white relative">
+                <iframe id="proxyFrame" src="" class="w-full h-full border-none shadow-inner"></iframe>
             </div>
         </div>
     </div>
+
+    <footer class="mt-auto py-10 text-gray-900 text-[9px] tracking-[0.5em] uppercase">
+        © 2026 useridk758 terminal • active
+    </footer>
 
     <script>
         const form = document.getElementById('proxyForm');
@@ -69,9 +73,6 @@
         const resultArea = document.getElementById('resultArea');
         const frame = document.getElementById('proxyFrame');
         const urlTitle = document.getElementById('urlTitle');
-
-        // This is a "Wrapper" engine. It handles the security headers for you.
-        const proxyBase = "https://api.allorigins.win/raw?url=";
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -84,13 +85,15 @@
 
         function go(url) {
             urlTitle.innerText = url;
-            // If it's Google, we use a special frame parameter
+            
+            // Logic: Google stays in-frame via &igu=1
+            // Other sites are loaded directly. If they fail (blank white), user clicks "Pop Out"
             if (url.includes('google.com')) {
                 frame.src = url.includes('igu=1') ? url : url + '&igu=1';
             } else {
-                // For other sites, we try to wrap them
                 frame.src = url; 
             }
+            
             resultArea.classList.remove('hidden');
             window.scrollTo({ top: resultArea.offsetTop - 20, behavior: 'smooth' });
         }
