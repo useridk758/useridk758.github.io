@@ -138,29 +138,15 @@
     </div>
 
     <script>
-        /* --- 1. SESSION & INTRO LOGIC --- */
+        /* --- 1. INTRO LOGIC --- */
         const nameInput = document.getElementById('nameInput');
         const introOverlay = document.getElementById('intro-overlay');
         const mainContent = document.getElementById('main-content');
         const navName = document.getElementById('nav-name');
 
-        // Check if user already entered their name in THIS session (tab)
-        window.onload = function() {
-            const sessionName = sessionStorage.getItem('useridk_name');
-            if (sessionName) {
-                // If name exists, skip intro completely
-                introOverlay.style.display = 'none';
-                mainContent.style.opacity = "1";
-                mainContent.style.pointerEvents = "all";
-                document.body.style.overflow = "auto";
-                navName.innerText = sessionName;
-            }
-        };
-
         nameInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && nameInput.value.trim() !== "") {
                 const user = nameInput.value.trim();
-                sessionStorage.setItem('useridk_name', user); // Store for the session
                 
                 document.getElementById('name-prompt').style.opacity = "0";
                 setTimeout(() => {
