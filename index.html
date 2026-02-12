@@ -8,45 +8,69 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
+        /* Optimization: force hardware acceleration */
+        * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; box-sizing: border-box; }
+        
         body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; margin: 0; overflow: hidden; }
         
-        #starCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at center, #0a0a1a 0%, #050505 100%); }
+        #starCanvas { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; 
+            background: radial-gradient(circle at center, #0a0a1a 0%, #050505 100%);
+            will-change: transform;
+        }
 
-        /* --- Transitions Engine --- */
-        #intro-overlay { position: fixed; inset: 0; z-index: 100; background: #050505; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 1s ease-in-out; }
+        /* --- High-Performance Transitions --- */
+        #intro-overlay { 
+            position: fixed; inset: 0; z-index: 100; background: #050505; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
         
-        #name-prompt { transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        #name-prompt { 
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease;
+            will-change: transform, opacity;
+        }
         
         #welcome-text { 
             position: absolute; display: none; font-size: 3.5rem; font-weight: 900; 
             font-style: italic; text-transform: uppercase; text-align: center;
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            transform: translateY(20px); opacity: 0;
+            transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease;
+            transform: translateY(40px); opacity: 0;
+            will-change: transform, opacity;
         }
 
-        #main-content { opacity: 0; transition: opacity 1.5s ease; pointer-events: none; display: flex; flex-direction: column; align-items: center; width: 100%; padding: 1.5rem; }
+        #main-content { 
+            opacity: 0; transition: opacity 1s ease-out; pointer-events: none; 
+            display: flex; flex-direction: column; align-items: center; width: 100%; padding: 1.5rem; 
+        }
 
-        /* UI Styling */
-        .glow-text { color: white; text-shadow: 0 0 15px rgba(59, 130, 246, 0.6), 0 0 30px rgba(59, 130, 246, 0.4); }
-        .bento-card { background: rgba(15, 15, 15, 0.8); border: 1px solid #1f1f1f; border-radius: 20px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; backdrop-filter: blur(5px); }
-        .bento-card:hover { transform: scale(1.1); border-color: #3b82f6; box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
-        .proxy-input { background: rgba(10, 10, 10, 0.9); border: 1px solid #333; outline: none; transition: 0.3s; backdrop-filter: blur(10px); }
+        .glow-text { color: white; text-shadow: 0 0 15px rgba(59, 130, 246, 0.6); }
+
+        .bento-card { 
+            background: rgba(15, 15, 15, 0.8); border: 1px solid #1f1f1f; border-radius: 20px; 
+            transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), border-color 0.3s ease;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            font-size: 1.5rem; backdrop-filter: blur(10px);
+            will-change: transform;
+        }
+        .bento-card:hover { transform: scale(1.08) translateY(-5px); border-color: #3b82f6; }
+
+        .proxy-input { background: rgba(10, 10, 10, 0.9); border: 1px solid #333; outline: none; transition: 0.2s; backdrop-filter: blur(10px); }
         .milky-way-banner { width: 100%; max-width: 800px; height: 120px; object-fit: cover; border-radius: 20px; border: 1px solid #1f1f1f; mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent); }
 
-        /* Cloak & Menu Controls */
-        #cloak-btn { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #111; border: 1px solid #333; padding: 10px 25px; border-radius: 50px; font-size: 10px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: 0.3s; z-index: 60; color: #666; }
-        #cloak-btn:hover { border-color: #3b82f6; color: white; }
-        #menu-btn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.3s; }
-        
-        /* Browser Window Transition */
+        /* Browser Window Transition (Optimized) */
         .browser-window { 
             border: 1px solid #333; border-radius: 15px; overflow: hidden; background: #000; 
             position: fixed; top: 5%; left: 5%; width: 90%; height: 90%; z-index: 150; 
             display: none; flex-direction: column;
-            transform: scale(0.9); opacity: 0;
-            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+            transform: scale(0.95) translateY(20px); opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-out;
+            will-change: transform, opacity;
         }
-        .browser-window.active { display: flex; transform: scale(1); opacity: 1; }
+        .browser-window.active { display: flex; transform: scale(1) translateY(0); opacity: 1; }
+
+        #cloak-btn { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #111; border: 1px solid #333; padding: 10px 25px; border-radius: 50px; font-size: 10px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: 0.2s; z-index: 60; color: #666; }
+        #cloak-btn:hover { color: white; border-color: #3b82f6; }
     </style>
 </head>
 <body>
@@ -67,10 +91,10 @@
             <img src="https://www.nhm.ac.uk/content/dam/nhm-www/discover/what-is-space/what-is-space-milky-way-full-width.jpg" class="milky-way-banner mb-6">
             <nav class="bg-[#0f0f0f]/80 border border-[#1f1f1f] rounded-full px-8 py-3 flex items-center gap-6 backdrop-blur-md">
                 <div class="text-blue-500 font-bold tracking-tighter uppercase">USERIDK758</div>
-                <div class="text-gray-500 text-[10px] uppercase">User: <span id="nav-name" class="text-white">...</span></div>
+                <div class="text-gray-500 text-[10px] uppercase tracking-widest">User: <span id="nav-name" class="text-white">...</span></div>
                 <div class="flex items-center gap-2">
                     <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <div class="text-gray-400 text-[9px] font-bold uppercase">Koyeb Active</div>
+                    <div class="text-gray-400 text-[9px] font-bold uppercase tracking-widest">120 FPS MODE</div>
                 </div>
             </nav>
         </div>
@@ -90,26 +114,27 @@
         </div>
 
         <div class="w-full max-w-xl mb-10">
-            <form id="proxyForm" class="relative">
+            <form id="proxyForm" class="relative" onsubmit="event.preventDefault(); processUrl(document.getElementById('urlInput').value);">
                 <input type="text" id="urlInput" placeholder="Command URL..." class="w-full proxy-input py-4 px-8 rounded-full text-center text-lg text-white">
-                <button type="submit" class="absolute right-3 top-2 bg-white text-black px-5 py-2 rounded-full font-bold transition">GO</button>
+                <button type="submit" class="absolute right-3 top-2 bg-white text-black px-5 py-2 rounded-full font-bold">GO</button>
             </form>
         </div>
     </div>
 
     <button id="cloak-btn" onclick="cloakTab()">Cloak Tab</button>
-    <div id="menu-btn" onclick="toggleMenu()">...</div>
 
     <div id="resultArea" class="browser-window">
-        <div class="bg-[#1a1a1a] p-3 flex justify-between items-center">
-            <div class="flex gap-2"><div onclick="closeFrame()" class="w-3 h-3 bg-red-500 rounded-full cursor-pointer"></div></div>
-            <span id="urlTitle" class="text-[10px] text-gray-500">LINK ESTABLISHED</span>
+        <div class="bg-[#1a1a1a] p-3 flex justify-between items-center border-b border-[#333]">
+            <div class="flex gap-2"><div onclick="closeFrame()" class="w-3 h-3 bg-red-500 rounded-full cursor-pointer hover:bg-red-400 transition"></div></div>
+            <span class="text-[9px] text-gray-500 tracking-widest uppercase">High Speed Link</span>
         </div>
-        <div class="flex-grow bg-white"><iframe id="proxyFrame" class="w-full h-full border-none"></iframe></div>
+        <div class="flex-grow bg-white">
+            <iframe id="proxyFrame" class="w-full h-full border-none"></iframe>
+        </div>
     </div>
 
     <script>
-        /* --- Transitions Engine Logic --- */
+        /* --- Optimized Intro --- */
         const nameInput = document.getElementById('nameInput');
         const namePrompt = document.getElementById('name-prompt');
         const welcomeText = document.getElementById('welcome-text');
@@ -118,27 +143,23 @@
         nameInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && nameInput.value.trim() !== "") {
                 const user = nameInput.value.trim();
-                
-                // 1. Prompt Fades and Slides Down
                 namePrompt.style.opacity = "0";
-                namePrompt.style.transform = "translateY(30px)";
+                namePrompt.style.transform = "translateY(20px)";
 
                 setTimeout(() => {
                     namePrompt.style.display = "none";
                     document.getElementById('display-name').innerText = user;
                     document.getElementById('nav-name').innerText = user;
                     
-                    // 2. Welcome Text Transitions In
                     welcomeText.style.display = "block";
-                    setTimeout(() => {
+                    requestAnimationFrame(() => {
                         welcomeText.style.opacity = "1";
                         welcomeText.style.transform = "translateY(0)";
-                    }, 50);
+                    });
 
-                    // 3. Welcome Text Disappears and Main Content Fades In
                     setTimeout(() => {
                         welcomeText.style.opacity = "0";
-                        welcomeText.style.transform = "translateY(-30px)";
+                        welcomeText.style.transform = "translateY(-40px)";
                         
                         setTimeout(() => {
                             introOverlay.style.opacity = "0";
@@ -146,14 +167,56 @@
                                 introOverlay.style.display = "none";
                                 document.getElementById('main-content').style.opacity = "1";
                                 document.getElementById('main-content').style.pointerEvents = "all";
-                            }, 1000);
-                        }, 500);
-                    }, 2000);
+                            }, 800);
+                        }, 600);
+                    }, 1800);
                 }, 600);
             }
         });
 
-        /* --- Browser & Proxy Logic --- */
+        /* --- GPU Accelerated Starfield --- */
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d', { alpha: false }); // Optimization
+        let stars = [];
+        let lastTime = 0;
+
+        function initStars() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            stars = [];
+            for (let i = 0; i < 250; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 1.8,
+                    speed: Math.random() * 0.5 + 0.1
+                });
+            }
+        }
+
+        function drawStars(timestamp) {
+            // Calculate delta for framerate independence
+            const deltaTime = timestamp - lastTime;
+            lastTime = timestamp;
+
+            ctx.fillStyle = "#050505";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = "white";
+            for (let i = 0; i < stars.length; i++) {
+                const s = stars[i];
+                ctx.fillRect(s.x, s.y, s.size, s.size);
+                s.y += s.speed * (deltaTime / 8); // Adjust speed for 120fps
+                if (s.y > canvas.height) s.y = 0;
+            }
+            requestAnimationFrame(drawStars);
+        }
+
+        window.addEventListener('resize', initStars);
+        initStars();
+        requestAnimationFrame(drawStars);
+
+        /* --- Proxy Engine --- */
         const koyebLink = "https://positive-clarice-somethingyea-24976ff7.koyeb.app";
         function processUrl(val) {
             if (!val) return;
@@ -166,40 +229,22 @@
             
             const area = document.getElementById('resultArea');
             document.getElementById('proxyFrame').src = target;
-            
-            // Activate Browser Window with Zoom transition
             area.style.display = "flex";
-            setTimeout(() => area.classList.add('active'), 10);
+            requestAnimationFrame(() => area.classList.add('active'));
         }
 
         function closeFrame() {
             const area = document.getElementById('resultArea');
             area.classList.remove('active');
-            setTimeout(() => { area.style.display = 'none'; document.getElementById('proxyFrame').src = ""; }, 500);
+            setTimeout(() => { area.style.display = 'none'; document.getElementById('proxyFrame').src = ""; }, 400);
         }
 
         function cloakTab() {
             const win = window.open();
             if (!win) return alert("Popups blocked!");
-            win.document.body.innerHTML = `<iframe style="border:none;width:100%;height:100vh;margin:0" src="${window.location.href}"></iframe>`;
+            win.document.body.innerHTML = `<iframe style="border:none;width:100%;height:100vh;margin:0;padding:0;overflow:hidden" src="${window.location.href}"></iframe>`;
             window.location.replace('https://google.com');
         }
-
-        /* --- Starfield --- */
-        const canvas = document.getElementById('starCanvas');
-        const ctx = canvas.getContext('2d');
-        let stars = [];
-        function initStars() {
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            stars = [];
-            for (let i = 0; i < 200; i++) stars.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 1.5, speed: Math.random() * 0.4 + 0.1 });
-        }
-        function drawStars() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = "white";
-            stars.forEach(s => { ctx.fillRect(s.x, s.y, s.size, s.size); s.y += s.speed; if (s.y > canvas.height) s.y = 0; });
-            requestAnimationFrame(drawStars);
-        }
-        initStars(); drawStars();
     </script>
 </body>
 </html>
