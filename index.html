@@ -3,22 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>useridk758 | Milky Way Arcade</title>
-    
+    <title>useridk758 | Cosmic Arcade</title>
     <link rel="icon" type="image/jpg" href="https://www.nhm.ac.uk/content/dam/nhm-www/discover/what-is-space/what-is-space-milky-way-full-width.jpg">
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; margin: 0; overflow-x: hidden; }
-        .bento-card { background: #0f0f0f; border: 1px solid #1f1f1f; border-radius: 20px; transition: all 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        
+        /* Starfield Canvas Background */
+        #starCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Puts stars behind everything */
+            background: radial-gradient(circle at center, #0a0a1a 0%, #050505 100%);
+        }
+
+        .bento-card { background: rgba(15, 15, 15, 0.8); border: 1px solid #1f1f1f; border-radius: 20px; transition: all 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; backdrop-filter: blur(5px); }
         .bento-card:hover { transform: translateY(-5px); border-color: #3b82f6; box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
-        .proxy-input { background: #0a0a0a; border: 1px solid #333; outline: none; transition: all 0.3s; }
+        .proxy-input { background: rgba(10, 10, 10, 0.9); border: 1px solid #333; outline: none; transition: all 0.3s; backdrop-filter: blur(10px); }
         .proxy-input:focus { border-color: #3b82f6; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
         .browser-window { border: 1px solid #333; border-radius: 15px; overflow: hidden; background: #000; position: fixed; top: 5%; left: 5%; width: 90%; height: 90%; z-index: 100; display: none; flex-direction: column; }
         .browser-bar { background: #1a1a1a; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
         
-        /* Milky Way Banner Effect */
         .milky-way-logo {
             width: 100%;
             max-width: 800px;
@@ -32,23 +41,24 @@
 </head>
 <body class="flex flex-col items-center min-h-screen p-6">
 
-    <div class="w-full flex flex-col items-center mb-12">
+    <canvas id="starCanvas"></canvas>
+
+    <div class="w-full flex flex-col items-center mb-12 relative z-10">
         <img src="https://www.nhm.ac.uk/content/dam/nhm-www/discover/what-is-space/what-is-space-milky-way-full-width.jpg" 
-             alt="Milky Way Logo" 
              class="milky-way-logo mb-6 shadow-2xl">
              
-        <nav class="bg-[#0f0f0f] border border-[#1f1f1f] rounded-full px-8 py-3 flex gap-8 shadow-2xl">
+        <nav class="bg-[#0f0f0f]/80 border border-[#1f1f1f] rounded-full px-8 py-3 flex gap-8 shadow-2xl backdrop-blur-md">
             <div class="text-blue-500 font-bold tracking-tighter uppercase">USERIDK758</div>
-            <div class="text-gray-500 text-[10px] self-center">COSMIC ENGINE ACTIVE</div>
+            <div class="text-gray-500 text-[10px] self-center">ENGINE: STABLE</div>
         </nav>
     </div>
 
-    <div class="text-center mb-10">
-        <h1 class="text-6xl font-black italic tracking-tighter uppercase">Milky Way v4</h1>
+    <div class="text-center mb-10 relative z-10">
+        <h1 class="text-6xl font-black italic tracking-tighter uppercase">Space Arcade v4</h1>
         <p class="text-gray-600 text-[10px] mt-2 uppercase tracking-[0.5em]">Koyeb Powered Proxy</p>
     </div>
 
-    <div class="grid grid-cols-3 md:grid-cols-6 gap-4 mb-12 w-full max-w-2xl">
+    <div class="grid grid-cols-3 md:grid-cols-6 gap-4 mb-12 w-full max-w-2xl relative z-10">
         <div onclick="processUrl('google.com')" class="h-16 bento-card">🔍</div>
         <div onclick="processUrl('youtube.com')" class="h-16 bento-card text-red-600">▶️</div>
         <div onclick="processUrl('discord.com')" class="h-16 bento-card text-indigo-500">💬</div>
@@ -57,74 +67,92 @@
         <div onclick="processUrl('poki.com')" class="h-16 bento-card text-yellow-500">🎮</div>
     </div>
 
-    <div class="w-full max-w-xl mb-10">
+    <div class="w-full max-w-xl mb-10 relative z-10">
         <form id="proxyForm" class="relative">
             <input type="text" id="urlInput" placeholder="Enter URL or Search..." 
-                   class="w-full proxy-input py-4 px-8 rounded-full text-center text-lg text-white">
+                   class="w-full proxy-input py-4 px-8 rounded-full text-center text-lg text-white shadow-xl">
             <button type="submit" class="absolute right-3 top-2 bg-white text-black px-5 py-2 rounded-full font-bold hover:bg-blue-600 hover:text-white transition">GO</button>
         </form>
     </div>
 
     <div id="resultArea" class="browser-window shadow-2xl">
         <div class="browser-bar">
-            <div class="flex gap-2">
-                <div onclick="closeFrame()" class="w-3 h-3 bg-red-500 rounded-full cursor-pointer"></div>
-                <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-            </div>
-            <span id="urlTitle" class="text-[10px] text-gray-500 font-mono italic truncate px-4">Initializing Tunnel...</span>
-            <button onclick="popOut()" class="text-[9px] bg-blue-600 text-white px-3 py-1 rounded-full font-bold uppercase">External Tab</button>
+            <div class="flex gap-2"><div onclick="closeFrame()" class="w-3 h-3 bg-red-500 rounded-full cursor-pointer"></div><div class="w-3 h-3 bg-yellow-500 rounded-full"></div><div class="w-3 h-3 bg-green-500 rounded-full"></div></div>
+            <span id="urlTitle" class="text-[10px] text-gray-500 font-mono italic truncate px-4">Connecting...</span>
+            <button onclick="popOut()" class="text-[9px] bg-blue-600 text-white px-3 py-1 rounded-full font-bold uppercase">External</button>
         </div>
         <div class="flex-grow bg-white relative">
-            <iframe id="proxyFrame" src="" class="w-full h-full border-none shadow-inner"></iframe>
+            <iframe id="proxyFrame" src="" class="w-full h-full border-none"></iframe>
         </div>
     </div>
 
     <script>
+        /* --- Starfield Engine --- */
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+        const numStars = 400;
+        const speed = 0.5;
+
+        function initStars() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            stars = [];
+            for (let i = 0; i < numStars; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2,
+                    opacity: Math.random()
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            stars.forEach(star => {
+                ctx.globalAlpha = star.opacity;
+                ctx.fillRect(star.x, star.y, star.size, star.size);
+                
+                // Move stars downward
+                star.y += speed;
+                if (star.y > canvas.height) {
+                    star.y = 0;
+                    star.x = Math.random() * canvas.width;
+                }
+            });
+            requestAnimationFrame(drawStars);
+        }
+
+        window.addEventListener('resize', initStars);
+        initStars();
+        drawStars();
+
+        /* --- Proxy Logic --- */
+        const koyebLink = "https://positive-clarice-somethingyea-24976ff7.koyeb.app";
         const form = document.getElementById('proxyForm');
         const input = document.getElementById('urlInput');
         const resultArea = document.getElementById('resultArea');
         const frame = document.getElementById('proxyFrame');
-        const urlTitle = document.getElementById('urlTitle');
-
-        // REPLACE THIS with your healthy Koyeb link when ready
-        const koyebLink = "https://positive-clarice-somethingyea-24976ff7.koyeb.app";
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            processUrl(input.value.trim());
+            let val = input.value.trim();
+            if (!val) return;
+            let target = val.includes('.') ? (val.startsWith('http') ? val : 'https://' + val) : 'https://www.google.com/search?q=' + encodeURIComponent(val) + '&igu=1';
+            
+            if (target.includes('google.com')) {
+                frame.src = target;
+            } else {
+                const encoded = btoa(target).replace(/\//g, '_').replace(/\+/g, '-').replace(/=/g, '');
+                frame.src = koyebLink + "/service/" + encoded;
+            }
+            resultArea.style.display = 'flex';
         });
 
-        function processUrl(val) {
-            if (!val) return;
-            let target = "";
-
-            if (!val.includes('.') || val.includes(' ')) {
-                target = "https://www.google.com/search?q=" + encodeURIComponent(val) + "&igu=1";
-                launchFrame(target);
-            } else {
-                target = val.startsWith('http') ? val : 'https://' + val;
-                const encoded = btoa(target).replace(/\//g, '_').replace(/\+/g, '-').replace(/=/g, '');
-                launchFrame(koyebLink + "/service/" + encoded);
-            }
-        }
-
-        function launchFrame(finalUrl) {
-            urlTitle.innerText = finalUrl;
-            frame.src = finalUrl;
-            resultArea.style.display = 'flex';
-        }
-
-        function closeFrame() {
-            resultArea.style.display = 'none';
-            frame.src = "";
-        }
-
-        function popOut() {
-            const val = input.value.trim();
-            const target = val.startsWith('http') ? val : 'https://' + val;
-            window.open(target, '_blank');
-        }
+        function closeFrame() { resultArea.style.display = 'none'; frame.src = ""; }
+        function popOut() { window.open(input.value.includes('.') ? 'https://' + input.value : 'https://google.com', '_blank'); }
     </script>
 </body>
 </html>
