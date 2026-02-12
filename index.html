@@ -1,50 +1,43 @@
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-<style>
-* { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; margin: 0; overflow: hidden; transition: background 0.8s ease; }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="tab-title">USERIDK758 | Cosmic Arcade</title>
+    <link id="tab-icon" rel="icon" type="image/jpg" href="https://www.nhm.ac.uk/content/dam/nhm-www/discover/what-is-space/what-is-space-milky-way-full-width.jpg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; margin: 0; overflow: hidden; }
-
-#starCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; transition: filter 0.8s ease; }
+        
+        #starCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; transition: filter 0.8s ease; }
 
         /* --- Theme Variables --- */
         :root { --theme-main: #3b82f6; --theme-glow: rgba(59, 130, 246, 0.8); --theme-glow-dim: rgba(59, 130, 246, 0.3); }
 
-/* --- Intro Animation --- */
-        #intro-overlay { position: fixed; inset: 0; z-index: 100; background: #050505; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
+        /* --- Intro Animation --- */
         #intro-overlay { position: fixed; inset: 0; z-index: 500; background: #050505; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
-#welcome-text { display: none; font-size: 5rem; font-weight: 900; text-transform: uppercase; text-align: center; line-height: 1; letter-spacing: -0.05em; transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1); transform: scale(0.8); opacity: 0; }
-        .mega-glow { color: white; transition: text-shadow 0.5s ease; animation: pulseGlow 2s infinite alternate; }
+        #welcome-text { display: none; font-size: 5rem; font-weight: 900; text-transform: uppercase; text-align: center; line-height: 1; letter-spacing: -0.05em; transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1); transform: scale(0.8); opacity: 0; }
         .mega-glow { color: white; animation: pulseGlow 2s infinite alternate; }
 
-@keyframes pulseGlow {
-from { text-shadow: 0 0 20px var(--theme-glow), 0 0 40px var(--theme-glow-dim); }
-            to { text-shadow: 0 0 40px var(--theme-glow), 0 0 80px var(--theme-glow-dim); }
+        @keyframes pulseGlow {
+            from { text-shadow: 0 0 20px var(--theme-glow), 0 0 40px var(--theme-glow-dim); }
             to { text-shadow: 0 0 40px var(--theme-glow), 0 0 80px var(--theme-glow-dim), 0 0 120px var(--theme-glow-dim); }
-}
+        }
 
-        /* --- Theme Variables --- */
-        :root { --theme-main: #3b82f6; --theme-glow: rgba(59, 130, 246, 0.8); --theme-glow-dim: rgba(59, 130, 246, 0.3); }
+        /* --- Main UI --- */
+        #main-content { opacity: 0; transition: opacity 0.8s ease-in; pointer-events: none; display: flex; flex-direction: column; align-items: center; width: 100%; padding: 1.5rem; }
+        .bento-card { background: rgba(15, 15, 15, 0.85); border: 1px solid #1f1f1f; border-radius: 20px; transition: 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; backdrop-filter: blur(8px); }
+        .bento-card:hover { transform: translateY(-4px); border-color: var(--theme-main); box-shadow: 0 0 20px var(--theme-glow-dim); }
 
-/* --- Main UI --- */
-#main-content { opacity: 0; transition: opacity 0.8s ease-in; pointer-events: none; display: flex; flex-direction: column; align-items: center; width: 100%; padding: 1.5rem; }
-.bento-card { background: rgba(15, 15, 15, 0.85); border: 1px solid #1f1f1f; border-radius: 20px; transition: 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; backdrop-filter: blur(8px); }
-.bento-card:hover { transform: translateY(-4px); border-color: var(--theme-main); box-shadow: 0 0 20px var(--theme-glow-dim); }
-
-        /* --- Menu & Sidebar --- */
-        #menu-btn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.3s; }
-        #drop-menu { position: fixed; bottom: 80px; right: 20px; width: 200px; background: #0f0f0f; border: 1px solid #333; border-radius: 15px; display: none; flex-direction: column; overflow: hidden; z-index: 60; opacity: 0; transform: translateY(10px); transition: 0.3s; pointer-events: none; }
-        #drop-menu.active { display: flex; opacity: 1; transform: translateY(0); pointer-events: all; }
-        .menu-item { padding: 12px; border-bottom: 1px solid #222; cursor: pointer; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; text-align: center; }
         /* --- Menu System --- */
         #menu-btn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.3s; color: white; font-weight: bold; }
         #drop-menu { position: fixed; bottom: 80px; right: 20px; width: 200px; background: #0f0f0f; border: 1px solid #333; border-radius: 15px; display: none; flex-direction: column; overflow: hidden; z-index: 60; opacity: 0; transform: translateY(10px); transition: 0.3s; }
         #drop-menu.active { display: flex; opacity: 1; transform: translateY(0); }
         .menu-item { padding: 15px; border-bottom: 1px solid #222; cursor: pointer; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; text-align: center; color: #aaa; transition: 0.2s; }
-.menu-item:hover { background: #1a1a1a; color: var(--theme-main); }
+        .menu-item:hover { background: #1a1a1a; color: var(--theme-main); }
 
-        .settings-container { width: 90%; max-width: 800px; height: 500px; background: #0f0f0f; border: 1px solid #222; border-radius: 20px; display: flex; overflow: hidden; }
-        .settings-sidebar { width: 180px; border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
-        .nav-line { height: 1px; flex-grow: 1; background: #333; transition: 0.3s; }
         /* --- Overlays & Settings --- */
         .overlay-screen { position: fixed; inset: 0; background: rgba(5,5,5,0.98); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 0.4s; pointer-events: none; }
         .overlay-screen.active { display: flex; opacity: 1; pointer-events: all; }
@@ -54,132 +47,93 @@ from { text-shadow: 0 0 20px var(--theme-glow), 0 0 40px var(--theme-glow-dim); 
         .settings-nav-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #444; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
         .settings-nav-item:hover, .settings-nav-item.active { color: white; }
         .nav-line { height: 1px; flex-grow: 1; background: #222; transition: 0.3s; }
-.settings-nav-item.active .nav-line { background: var(--theme-main); }
-        .settings-nav-item.active { color: white; }
+        .settings-nav-item.active .nav-line { background: var(--theme-main); }
         
         .settings-content { flex-grow: 1; padding: 40px; }
         .settings-pane { display: none; flex-direction: column; animation: fadeIn 0.3s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- Proxy Input --- */
-        .proxy-input-glow:focus { border-color: var(--theme-main); box-shadow: 0 0 15px var(--theme-glow-dim); }
         .back-btn { margin-top: 30px; padding: 12px 40px; border: 1px solid #333; border-radius: 50px; text-transform: uppercase; font-size: 0.7rem; font-weight: 900; cursor: pointer; transition: 0.3s; }
         .back-btn:hover { background: white; color: black; border-color: white; }
 
-        /* --- Browser Frame --- */
-        .browser-window { border: 1px solid #333; border-radius: 15px; overflow: hidden; background: #000; position: fixed; top: 5%; left: 5%; width: 90%; height: 90%; z-index: 150; display: none; flex-direction: column; transform: scale(0.95); opacity: 0; transition: 0.4s; }
-        .browser-window.active { display: flex; transform: scale(1); opacity: 1; }
         .fps-btn { padding: 10px 20px; border: 1px solid #333; border-radius: 10px; font-size: 12px; transition: 0.3s; cursor: pointer; }
         .fps-btn.active { border-color: var(--theme-main); background: var(--theme-glow-dim); }
-</style>
+    </style>
 </head>
-<body id="body-main">
 <body>
 
-<canvas id="starCanvas"></canvas>
+    <canvas id="starCanvas"></canvas>
 
-<div id="intro-overlay">
-        <div id="name-prompt" class="flex flex-col items-center gap-6 transition-all duration-500">
-            <h2 class="text-3xl font-black italic uppercase brand-color" style="color: var(--theme-main)">System Handshake</h2>
-            <input type="text" id="nameInput" autofocus class="bg-transparent border-b-2 border-white/20 text-3xl text-center outline-none px-4 py-2 w-64 transition-all" style="border-color: var(--theme-glow)" placeholder="...">
+    <div id="intro-overlay">
         <div id="name-prompt" class="flex flex-col items-center gap-6">
             <h2 class="text-3xl font-black italic uppercase" style="color: var(--theme-main)">System Handshake</h2>
             <input type="text" id="nameInput" autofocus class="bg-transparent border-b-2 border-white/20 text-3xl text-center outline-none px-4 py-2 w-64 focus:border-blue-500 transition-all" placeholder="...">
-</div>
-        <h2 id="welcome-text" class="mega-glow">WELCOME,<br><span id="display-name" class="brand-color" style="color: var(--theme-main)"></span></h2>
+        </div>
         <h2 id="welcome-text" class="mega-glow">WELCOME,<br><span id="display-name" style="color: var(--theme-main)"></span></h2>
-</div>
+    </div>
 
-<div id="main-content">
-<div class="w-full flex flex-col items-center mb-10">
-            <img id="main-banner" src="https://www.nhm.ac.uk/content/dam/nhm-www/discover/what-is-space/what-is-space-milky-way-full-width.jpg" class="w-full max-w-[800px] h-[120px] object-cover rounded-[20px] mb-6 border border-[#1f1f1f] transition-all">
+    <div id="main-content">
+        <div class="w-full flex flex-col items-center mb-10">
             <img src="https://www.nhm.ac.uk/content/dam/nhm-www/discover/what-is-space/what-is-space-milky-way-full-width.jpg" class="w-full max-w-[800px] h-[120px] object-cover rounded-[20px] mb-6 border border-[#1f1f1f]">
-<nav class="bg-[#0f0f0f]/80 border border-[#1f1f1f] rounded-full px-8 py-3 flex items-center gap-6 backdrop-blur-md">
-                <div class="font-bold uppercase tracking-tighter brand-color" style="color: var(--theme-main)">USERIDK758</div>
+            <nav class="bg-[#0f0f0f]/80 border border-[#1f1f1f] rounded-full px-8 py-3 flex items-center gap-6 backdrop-blur-md">
                 <div class="font-bold uppercase tracking-tighter" style="color: var(--theme-main)">USERIDK758</div>
-<div class="text-gray-500 text-[10px] uppercase">User: <span id="nav-name" class="text-white">...</span></div>
-                <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <div id="fps-label" class="text-gray-400 text-[9px] font-bold uppercase">60 FPS MODE</div>
-                </div>
+                <div class="text-gray-500 text-[10px] uppercase">User: <span id="nav-name" class="text-white">...</span></div>
                 <div id="fps-label" class="text-gray-400 text-[9px] font-bold uppercase">60 FPS MODE</div>
-</nav>
-</div>
+            </nav>
+        </div>
 
-@@ -83,152 +88,193 @@ <h1 id="brand-title" class="text-7xl font-black italic tracking-tighter uppercas
-</div>
+        <div class="text-center mb-10">
+            <h1 id="brand-title" class="text-7xl font-black italic tracking-tighter uppercase mega-glow">USERIDK758</h1>
+            <p class="text-gray-500 text-[10px] mt-2 uppercase tracking-[0.6em]">Cosmic Pr*xy Network</p>
+        </div>
 
-<div class="grid grid-cols-3 md:grid-cols-6 gap-4 mb-12 w-full max-w-2xl">
-            <div onclick="processUrl('google.com')" class="h-16 bento-card">🔍</div>
-            <div onclick="processUrl('youtube.com')" class="h-16 bento-card text-red-600">▶️</div>
-            <div onclick="processUrl('discord.com')" class="h-16 bento-card text-indigo-500">💬</div>
-            <div onclick="processUrl('tiktok.com')" class="h-16 bento-card text-pink-500">📱</div>
-            <div onclick="processUrl('twitch.tv')" class="h-16 bento-card text-purple-500">💜</div>
-            <div onclick="processUrl('poki.com')" class="h-16 bento-card text-yellow-500">🎮</div>
+        <div class="grid grid-cols-3 md:grid-cols-6 gap-4 mb-12 w-full max-w-2xl">
             <div class="h-16 bento-card">🔍</div>
             <div class="h-16 bento-card text-red-600">▶️</div>
             <div class="h-16 bento-card text-indigo-500">💬</div>
             <div class="h-16 bento-card text-pink-500">📱</div>
             <div class="h-16 bento-card text-purple-500">💜</div>
             <div class="h-16 bento-card text-yellow-500">🎮</div>
-</div>
+        </div>
 
-<div class="w-full max-w-xl">
-            <form onsubmit="event.preventDefault(); processUrl(document.getElementById('urlInput').value);" class="relative">
-                <input type="text" id="urlInput" placeholder="Command URL..." class="w-full bg-[#0a0a0a] border border-[#333] py-4 px-8 rounded-full text-center text-lg outline-none transition proxy-input-glow">
-                <button type="submit" class="absolute right-3 top-2 bg-white text-black px-5 py-2 rounded-full font-bold">GO</button>
-            </form>
+        <div class="w-full max-w-xl">
             <input type="text" placeholder="Command URL..." class="w-full bg-[#0a0a0a] border border-[#333] py-4 px-8 rounded-full text-center text-lg outline-none focus:border-blue-600 transition">
-</div>
-</div>
+        </div>
+    </div>
 
-    <div id="settings-screen" class="overlay-screen" style="position: fixed; inset: 0; background: rgba(5,5,5,0.95); z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 0.4s; pointer-events: none;">
     <div id="settings-screen" class="overlay-screen">
-<div class="settings-container">
-<div class="settings-sidebar">
-                <div class="settings-nav-item active flex items-center gap-2 text-[11px] font-black uppercase text-gray-500 cursor-pointer" onclick="switchTab('cloaker', this)">Cloaker <div class="nav-line"></div></div>
-                <div class="settings-nav-item flex items-center gap-2 text-[11px] font-black uppercase text-gray-500 cursor-pointer" onclick="switchTab('theme', this)">Theme <div class="nav-line"></div></div>
-                <div class="settings-nav-item flex items-center gap-2 text-[11px] font-black uppercase text-gray-500 cursor-pointer" onclick="switchTab('opti', this)">Optimization <div class="nav-line"></div></div>
+        <div class="settings-container">
+            <div class="settings-sidebar">
                 <div class="settings-nav-item active" onclick="switchTab('cloaker', this)">Cloaker <div class="nav-line"></div></div>
                 <div class="settings-nav-item" onclick="switchTab('theme', this)">Theme <div class="nav-line"></div></div>
                 <div class="settings-nav-item" onclick="switchTab('opti', this)">Optimization <div class="nav-line"></div></div>
-</div>
-<div class="settings-content">
-<div id="pane-cloaker" class="settings-pane" style="display:flex">
-                    <h3 class="font-black uppercase italic mb-6 brand-color" style="color: var(--theme-main)">Custom Cloak</h3>
+            </div>
+            <div class="settings-content">
+                <div id="pane-cloaker" class="settings-pane" style="display:flex">
                     <h3 class="font-black uppercase italic mb-6" style="color: var(--theme-main)">Custom Cloak</h3>
-<input type="text" id="cloak-title" class="bg-[#111] border border-[#333] p-3 rounded-lg w-full mb-4 outline-none text-white" placeholder="Website Title">
-<input type="text" id="cloak-favicon" class="bg-[#111] border border-[#333] p-3 rounded-lg w-full outline-none text-white" placeholder="Favicon URL">
-                    <p id="error-text" class="text-red-500 text-[10px] font-bold mt-2 opacity-0 transition">Sorry, URL not detected!</p>
+                    <input type="text" id="cloak-title" class="bg-[#111] border border-[#333] p-3 rounded-lg w-full mb-4 outline-none text-white" placeholder="Website Title">
+                    <input type="text" id="cloak-favicon" class="bg-[#111] border border-[#333] p-3 rounded-lg w-full outline-none text-white" placeholder="Favicon URL">
                     <p id="error-text" class="text-red-500 text-[10px] font-bold mt-2 opacity-0 transition">URL Not Found! Try Again.</p>
-</div>
-<div id="pane-theme" class="settings-pane">
-                    <h3 class="font-black uppercase italic mb-6 brand-color" style="color: var(--theme-main)">Visual Theme</h3>
-                    <select id="theme-select" onchange="changeTheme(this.value)" class="bg-[#111] border border-[#333] p-4 rounded-xl text-white outline-none w-full">
+                </div>
+                <div id="pane-theme" class="settings-pane">
                     <h3 class="font-black uppercase italic mb-6" style="color: var(--theme-main)">Visual Theme</h3>
                     <select id="theme-select" onchange="changeTheme(this.value)" class="bg-[#111] border border-[#333] p-4 rounded-xl text-white outline-none w-full cursor-pointer">
-<option value="default">Default Galaxy (Blue)</option>
-                        <option value="yellow">Yellow Galaxy (Full Bloom)</option>
+                        <option value="default">Default Galaxy (Blue)</option>
                         <option value="yellow">Yellow Galaxy (Intense)</option>
-<option value="red">Red Galaxy (Nebula)</option>
-</select>
-</div>
-<div id="pane-opti" class="settings-pane">
-                    <h3 class="font-black uppercase italic mb-6 brand-color" style="color: var(--theme-main)">System Opti</h3>
+                        <option value="red">Red Galaxy (Nebula)</option>
+                    </select>
+                </div>
+                <div id="pane-opti" class="settings-pane">
                     <h3 class="font-black uppercase italic mb-6" style="color: var(--theme-main)">Optimization</h3>
-<div class="flex gap-4 mb-4">
-                        <div id="fps-60" class="fps-btn active border border-[#333] p-3 rounded-lg cursor-pointer" onclick="setFPS(60)">60 FPS</div>
-                        <div id="fps-120" class="fps-btn border border-[#333] p-3 rounded-lg cursor-pointer" onclick="setFPS(120)">120 FPS</div>
+                    <div class="flex gap-4 mb-4">
                         <div id="fps-60" class="fps-btn active" onclick="setFPS(60)">60 FPS</div>
                         <div id="fps-120" class="fps-btn" onclick="setFPS(120)">120 FPS</div>
-</div>
-                    <div class="bg-[#111] p-4 rounded-xl border border-[#222] text-center"><span class="brand-color font-black" style="color: var(--theme-main)">hi!</span></div>
+                    </div>
                     <p class="text-yellow-600 text-[9px] font-bold uppercase mb-4">Warning: Higher FPS can be laggy!</p>
                     <div class="bg-[#111] p-4 rounded-xl border border-[#222] text-center font-black" style="color: var(--theme-main)">hi!</div>
-</div>
-</div>
-</div>
-        <div class="back-btn border border-[#333] mt-6 px-10 py-3 rounded-full uppercase text-[10px] font-black cursor-pointer transition-all hover:bg-white hover:text-black" onclick="saveAndExitSettings()">Save & Exit</div>
+                </div>
+            </div>
+        </div>
         <div class="back-btn" onclick="saveAndExitSettings()">Save & Exit</div>
     </div>
 
@@ -193,20 +147,16 @@ from { text-shadow: 0 0 20px var(--theme-glow), 0 0 40px var(--theme-glow-dim); 
         <h2 class="text-3xl font-black italic mb-4 uppercase">Terms of Service</h2>
         <p class="text-gray-500 text-xs max-w-sm text-center">By using USERIDK758, you agree to respect the stars and the network. Educational purposes only.</p>
         <div class="back-btn" onclick="hideScreens()">I Accept</div>
-</div>
+    </div>
 
-<div id="menu-btn" onclick="toggleMenu()">...</div>
-<div id="drop-menu">
-        <div class="menu-item" onclick="showScreen('settings-screen')">Settings</div>
-        <div class="menu-item" onclick="showScreen('suggestions-screen')">Suggestions</div>
-        <div class="menu-item" onclick="showScreen('tos-screen')">Terms</div>
+    <div id="menu-btn" onclick="toggleMenu()">...</div>
+    <div id="drop-menu">
         <div class="menu-item" onclick="openScreen('settings-screen')">Settings</div>
         <div class="menu-item" onclick="openScreen('suggestions-screen')">Suggestions</div>
         <div class="menu-item" onclick="openScreen('tos-screen')">Terms</div>
-</div>
+    </div>
 
-<script>
-        /* --- Intense Theme Engine --- */
+    <script>
         /* --- MENU LOGIC --- */
         function toggleMenu() {
             const menu = document.getElementById('drop-menu');
@@ -253,60 +203,44 @@ from { text-shadow: 0 0 20px var(--theme-glow), 0 0 40px var(--theme-glow-dim); 
         }
 
         /* --- THEME ENGINE --- */
-function changeTheme(mode) {
-const root = document.documentElement;
-            let main, glow, dim, filter;
+        function changeTheme(mode) {
+            const root = document.documentElement;
             let main, glow, dim, starColor;
 
-if (mode === 'yellow') {
-                main = '#eab308'; glow = 'rgba(234, 179, 8, 0.8)'; dim = 'rgba(234, 179, 8, 0.2)';
-                filter = 'sepia(1) saturate(5) hue-rotate(10deg)';
-                document.getElementById('starCanvas').style.filter = "drop-shadow(0 0 10px rgba(234, 179, 8, 0.3))";
+            if (mode === 'yellow') {
                 main = '#eab308'; glow = 'rgba(234, 179, 8, 0.8)'; dim = 'rgba(234, 179, 8, 0.2)'; starColor = '#eab308';
                 document.getElementById('starCanvas').style.filter = "sepia(1) saturate(5)";
-} else if (mode === 'red') {
-                main = '#ef4444'; glow = 'rgba(239, 68, 68, 0.8)'; dim = 'rgba(239, 68, 68, 0.2)';
-                filter = 'hue-rotate(320deg) saturate(3)';
+            } else if (mode === 'red') {
                 main = '#ef4444'; glow = 'rgba(239, 68, 68, 0.8)'; dim = 'rgba(239, 68, 68, 0.2)'; starColor = '#ef4444';
                 document.getElementById('starCanvas').style.filter = "hue-rotate(320deg) saturate(3)";
-} else {
-                main = '#3b82f6'; glow = 'rgba(59, 130, 246, 0.8)'; dim = 'rgba(59, 130, 246, 0.2)';
-                filter = 'none';
+            } else {
                 main = '#3b82f6'; glow = 'rgba(59, 130, 246, 0.8)'; dim = 'rgba(59, 130, 246, 0.2)'; starColor = '#FFFFFF';
                 document.getElementById('starCanvas').style.filter = "none";
-}
+            }
 
-root.style.setProperty('--theme-main', main);
-root.style.setProperty('--theme-glow', glow);
-root.style.setProperty('--theme-glow-dim', dim);
-            
-            // Apply to all brand elements
-            document.querySelectorAll('.brand-color').forEach(el => el.style.color = main);
-            document.getElementById('starCanvas').style.filter = filter;
-            window.currentStarColor = mode === 'default' ? '#FFFFFF' : main;
+            root.style.setProperty('--theme-main', main);
+            root.style.setProperty('--theme-glow', glow);
+            root.style.setProperty('--theme-glow-dim', dim);
             window.currentStarColor = starColor;
-}
+        }
 
-        /* --- Graphics & Logic (Condensed) --- */
         /* --- GRAPHICS ENGINE --- */
-const canvas = document.getElementById('starCanvas');
-const ctx = canvas.getContext('2d');
-let stars = [], targetFPS = 60;
-window.currentStarColor = "#FFFFFF";
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [], targetFPS = 60;
+        window.currentStarColor = "#FFFFFF";
 
-function initStars() {
-canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            stars = []; for (let i=0; i<150; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, size:Math.random()*1.5, speed:Math.random()*0.4+0.1});
+        function initStars() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
             stars = []; for(let i=0; i<150; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, size:Math.random()*1.5, speed:Math.random()*0.4+0.1});
-}
-function drawStars() {
-ctx.fillStyle = "#050505"; ctx.fillRect(0,0,canvas.width,canvas.height);
-ctx.fillStyle = window.currentStarColor;
-            stars.forEach(s => { ctx.fillRect(s.x, s.y, s.size, s.size); s.y += s.speed * (targetFPS/60); if(s.y>canvas.height) s.y=0; });
+        }
+        function drawStars() {
+            ctx.fillStyle = "#050505"; ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = window.currentStarColor;
             stars.forEach(s => { ctx.fillRect(s.x, s.y, s.size, s.size); s.y += s.speed * (targetFPS/60); if(s.y > canvas.height) s.y = 0; });
-requestAnimationFrame(drawStars);
-}
-initStars(); drawStars();
+            requestAnimationFrame(drawStars);
+        }
+        initStars(); drawStars();
 
         function setFPS(v) {
             targetFPS = v;
@@ -316,54 +250,31 @@ initStars(); drawStars();
         }
 
         /* --- INTRO LOGIC --- */
-const nInput = document.getElementById('nameInput');
-nInput.addEventListener('keypress', (e) => {
-if (e.key === 'Enter' && nInput.value.trim() !== "") {
-document.getElementById('name-prompt').style.opacity = "0";
-setTimeout(() => {
-document.getElementById('name-prompt').style.display = "none";
-document.getElementById('display-name').innerText = nInput.value;
+        const nInput = document.getElementById('nameInput');
+        nInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && nInput.value.trim() !== "") {
+                document.getElementById('name-prompt').style.opacity = "0";
+                setTimeout(() => {
+                    document.getElementById('name-prompt').style.display = "none";
+                    document.getElementById('display-name').innerText = nInput.value;
                     document.getElementById('nav-name').innerText = nInput.value;
-const w = document.getElementById('welcome-text');
-w.style.display = "block";
-setTimeout(() => { w.style.opacity = "1"; w.style.transform = "scale(1)"; }, 50);
-setTimeout(() => {
-w.style.opacity = "0"; w.style.transform = "scale(1.2)";
-                        setTimeout(() => { 
+                    const w = document.getElementById('welcome-text');
+                    w.style.display = "block";
+                    setTimeout(() => { w.style.opacity = "1"; w.style.transform = "scale(1)"; }, 50);
+                    setTimeout(() => {
+                        w.style.opacity = "0"; w.style.transform = "scale(1.2)";
                         setTimeout(() => {
-document.getElementById('intro-overlay').style.opacity = "0";
-                            setTimeout(() => { 
-                                document.getElementById('intro-overlay').style.display="none"; 
-                                document.getElementById('main-content').style.opacity="1";
-                                document.getElementById('main-content').style.pointerEvents="all";
+                            document.getElementById('intro-overlay').style.opacity = "0";
                             setTimeout(() => {
                                 document.getElementById('intro-overlay').style.display = "none";
                                 document.getElementById('main-content').style.opacity = "1";
                                 document.getElementById('main-content').style.pointerEvents = "all";
-}, 800);
-}, 500);
-}, 2500);
-}, 600);
-}
-});
-
-        function toggleMenu() { document.getElementById('drop-menu').classList.toggle('active'); }
-        function showScreen(id) { toggleMenu(); const s = document.getElementById(id); s.style.display='flex'; setTimeout(()=>s.classList.add('active'), 10); }
-        function hideScreens() { document.querySelectorAll('.overlay-screen').forEach(s => { s.classList.remove('active'); setTimeout(()=>s.style.display='none', 400); }); }
-        function switchTab(p, el) { 
-            document.querySelectorAll('.settings-pane').forEach(x => x.style.display='none');
-            document.querySelectorAll('.settings-nav-item').forEach(x => x.classList.remove('active'));
-            document.getElementById('pane-'+p).style.display='flex'; el.classList.add('active'); 
-        }
-        function saveAndExitSettings() { 
-            const t = document.getElementById('cloak-title').value;
-            const f = document.getElementById('cloak-favicon').value;
-            if(t) document.getElementById('tab-title').innerText = t;
-            if(f) document.getElementById('tab-icon').href = f;
-            hideScreens(); 
-        }
-        function setFPS(v) { targetFPS = v; document.getElementById('fps-label').innerText = v + " FPS MODE"; document.getElementById('fps-60').classList.toggle('active', v===60); document.getElementById('fps-120').classList.toggle('active', v===120); }
-        function processUrl(u) { /* Simplified for length */ window.open("https://google.com/search?q="+u, "_blank"); }
-</script>
+                            }, 800);
+                        }, 500);
+                    }, 2500);
+                }, 600);
+            }
+        });
+    </script>
 </body>
 </html>
