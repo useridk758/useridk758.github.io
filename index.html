@@ -9,72 +9,62 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; margin: 0; overflow-x: hidden; }
         .bento-card { background: #0f0f0f; border: 1px solid #1f1f1f; border-radius: 20px; transition: all 0.3s ease; }
-        .bento-card:hover { transform: translateY(-5px); border-color: #3b82f6; box-shadow: 0 0 20px rgba(59, 130, 246, 0.2); }
-        .proxy-input { 
-            background: #0a0a0a; border: 1px solid #333; outline: none; transition: all 0.3s;
-        }
+        .bento-card:hover { transform: translateY(-5px); border-color: #3b82f6; box-shadow: 0 0 25px rgba(59, 130, 246, 0.2); }
+        .proxy-input { background: #0a0a0a; border: 1px solid #333; outline: none; transition: all 0.3s; }
         .proxy-input:focus { border-color: #3b82f6; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
-        .browser-window { border: 1px solid #333; border-radius: 15px; overflow: hidden; background: #000; }
+        .browser-window { border: 1px solid #333; border-radius: 15px; overflow: hidden; background: #000; margin-top: 2rem; }
         .browser-bar { background: #1a1a1a; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .app-icon { width: 60px; height: 60px; display: flex; items-center; justify-center; font-size: 24px; cursor: pointer; }
     </style>
 </head>
-<body class="flex flex-col items-center min-h-screen p-4 md:p-8">
+<body class="flex flex-col items-center min-h-screen p-6">
 
-    <nav class="mt-4 bg-[#0f0f0f] border border-[#1f1f1f] rounded-full px-6 py-3 flex gap-8 mb-12 shadow-2xl">
-        <div class="text-blue-500 font-bold">👤 useridk758</div>
+    <nav class="mt-4 bg-[#0f0f0f] border border-[#1f1f1f] rounded-full px-8 py-3 flex gap-8 mb-12 shadow-2xl">
+        <div class="text-blue-500 font-bold tracking-tighter">USERIDK758</div>
         <div class="text-gray-500 hover:text-white cursor-pointer transition">🎮</div>
         <div class="text-gray-500 hover:text-white cursor-pointer transition">⚙️</div>
     </nav>
 
     <div class="text-center mb-10">
-        <h1 class="text-6xl font-black italic tracking-tighter text-white uppercase">useridk758 v4</h1>
-        <p class="text-gray-500 text-xs mt-3 uppercase tracking-[0.4em]">Personal Proxy Terminal</p>
+        <h1 class="text-6xl font-black italic tracking-tighter uppercase">useridk758 v4</h1>
+        <p class="text-gray-600 text-[10px] mt-2 uppercase tracking-[0.5em]">Private Access Terminal</p>
     </div>
 
-    <div class="grid grid-cols-3 md:grid-cols-6 gap-4 mb-12 w-full max-w-3xl">
-        <div onclick="launchProxy('https://www.google.com/search?igu=1')" class="app-icon bento-card" title="Google">🔍</div>
-        <div onclick="launchProxy('https://www.youtube.com')" class="app-icon bento-card text-red-600" title="YouTube">▶️</div>
-        <div onclick="launchProxy('https://discord.com/app')" class="app-icon bento-card text-indigo-500" title="Discord">💬</div>
-        <div onclick="launchProxy('https://www.tiktok.com')" class="app-icon bento-card text-pink-500" title="TikTok">📱</div>
-        <div onclick="launchProxy('https://www.twitch.tv')" class="app-icon bento-card text-purple-500" title="Twitch">💜</div>
-        <div onclick="launchProxy('https://poki.com')" class="app-icon bento-card text-yellow-500" title="Games">🎮</div>
+    <div class="grid grid-cols-3 md:grid-cols-6 gap-4 mb-12 w-full max-w-2xl">
+        <div onclick="launch('https://www.google.com/search?igu=1')" class="h-14 bento-card flex items-center justify-center cursor-pointer text-xl">🔍</div>
+        <div onclick="launch('https://www.youtube.com')" class="h-14 bento-card flex items-center justify-center cursor-pointer text-xl text-red-600">▶️</div>
+        <div onclick="launch('https://discord.com/app')" class="h-14 bento-card flex items-center justify-center cursor-pointer text-xl text-indigo-500">💬</div>
+        <div onclick="launch('https://www.tiktok.com')" class="h-14 bento-card flex items-center justify-center cursor-pointer text-xl text-pink-500">📱</div>
+        <div onclick="launch('https://www.twitch.tv')" class="h-14 bento-card flex items-center justify-center cursor-pointer text-xl text-purple-500">💜</div>
+        <div onclick="launch('https://poki.com')" class="h-14 bento-card flex items-center justify-center cursor-pointer text-xl text-yellow-500">🎮</div>
     </div>
 
-    <div class="w-full max-w-2xl mb-16">
+    <div class="w-full max-w-xl mb-10">
         <form id="proxyForm" class="relative">
-            <input 
-                type="text" 
-                id="urlInput"
-                placeholder="Search or enter URL (e.g. google.com)" 
-                class="w-full proxy-input py-5 px-10 rounded-full text-center text-xl text-white shadow-2xl"
-            >
-            <button type="submit" class="absolute right-4 top-3 bg-white text-black px-6 py-2 rounded-full font-black hover:bg-blue-600 hover:text-white transition">GO</button>
+            <input type="text" id="urlInput" placeholder="Search or type URL..." 
+                   class="w-full proxy-input py-4 px-8 rounded-full text-center text-lg text-white">
+            <button type="submit" class="absolute right-3 top-2 bg-white text-black px-5 py-2 rounded-full font-bold hover:bg-blue-600 hover:text-white transition">GO</button>
         </form>
     </div>
 
-    <div id="resultArea" class="hidden w-full max-w-6xl animate-in fade-in zoom-in duration-300">
-        <div class="browser-window shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+    <div id="resultArea" class="hidden w-full max-w-6xl">
+        <div class="browser-window shadow-2xl">
             <div class="browser-bar">
                 <div class="flex gap-2">
-                    <div onclick="closeFrame()" class="w-3 h-3 bg-red-500 rounded-full cursor-pointer hover:bg-red-400"></div>
+                    <div onclick="closeFrame()" class="w-3 h-3 bg-red-500 rounded-full cursor-pointer"></div>
                     <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
                     <div class="w-3 h-3 bg-green-500 rounded-full"></div>
                 </div>
-                <span id="urlDisplay" class="text-[10px] text-gray-500 font-mono truncate px-4 italic"></span>
-                <button onclick="popOut()" class="text-[9px] bg-white text-black px-3 py-1 rounded-full font-bold uppercase hover:bg-blue-600 hover:text-white transition">Unblock Site</button>
+                <span id="urlTitle" class="text-[10px] text-gray-500 font-mono italic"></span>
+                <button onclick="popOut()" class="text-[9px] bg-blue-600 text-white px-3 py-1 rounded-full font-bold uppercase hover:bg-white hover:text-black transition">Unblock Site</button>
             </div>
-            <div class="h-[75vh] bg-white">
+            <div class="h-[70vh] bg-white">
                 <iframe id="proxyFrame" src="" class="w-full h-full border-none"></iframe>
             </div>
         </div>
-        <p class="text-center text-gray-700 text-[10px] mt-6 tracking-widest uppercase">
-            Encrypted Tunnel via Ultraviolet Engine
-        </p>
     </div>
 
-    <footer class="mt-auto py-10 text-gray-900 text-[9px] tracking-[0.5em] uppercase">
-        © 2026 useridk758 • secure_access_v4
+    <footer class="mt-auto py-10 text-gray-800 text-[9px] tracking-[0.3em] uppercase">
+        © 2026 useridk758 terminal
     </footer>
 
     <script>
@@ -82,38 +72,29 @@
         const input = document.getElementById('urlInput');
         const resultArea = document.getElementById('resultArea');
         const frame = document.getElementById('proxyFrame');
-        const urlDisplay = document.getElementById('urlDisplay');
-
-        // PUBLIC ULTRAVIOLET ENGINE
+        const urlTitle = document.getElementById('urlTitle');
+        
+        // Public Ultraviolet engine - No Render account needed!
         const engine = "https://uv.student-portal.workers.dev/main/";
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            processUrl(input.value.trim());
-        });
-
-        function processUrl(val) {
+            let val = input.value.trim();
             if (!val) return;
-            
-            let targetUrl = "";
-            if (!val.includes('.') || val.includes(' ')) {
-                // If it's a search term, use Google IGU (frame-friendly)
-                targetUrl = `https://www.google.com/search?q=${encodeURIComponent(val)}&igu=1`;
-                launchProxy(targetUrl, false);
-            } else {
-                // If it's a URL, use the UV engine
-                targetUrl = val.startsWith('http') ? val : 'https://' + val;
-                launchProxy(targetUrl, true);
-            }
-        }
 
-        function launchProxy(url, useEngine) {
-            const finalUrl = useEngine ? engine + encodeURIComponent(url) : url;
-            urlDisplay.innerText = url;
+            let finalUrl = "";
+            if (!val.includes('.') || val.includes(' ')) {
+                finalUrl = `https://www.google.com/search?q=${encodeURIComponent(val)}&igu=1`;
+            } else {
+                let target = val.startsWith('http') ? val : 'https://' + val;
+                finalUrl = engine + encodeURIComponent(target);
+            }
+            
+            urlTitle.innerText = val;
             frame.src = finalUrl;
             resultArea.classList.remove('hidden');
-            window.scrollTo({ top: resultArea.offsetTop - 40, behavior: 'smooth' });
-        }
+            window.scrollTo({ top: resultArea.offsetTop - 20, behavior: 'smooth' });
+        });
 
         function closeFrame() {
             resultArea.classList.add('hidden');
@@ -121,9 +102,8 @@
         }
 
         function popOut() {
-            // Opens the site in a new tab if it's stuck
-            const val = input.value.trim();
-            const target = val.startsWith('http') ? val : 'https://' + val;
+            let val = input.value.trim();
+            let target = val.startsWith('http') ? val : 'https://' + val;
             window.open(target, '_blank');
         }
     </script>
