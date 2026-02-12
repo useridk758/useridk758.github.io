@@ -13,65 +13,93 @@
         
         #starCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
-        /* --- UI Components --- */
+        /* --- Intro Animation --- */
+        #intro-overlay { 
+            position: fixed; inset: 0; z-index: 100; background: #050505; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            transition: opacity 0.8s ease; 
+        }
+
+        #welcome-text { 
+            display: none; 
+            font-size: 5rem; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            text-align: center;
+            line-height: 1;
+            letter-spacing: -0.05em;
+            transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+            transform: scale(0.8);
+            opacity: 0;
+        }
+
+        .mega-glow {
+            color: white;
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4);
+            animation: pulseGlow 2s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            from { text-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4); }
+            to { text-shadow: 0 0 30px rgba(59, 130, 246, 1), 0 0 60px rgba(59, 130, 246, 0.6), 0 0 100px rgba(59, 130, 246, 0.3); }
+        }
+
+        /* --- Main UI --- */
         #main-content { opacity: 0; transition: opacity 0.8s ease-in; pointer-events: none; display: flex; flex-direction: column; align-items: center; width: 100%; padding: 1.5rem; }
-        .glow-text { color: white; text-shadow: 0 0 12px rgba(59, 130, 246, 0.5); transition: 0.5s; }
         .bento-card { background: rgba(15, 15, 15, 0.85); border: 1px solid #1f1f1f; border-radius: 20px; transition: 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; backdrop-filter: blur(8px); }
         .bento-card:hover { transform: translateY(-4px); border-color: #3b82f6; }
 
-        /* --- Menu System --- */
+        /* --- Menu & Dropdown --- */
         #menu-btn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.3s; }
         #drop-menu { position: fixed; bottom: 80px; right: 20px; width: 200px; background: #0f0f0f; border: 1px solid #333; border-radius: 15px; display: none; flex-direction: column; overflow: hidden; z-index: 60; opacity: 0; transform: translateY(10px); transition: 0.3s; pointer-events: none; }
         #drop-menu.active { display: flex; opacity: 1; transform: translateY(0); pointer-events: all; }
         .menu-item { padding: 12px; border-bottom: 1px solid #222; cursor: pointer; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; text-align: center; transition: 0.2s; }
         .menu-item:hover { background: #1a1a1a; color: #3b82f6; }
 
-        /* --- Overlays --- */
+        /* --- Settings Layout --- */
         .overlay-screen { position: fixed; inset: 0; background: rgba(5,5,5,0.95); z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 0.4s; pointer-events: none; }
         .overlay-screen.active { display: flex; opacity: 1; pointer-events: all; }
-        .back-btn { margin-top: 30px; padding: 8px 25px; border: 1px solid #333; border-radius: 50px; text-transform: uppercase; font-size: 0.7rem; cursor: pointer; transition: 0.3s; }
-
-        /* --- Settings Layout --- */
         .settings-container { width: 90%; max-width: 800px; height: 500px; background: #0f0f0f; border: 1px solid #222; border-radius: 20px; display: flex; overflow: hidden; }
         .settings-sidebar { width: 180px; border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
         .settings-nav-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #555; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
         .settings-nav-item:hover, .settings-nav-item.active { color: white; }
         .nav-line { height: 1px; flex-grow: 1; background: #333; transition: 0.3s; }
         .settings-nav-item.active .nav-line { background: #3b82f6; }
-        
-        .settings-content { flex-grow: 1; padding: 40px; position: relative; }
+        .settings-content { flex-grow: 1; padding: 40px; }
         .settings-pane { display: none; flex-direction: column; animation: fadeIn 0.4s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
 
-        .setting-input { background: #111; border: 1px solid #333; padding: 12px; border-radius: 10px; width: 100%; margin-bottom: 15px; outline: none; transition: 0.3s; font-size: 13px; }
-        .setting-input:focus { border-color: #3b82f6; }
-        
-        #error-text { color: #ff4444; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-top: 10px; opacity: 0; transition: 0.3s; }
-        
-        /* Dropdown Theme */
-        select { background: #111; color: white; border: 1px solid #333; padding: 10px; border-radius: 10px; outline: none; cursor: pointer; }
+        .setting-input { background: #111; border: 1px solid #333; padding: 12px; border-radius: 10px; width: 100%; margin-bottom: 15px; outline: none; transition: 0.3s; font-size: 13px; color: white; }
+        #error-text { color: #ff4444; font-size: 10px; font-weight: bold; text-transform: uppercase; opacity: 0; transition: 0.3s; }
 
         .fps-btn { padding: 10px 20px; border: 1px solid #333; border-radius: 10px; font-size: 12px; transition: 0.3s; cursor: pointer; }
         .fps-btn.active { border-color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+        .back-btn { margin-top: 30px; padding: 10px 35px; border: 1px solid #333; border-radius: 50px; text-transform: uppercase; font-size: 0.7rem; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .back-btn:hover { background: white; color: black; }
+
+        /* --- Browser Frame --- */
+        .browser-window { border: 1px solid #333; border-radius: 15px; overflow: hidden; background: #000; position: fixed; top: 5%; left: 5%; width: 90%; height: 90%; z-index: 150; display: none; flex-direction: column; transform: scale(0.95); opacity: 0; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .browser-window.active { display: flex; transform: scale(1); opacity: 1; }
     </style>
 </head>
 <body>
 
     <canvas id="starCanvas"></canvas>
 
-    <div id="intro-overlay" class="fixed inset-0 z-[100] bg-[#050505] flex flex-col items-center justify-center transition-opacity duration-700">
+    <div id="intro-overlay">
         <div id="name-prompt" class="flex flex-col items-center gap-6 transition-all duration-500">
-            <h2 class="text-3xl font-black italic text-blue-500 uppercase">System Handshake</h2>
+            <h2 class="text-3xl font-black italic text-blue-500 uppercase brand-color">System Handshake</h2>
+            <p class="text-[10px] uppercase tracking-widest text-gray-500">What is your name?</p>
             <input type="text" id="nameInput" autofocus class="bg-transparent border-b-2 border-white/20 text-3xl text-center outline-none px-4 py-2 w-64 focus:border-blue-600 transition-all" placeholder="...">
         </div>
-        <h2 id="welcome-text" class="glow-text">Welcome, <br><span id="display-name" class="text-blue-500"></span></h2>
+        <h2 id="welcome-text" class="mega-glow">WELCOME,<br><span id="display-name" class="text-blue-500 brand-color"></span></h2>
     </div>
 
     <div id="main-content">
         <div class="w-full flex flex-col items-center mb-10">
             <img src="https://www.nhm.ac.uk/content/dam/nhm-www/discover/what-is-space/what-is-space-milky-way-full-width.jpg" class="w-full max-w-[800px] h-[120px] object-cover rounded-[20px] mb-6 border border-[#1f1f1f]">
             <nav class="bg-[#0f0f0f]/80 border border-[#1f1f1f] rounded-full px-8 py-3 flex items-center gap-6 backdrop-blur-md">
-                <div class="text-blue-500 font-bold uppercase tracking-tighter">USERIDK758</div>
+                <div class="text-blue-500 font-bold uppercase tracking-tighter brand-color">USERIDK758</div>
                 <div class="text-gray-500 text-[10px] uppercase">User: <span id="nav-name" class="text-white">...</span></div>
                 <div class="flex items-center gap-2">
                     <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
@@ -81,7 +109,7 @@
         </div>
 
         <div class="text-center mb-10">
-            <h1 id="brand-title" class="text-7xl font-black italic tracking-tighter uppercase glow-text">USERIDK758</h1>
+            <h1 id="brand-title" class="text-7xl font-black italic tracking-tighter uppercase mega-glow">USERIDK758</h1>
             <p class="text-gray-500 text-[10px] mt-2 uppercase tracking-[0.6em]">Cosmic Pr*xy Network</p>
         </div>
 
@@ -94,7 +122,7 @@
             <div onclick="processUrl('poki.com')" class="h-16 bento-card text-yellow-500">🎮</div>
         </div>
 
-        <div class="w-full max-w-xl mb-10">
+        <div class="w-full max-w-xl">
             <form onsubmit="event.preventDefault(); processUrl(document.getElementById('urlInput').value);" class="relative">
                 <input type="text" id="urlInput" placeholder="Command URL..." class="w-full bg-[#0a0a0a] border border-[#333] py-4 px-8 rounded-full text-center text-lg outline-none focus:border-blue-600 transition">
                 <button type="submit" class="absolute right-3 top-2 bg-white text-black px-5 py-2 rounded-full font-bold">GO</button>
@@ -111,7 +139,7 @@
             </div>
             <div class="settings-content">
                 <div id="pane-cloaker" class="settings-pane" style="display:flex">
-                    <h3 class="text-blue-500 font-black uppercase italic mb-6">Custom Cloak</h3>
+                    <h3 class="text-blue-500 font-black uppercase italic mb-6 brand-color">Custom Cloak</h3>
                     <p class="text-[10px] text-gray-500 uppercase mb-2">Website Title</p>
                     <input type="text" id="cloak-title" class="setting-input" placeholder="e.g. Google Drive">
                     <p class="text-[10px] text-gray-500 uppercase mb-2">Favicon URL</p>
@@ -119,43 +147,40 @@
                     <p id="error-text">Sorry, Url was not detected or real! Try Again!</p>
                 </div>
                 <div id="pane-theme" class="settings-pane">
-                    <h3 class="text-blue-500 font-black uppercase italic mb-6">Visual Theme</h3>
-                    <select id="theme-select" onchange="changeTheme(this.value)">
+                    <h3 class="text-blue-500 font-black uppercase italic mb-6 brand-color">Visual Theme</h3>
+                    <select id="theme-select" onchange="changeTheme(this.value)" class="bg-[#111] border border-[#333] p-3 rounded-lg text-white">
                         <option value="default">Default Galaxy</option>
                         <option value="yellow">Yellow Galaxy</option>
                         <option value="red">Red Galaxy</option>
                     </select>
                 </div>
                 <div id="pane-opti" class="settings-pane">
-                    <h3 class="text-blue-500 font-black uppercase italic mb-6">System Opti</h3>
+                    <h3 class="text-blue-500 font-black uppercase italic mb-6 brand-color">System Opti</h3>
                     <div class="flex gap-4 mb-2">
                         <div id="fps-60" class="fps-btn active" onclick="setFPS(60)">60 FPS</div>
                         <div id="fps-120" class="fps-btn" onclick="setFPS(120)">120 FPS</div>
                     </div>
                     <p class="text-[9px] text-yellow-600 font-bold uppercase mb-6">Warning: High FPS can be laggy!</p>
-                    <div class="bg-[#111] p-4 rounded-xl border border-[#222] text-center">
-                        <span class="text-blue-500 font-black">hi!</span>
-                    </div>
+                    <div class="bg-[#111] p-4 rounded-xl border border-[#222] text-center"><span class="brand-color font-black">hi!</span></div>
                 </div>
             </div>
         </div>
-        <div class="back-btn" onclick="hideScreens()">Save & Exit</div>
+        <div class="back-btn" onclick="saveAndExitSettings()">Save & Exit</div>
     </div>
 
     <div id="suggestions-screen" class="overlay-screen">
-        <h2 class="glow-text text-xl font-black mb-4">FEEDBACK PORTAL</h2>
-        <p class="text-blue-500 text-sm">https://forms.gle/h1QBWvupta83Xrdt5</p>
+        <h2 class="text-2xl font-black mb-4">FEEDBACK</h2>
+        <p class="text-blue-500 brand-color">https://forms.gle/h1QBWvupta83Xrdt5</p>
         <div class="back-btn" onclick="hideScreens()">Back</div>
     </div>
     <div id="tos-screen" class="overlay-screen">
-        <h2 class="glow-text text-2xl font-black uppercase italic mb-4">Terms of Service</h2>
-        <p class="text-gray-500 text-[10px] max-w-sm text-center">EDUCATIONAL USE ONLY. NO LOGS. DON'T BREAK THE STARS.</p>
+        <h2 class="text-2xl font-black mb-4">TERMS</h2>
+        <p class="text-gray-500 text-xs">Educational use only.</p>
         <div class="back-btn" onclick="hideScreens()">Accept</div>
     </div>
     <div id="partners-screen" class="overlay-screen">
-        <h2 class="text-gray-500 text-[10px] mb-8 uppercase tracking-[0.5em]">Established Alliances</h2>
+        <h2 class="text-gray-500 text-xs mb-8 uppercase tracking-[0.5em]">Partners</h2>
         <a href="#" class="text-4xl font-black hover:text-blue-500 transition mb-4">VYNX</a>
-        <a href="#" class="text-4xl font-black hover:text-blue-500 transition mb-4">GITHUB</a>
         <div class="back-btn" onclick="hideScreens()">Close</div>
     </div>
 
@@ -167,120 +192,30 @@
         <div class="menu-item" onclick="showScreen('partners-screen')">Partners</div>
     </div>
 
+    <div id="resultArea" class="browser-window">
+        <div class="bg-[#1a1a1a] p-3 flex justify-between items-center border-b border-[#333]">
+            <div onclick="closeFrame()" class="w-3 h-3 bg-red-500 rounded-full cursor-pointer"></div>
+            <span class="text-[9px] text-gray-500 uppercase tracking-widest">Secure Link</span>
+        </div>
+        <iframe id="proxyFrame" class="flex-grow w-full bg-white"></iframe>
+    </div>
+
     <script>
-        /* --- Settings Logic --- */
-        function switchTab(paneId, el) {
-            document.querySelectorAll('.settings-pane').forEach(p => p.style.display = 'none');
-            document.querySelectorAll('.settings-nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById('pane-' + paneId).style.display = 'flex';
-            el.classList.add('active');
-        }
-
-        // Cloaker Settings
-        document.getElementById('cloak-title').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                document.getElementById('tab-title').innerText = e.target.value;
-            }
-        });
-
-        document.getElementById('cloak-favicon').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const url = e.target.value;
-                const img = new Image();
-                img.onload = () => {
-                    document.getElementById('tab-icon').href = url;
-                    document.getElementById('error-text').style.opacity = "0";
-                };
-                img.onerror = () => {
-                    const err = document.getElementById('error-text');
-                    err.style.opacity = "1";
-                    setTimeout(() => err.style.opacity = "0", 3000);
-                };
-                img.src = url;
-            }
-        });
-
-        // Theme Settings
-        function changeTheme(mode) {
-            const starColor = mode === 'yellow' ? '#EAB308' : mode === 'red' ? '#EF4444' : '#FFFFFF';
-            const brandColor = mode === 'yellow' ? '#EAB308' : mode === 'red' ? '#EF4444' : '#3B82F6';
-            
-            window.currentStarColor = starColor;
-            document.querySelectorAll('.text-blue-500').forEach(el => el.style.color = brandColor);
-            document.getElementById('brand-title').style.textShadow = `0 0 15px ${brandColor}`;
-        }
-
-        // FPS Settings
-        let targetFPS = 60;
-        function setFPS(val) {
-            targetFPS = val;
-            document.getElementById('fps-label').innerText = val + " FPS MODE";
-            document.getElementById('fps-60').classList.toggle('active', val === 60);
-            document.getElementById('fps-120').classList.toggle('active', val === 120);
-        }
-
-        /* --- Starfield --- */
-        const canvas = document.getElementById('starCanvas');
-        const ctx = canvas.getContext('2d');
-        let stars = [];
-        window.currentStarColor = "#FFFFFF";
-
-        function initStars() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            stars = [];
-            for (let i = 0; i < 150; i++) {
-                stars.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 1.5, speed: Math.random() * 0.4 + 0.1 });
-            }
-        }
-
-        function drawStars() {
-            ctx.fillStyle = "#050505";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = window.currentStarColor;
-            stars.forEach(s => {
-                ctx.fillRect(s.x, s.y, s.size, s.size);
-                s.y += s.speed * (targetFPS / 60);
-                if (s.y > canvas.height) s.y = 0;
-            });
-            requestAnimationFrame(drawStars);
-        }
-        initStars(); drawStars();
-
-        /* --- UI Controls --- */
-        function toggleMenu() {
-            const m = document.getElementById('drop-menu');
-            m.classList.toggle('active');
-        }
-        function showScreen(id) {
-            document.getElementById('drop-menu').classList.remove('active');
-            const s = document.getElementById(id);
-            s.style.display = 'flex';
-            setTimeout(() => s.classList.add('active'), 10);
-        }
-        function hideScreens() {
-            document.querySelectorAll('.overlay-screen').forEach(s => {
-                s.classList.remove('active');
-                setTimeout(() => s.style.display = 'none', 400);
-            });
-        }
-
-        /* --- Intro Sequence --- */
+        /* --- Core Logic --- */
         const nInput = document.getElementById('nameInput');
         nInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && nInput.value.trim() !== "") {
                 const user = nInput.value.trim();
                 document.getElementById('name-prompt').style.opacity = "0";
-                document.getElementById('name-prompt').style.transform = "translateY(20px)";
                 setTimeout(() => {
                     document.getElementById('name-prompt').style.display = "none";
                     document.getElementById('display-name').innerText = user;
                     document.getElementById('nav-name').innerText = user;
                     const wText = document.getElementById('welcome-text');
                     wText.style.display = "block";
-                    setTimeout(() => { wText.style.opacity = "1"; wText.style.transform = "translateY(0)"; }, 50);
+                    setTimeout(() => { wText.style.opacity = "1"; wText.style.transform = "scale(1)"; }, 50);
                     setTimeout(() => {
-                        wText.style.opacity = "0"; wText.style.transform = "translateY(-30px)";
+                        wText.style.opacity = "0"; wText.style.transform = "scale(1.2)";
                         setTimeout(() => {
                             document.getElementById('intro-overlay').style.opacity = "0";
                             setTimeout(() => {
@@ -289,10 +224,86 @@
                                 document.getElementById('main-content').style.pointerEvents = "all";
                             }, 800);
                         }, 500);
-                    }, 2000);
+                    }, 2500);
                 }, 600);
             }
         });
+
+        /* --- Settings & Cloak --- */
+        function applyCloak() {
+            const t = document.getElementById('cloak-title').value.trim();
+            const f = document.getElementById('cloak-favicon').value.trim();
+            if (t) document.getElementById('tab-title').innerText = t;
+            if (f) {
+                const img = new Image();
+                img.onload = () => { document.getElementById('tab-icon').href = f; document.getElementById('error-text').style.opacity = 0; };
+                img.onerror = () => { const err = document.getElementById('error-text'); err.style.opacity = 1; setTimeout(()=>err.style.opacity=0, 3000); };
+                img.src = f;
+            }
+        }
+        function saveAndExitSettings() { applyCloak(); hideScreens(); }
+        function switchTab(p, el) {
+            document.querySelectorAll('.settings-pane').forEach(x => x.style.display = 'none');
+            document.querySelectorAll('.settings-nav-item').forEach(x => x.classList.remove('active'));
+            document.getElementById('pane-'+p).style.display = 'flex';
+            el.classList.add('active');
+        }
+
+        /* --- Theme & FPS --- */
+        let targetFPS = 60;
+        window.currentStarColor = "#FFFFFF";
+        function changeTheme(mode) {
+            const color = mode === 'yellow' ? '#EAB308' : mode === 'red' ? '#EF4444' : '#3B82F6';
+            window.currentStarColor = mode === 'default' ? '#FFFFFF' : color;
+            document.querySelectorAll('.brand-color').forEach(el => el.style.color = color);
+            document.getElementById('brand-title').style.textShadow = `0 0 15px ${color}`;
+        }
+        function setFPS(v) {
+            targetFPS = v;
+            document.getElementById('fps-label').innerText = v + " FPS MODE";
+            document.getElementById('fps-60').classList.toggle('active', v===60);
+            document.getElementById('fps-120').classList.toggle('active', v===120);
+        }
+
+        /* --- Stars Engine --- */
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+        function initStars() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            stars = [];
+            for (let i = 0; i < 150; i++) stars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, size: Math.random()*1.5, speed: Math.random()*0.4+0.1 });
+        }
+        function drawStars() {
+            ctx.fillStyle = "#050505"; ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = window.currentStarColor;
+            stars.forEach(s => { ctx.fillRect(s.x, s.y, s.size, s.size); s.y += s.speed * (targetFPS/60); if (s.y > canvas.height) s.y = 0; });
+            requestAnimationFrame(drawStars);
+        }
+        window.addEventListener('resize', initStars); initStars(); drawStars();
+
+        /* --- Proxy Logic --- */
+        function processUrl(val) {
+            if (!val) return;
+            let target = val.includes('.') ? (val.startsWith('http') ? val : 'https://' + val) : 'https://google.com/search?q=' + encodeURIComponent(val) + '&igu=1';
+            if (!target.includes('google.com')) {
+                target = "https://positive-clarice-somethingyea-24976ff7.koyeb.app/service/" + btoa(target).replace(/\//g,'_').replace(/\+/g,'-').replace(/=/g,'');
+            }
+            document.getElementById('proxyFrame').src = target;
+            const res = document.getElementById('resultArea');
+            res.style.display = "flex";
+            setTimeout(() => res.classList.add('active'), 10);
+        }
+        function closeFrame() {
+            const res = document.getElementById('resultArea');
+            res.classList.remove('active');
+            setTimeout(() => { res.style.display = 'none'; document.getElementById('proxyFrame').src = ""; }, 400);
+        }
+
+        /* --- UI Helpers --- */
+        function toggleMenu() { document.getElementById('drop-menu').classList.toggle('active'); }
+        function showScreen(id) { toggleMenu(); const s = document.getElementById(id); s.style.display = 'flex'; setTimeout(() => s.classList.add('active'), 10); }
+        function hideScreens() { document.querySelectorAll('.overlay-screen').forEach(s => { s.classList.remove('active'); setTimeout(() => s.style.display = 'none', 400); }); }
     </script>
 </body>
 </html>
