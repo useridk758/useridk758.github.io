@@ -3,30 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>useridk758 | v4 Arcade</title>
+    <title>useridk758 | Milky Way Arcade</title>
+    
+    <link rel="icon" type="image/jpg" href="https://www.nhm.ac.uk/content/dam/nhm-www/discover/what-is-space/what-is-space-milky-way-full-width.jpg">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; margin: 0; overflow: hidden; }
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; margin: 0; overflow-x: hidden; }
         .bento-card { background: #0f0f0f; border: 1px solid #1f1f1f; border-radius: 20px; transition: all 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
         .bento-card:hover { transform: translateY(-5px); border-color: #3b82f6; box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
         .proxy-input { background: #0a0a0a; border: 1px solid #333; outline: none; transition: all 0.3s; }
         .proxy-input:focus { border-color: #3b82f6; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
         .browser-window { border: 1px solid #333; border-radius: 15px; overflow: hidden; background: #000; position: fixed; top: 5%; left: 5%; width: 90%; height: 90%; z-index: 100; display: none; flex-direction: column; }
         .browser-bar { background: #1a1a1a; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .hidden { display: none !important; }
+        
+        /* Milky Way Banner Effect */
+        .milky-way-logo {
+            width: 100%;
+            max-width: 800px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 20px;
+            border: 1px solid #1f1f1f;
+            mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+        }
     </style>
 </head>
 <body class="flex flex-col items-center min-h-screen p-6">
 
-    <nav class="mt-4 bg-[#0f0f0f] border border-[#1f1f1f] rounded-full px-8 py-3 flex gap-8 mb-12 shadow-2xl">
-        <div class="text-blue-500 font-bold tracking-tighter uppercase">USERIDK758</div>
-        <div class="text-gray-500 text-[10px] self-center">ENGINE: KOYEB ACTIVE</div>
-    </nav>
+    <div class="w-full flex flex-col items-center mb-12">
+        <img src="https://www.nhm.ac.uk/content/dam/nhm-www/discover/what-is-space/what-is-space-milky-way-full-width.jpg" 
+             alt="Milky Way Logo" 
+             class="milky-way-logo mb-6 shadow-2xl">
+             
+        <nav class="bg-[#0f0f0f] border border-[#1f1f1f] rounded-full px-8 py-3 flex gap-8 shadow-2xl">
+            <div class="text-blue-500 font-bold tracking-tighter uppercase">USERIDK758</div>
+            <div class="text-gray-500 text-[10px] self-center">COSMIC ENGINE ACTIVE</div>
+        </nav>
+    </div>
 
     <div class="text-center mb-10">
-        <h1 class="text-6xl font-black italic tracking-tighter uppercase">useridk758 v4</h1>
-        <p class="text-gray-600 text-[10px] mt-2 uppercase tracking-[0.5em]">Arcade Terminal</p>
+        <h1 class="text-6xl font-black italic tracking-tighter uppercase">Milky Way v4</h1>
+        <p class="text-gray-600 text-[10px] mt-2 uppercase tracking-[0.5em]">Koyeb Powered Proxy</p>
     </div>
 
     <div class="grid grid-cols-3 md:grid-cols-6 gap-4 mb-12 w-full max-w-2xl">
@@ -40,7 +59,7 @@
 
     <div class="w-full max-w-xl mb-10">
         <form id="proxyForm" class="relative">
-            <input type="text" id="urlInput" placeholder="Search or Enter URL..." 
+            <input type="text" id="urlInput" placeholder="Enter URL or Search..." 
                    class="w-full proxy-input py-4 px-8 rounded-full text-center text-lg text-white">
             <button type="submit" class="absolute right-3 top-2 bg-white text-black px-5 py-2 rounded-full font-bold hover:bg-blue-600 hover:text-white transition">GO</button>
         </form>
@@ -53,17 +72,13 @@
                 <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
                 <div class="w-3 h-3 bg-green-500 rounded-full"></div>
             </div>
-            <span id="urlTitle" class="text-[10px] text-gray-500 font-mono italic truncate px-4">Initializing...</span>
-            <button onclick="popOut()" class="text-[9px] bg-blue-600 text-white px-3 py-1 rounded-full font-bold uppercase hover:bg-white hover:text-black">Open New Tab</button>
+            <span id="urlTitle" class="text-[10px] text-gray-500 font-mono italic truncate px-4">Initializing Tunnel...</span>
+            <button onclick="popOut()" class="text-[9px] bg-blue-600 text-white px-3 py-1 rounded-full font-bold uppercase">External Tab</button>
         </div>
-        <div class="flex-grow bg-white">
-            <iframe id="proxyFrame" src="" class="w-full h-full border-none"></iframe>
+        <div class="flex-grow bg-white relative">
+            <iframe id="proxyFrame" src="" class="w-full h-full border-none shadow-inner"></iframe>
         </div>
     </div>
-
-    <footer class="mt-auto py-10 text-gray-900 text-[9px] tracking-[0.5em] uppercase">
-        © 2026 useridk758 • secure_access
-    </footer>
 
     <script>
         const form = document.getElementById('proxyForm');
@@ -72,8 +87,8 @@
         const frame = document.getElementById('proxyFrame');
         const urlTitle = document.getElementById('urlTitle');
 
-        // YOUR UPDATED KOYEB LINK
-        const engineBase = "https://positive-clarice-somethingyea-24976ff7.koyeb.app/service/";
+        // REPLACE THIS with your healthy Koyeb link when ready
+        const koyebLink = "https://positive-clarice-somethingyea-24976ff7.koyeb.app";
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -82,31 +97,21 @@
 
         function processUrl(val) {
             if (!val) return;
-            let targetUrl = "";
+            let target = "";
 
             if (!val.includes('.') || val.includes(' ')) {
-                // If it's a search, use Google Search
-                targetUrl = "https://www.google.com/search?q=" + encodeURIComponent(val) + "&igu=1";
-                launch(targetUrl, true);
+                target = "https://www.google.com/search?q=" + encodeURIComponent(val) + "&igu=1";
+                launchFrame(target);
             } else {
-                // If it's a URL, use UV
-                targetUrl = val.startsWith('http') ? val : 'https://' + val;
-                launch(targetUrl, false);
+                target = val.startsWith('http') ? val : 'https://' + val;
+                const encoded = btoa(target).replace(/\//g, '_').replace(/\+/g, '-').replace(/=/g, '');
+                launchFrame(koyebLink + "/service/" + encoded);
             }
         }
 
-        function launch(url, isSearch) {
-            urlTitle.innerText = url;
-            
-            if (isSearch) {
-                // Google search works better directly in the frame
-                frame.src = url;
-            } else {
-                // Encode the URL for Ultraviolet (Base64 method)
-                const encoded = btoa(url).replace(/\//g, '_').replace(/\+/g, '-').replace(/=/g, '');
-                frame.src = engineBase + encoded;
-            }
-
+        function launchFrame(finalUrl) {
+            urlTitle.innerText = finalUrl;
+            frame.src = finalUrl;
             resultArea.style.display = 'flex';
         }
 
@@ -116,8 +121,9 @@
         }
 
         function popOut() {
-            const url = urlTitle.innerText;
-            window.open(url, '_blank');
+            const val = input.value.trim();
+            const target = val.startsWith('http') ? val : 'https://' + val;
+            window.open(target, '_blank');
         }
     </script>
 </body>
