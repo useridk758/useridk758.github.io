@@ -11,245 +11,139 @@
         * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; margin: 0; overflow: hidden; }
         
-        #starCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; transition: filter 0.8s ease; }
+        #starCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
-        /* --- Theme Variables --- */
-        :root { --theme-main: #3b82f6; --theme-glow: rgba(59, 130, 246, 0.8); --theme-glow-dim: rgba(59, 130, 246, 0.3); }
+        :root { --theme-main: #3b82f6; --theme-glow: rgba(59, 130, 246, 0.8); }
 
-        /* --- Intro Animation --- */
-        #intro-overlay { position: fixed; inset: 0; z-index: 500; background: #050505; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
-        #welcome-text { display: none; font-size: 5rem; font-weight: 900; text-transform: uppercase; text-align: center; line-height: 1; letter-spacing: -0.05em; transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1); transform: scale(0.8); opacity: 0; }
+        /* --- Sidebar --- */
+        #side-nav { position: fixed; left: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
+        .side-icon { width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; filter: grayscale(1); font-size: 1.2rem; }
+        .side-icon:hover { filter: grayscale(0); border-color: var(--theme-main); box-shadow: 0 0 15px var(--theme-glow); transform: scale(1.1); }
+        #home-btn { position: fixed; top: 20px; left: 20px; z-index: 100; }
+
+        /* --- Intro --- */
+        #intro-overlay { position: fixed; inset: 0; z-index: 2000; background: #050505; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
+        #welcome-text { display: none; font-size: 5rem; font-weight: 900; text-transform: uppercase; text-align: center; opacity: 0; transition: 0.8s cubic-bezier(0.2, 1, 0.3, 1); transform: scale(0.8); }
         .mega-glow { color: white; animation: pulseGlow 2s infinite alternate; }
-
-        @keyframes pulseGlow {
-            from { text-shadow: 0 0 20px var(--theme-glow), 0 0 40px var(--theme-glow-dim); }
-            to { text-shadow: 0 0 40px var(--theme-glow), 0 0 80px var(--theme-glow-dim), 0 0 120px var(--theme-glow-dim); }
-        }
+        @keyframes pulseGlow { from { text-shadow: 0 0 20px var(--theme-glow); } to { text-shadow: 0 0 50px var(--theme-glow); } }
 
         /* --- Main UI --- */
-        #main-content { opacity: 0; transition: opacity 0.8s ease-in; pointer-events: none; display: flex; flex-direction: column; align-items: center; width: 100%; padding: 1.5rem; }
-        .bento-card { background: rgba(15, 15, 15, 0.85); border: 1px solid #1f1f1f; border-radius: 20px; transition: 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; backdrop-filter: blur(8px); }
-        .bento-card:hover { transform: translateY(-4px); border-color: var(--theme-main); box-shadow: 0 0 20px var(--theme-glow-dim); }
+        #main-content { opacity: 0; transition: opacity 0.8s ease-in; display: flex; flex-direction: column; align-items: center; width: 100%; padding: 2rem; }
+        .bento-card { background: rgba(15, 15, 15, 0.85); border: 1px solid #1f1f1f; border-radius: 20px; transition: 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .bento-card:hover { transform: translateY(-4px); border-color: var(--theme-main); }
 
-        /* --- Menu System --- */
-        #menu-btn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.3s; color: white; font-weight: bold; }
-        #drop-menu { position: fixed; bottom: 80px; right: 20px; width: 200px; background: #0f0f0f; border: 1px solid #333; border-radius: 15px; display: none; flex-direction: column; overflow: hidden; z-index: 60; opacity: 0; transform: translateY(10px); transition: 0.3s; }
-        #drop-menu.active { display: flex; opacity: 1; transform: translateY(0); }
-        .menu-item { padding: 15px; border-bottom: 1px solid #222; cursor: pointer; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; text-align: center; color: #aaa; transition: 0.2s; }
-        .menu-item:hover { background: #1a1a1a; color: var(--theme-main); }
-
-        /* --- Overlays & Settings --- */
-        .overlay-screen { position: fixed; inset: 0; background: rgba(5,5,5,0.98); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 0.4s; pointer-events: none; }
-        .overlay-screen.active { display: flex; opacity: 1; pointer-events: all; }
+        /* --- Browser Frame --- */
+        #browser-view { position: fixed; inset: 20px 20px 20px 90px; background: #000; border: 1px solid #333; border-radius: 20px; z-index: 50; display: none; overflow: hidden; flex-direction: column; }
+        #browser-view.active { display: flex; }
         
-        .settings-container { width: 90%; max-width: 800px; height: 500px; background: #0f0f0f; border: 1px solid #222; border-radius: 20px; display: flex; overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
-        .settings-sidebar { width: 200px; border-right: 1px solid #222; padding: 30px 20px; display: flex; flex-direction: column; gap: 25px; }
-        .settings-nav-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #444; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
-        .settings-nav-item:hover, .settings-nav-item.active { color: white; }
-        .nav-line { height: 1px; flex-grow: 1; background: #222; transition: 0.3s; }
-        .settings-nav-item.active .nav-line { background: var(--theme-main); }
-        
-        .settings-content { flex-grow: 1; padding: 40px; }
-        .settings-pane { display: none; flex-direction: column; animation: fadeIn 0.3s ease forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        .back-btn { margin-top: 30px; padding: 12px 40px; border: 1px solid #333; border-radius: 50px; text-transform: uppercase; font-size: 0.7rem; font-weight: 900; cursor: pointer; transition: 0.3s; }
-        .back-btn:hover { background: white; color: black; border-color: white; }
-
-        .fps-btn { padding: 10px 20px; border: 1px solid #333; border-radius: 10px; font-size: 12px; transition: 0.3s; cursor: pointer; }
-        .fps-btn.active { border-color: var(--theme-main); background: var(--theme-glow-dim); }
+        .overlay-screen { position: fixed; inset: 0; background: rgba(5,5,5,0.98); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 0.4s; }
+        .overlay-screen.active { display: flex; opacity: 1; }
+        #menu-btn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 60; }
+        #drop-menu { position: fixed; bottom: 80px; right: 20px; width: 180px; background: #0f0f0f; border: 1px solid #333; border-radius: 12px; display: none; flex-direction: column; z-index: 60; }
+        #drop-menu.active { display: flex; }
     </style>
 </head>
 <body>
 
     <canvas id="starCanvas"></canvas>
 
+    <div id="home-btn" class="side-icon" onclick="goHome()">🏠</div>
+    <div id="side-nav">
+        <div class="side-icon" onclick="openCategory('Music')">🎵</div>
+        <div class="side-icon" onclick="openCategory('Gaming')">🕹️</div>
+        <div class="side-icon" onclick="processUrl('https://cineby.gd')">🎬</div>
+    </div>
+
     <div id="intro-overlay">
         <div id="name-prompt" class="flex flex-col items-center gap-6">
-            <h2 class="text-3xl font-black italic uppercase" style="color: var(--theme-main)">System Handshake</h2>
+            <h2 class="text-2xl font-black italic uppercase" style="color: var(--theme-main)">Initialize Identity</h2>
             <input type="text" id="nameInput" autofocus class="bg-transparent border-b-2 border-white/20 text-3xl text-center outline-none px-4 py-2 w-64 focus:border-blue-500 transition-all" placeholder="...">
         </div>
         <h2 id="welcome-text" class="mega-glow">WELCOME,<br><span id="display-name" style="color: var(--theme-main)"></span></h2>
     </div>
 
     <div id="main-content">
-        <div class="w-full flex flex-col items-center mb-10">
-            <img src="https://www.nhm.ac.uk/content/dam/nhm-www/discover/what-is-space/what-is-space-milky-way-full-width.jpg" class="w-full max-w-[800px] h-[120px] object-cover rounded-[20px] mb-6 border border-[#1f1f1f]">
+        <div class="w-full flex flex-col items-center mb-12">
             <nav class="bg-[#0f0f0f]/80 border border-[#1f1f1f] rounded-full px-8 py-3 flex items-center gap-6 backdrop-blur-md">
-                <div class="font-bold uppercase tracking-tighter" style="color: var(--theme-main)">USERIDK758</div>
-                <div class="text-gray-500 text-[10px] uppercase">User: <span id="nav-name" class="text-white">...</span></div>
-                <div id="fps-label" class="text-gray-400 text-[9px] font-bold uppercase">60 FPS MODE</div>
+                <div class="font-black uppercase tracking-tighter" style="color: var(--theme-main)">USERIDK758</div>
+                <div class="text-gray-500 text-[10px] uppercase">Node: <span id="nav-name" class="text-white">...</span></div>
+                <div id="fps-label" class="text-gray-400 text-[9px] font-bold uppercase">60 FPS</div>
             </nav>
         </div>
 
-        <div class="text-center mb-10">
-            <h1 id="brand-title" class="text-7xl font-black italic tracking-tighter uppercase mega-glow">USERIDK758</h1>
-            <p class="text-gray-500 text-[10px] mt-2 uppercase tracking-[0.6em]">Cosmic Pr*xy Network</p>
-        </div>
+        <h1 class="text-7xl font-black italic tracking-tighter uppercase mega-glow mb-12">USERIDK758</h1>
 
         <div class="grid grid-cols-3 md:grid-cols-6 gap-4 mb-12 w-full max-w-2xl">
-            <div class="h-16 bento-card">🔍</div>
-            <div class="h-16 bento-card text-red-600">▶️</div>
-            <div class="h-16 bento-card text-indigo-500">💬</div>
-            <div class="h-16 bento-card text-pink-500">📱</div>
-            <div class="h-16 bento-card text-purple-500">💜</div>
-            <div class="h-16 bento-card text-yellow-500">🎮</div>
+            <div onclick="processUrl('https://google.com')" class="h-16 bento-card">🔍</div>
+            <div onclick="processUrl('https://youtube.com')" class="h-16 bento-card text-red-600">▶️</div>
+            <div onclick="processUrl('https://discord.com')" class="h-16 bento-card text-indigo-500">💬</div>
+            <div onclick="processUrl('https://tiktok.com')" class="h-16 bento-card text-pink-500">📱</div>
+            <div onclick="processUrl('https://twitch.tv')" class="h-16 bento-card text-purple-500">💜</div>
+            <div onclick="processUrl('https://poki.com')" class="h-16 bento-card text-yellow-500">🎮</div>
         </div>
 
-        <div class="w-full max-w-xl">
-            <input type="text" placeholder="Command URL..." class="w-full bg-[#0a0a0a] border border-[#333] py-4 px-8 rounded-full text-center text-lg outline-none focus:border-blue-600 transition">
+        <form onsubmit="handleSearch(event)" class="w-full max-w-xl relative">
+            <input type="text" id="urlInput" placeholder="Enter URL or Search..." class="w-full bg-[#0a0a0a] border border-[#333] py-4 px-8 rounded-full text-center outline-none focus:border-blue-600 transition">
+            <button type="submit" class="absolute right-6 top-4 text-[10px] font-black uppercase text-blue-500">GO</button>
+        </form>
+    </div>
+
+    <div id="browser-view">
+        <div class="bg-[#111] p-3 flex justify-between items-center border-b border-[#333]">
+            <span id="frame-status" class="text-[9px] uppercase font-bold text-gray-500">Connection Secure</span>
+            <div onclick="goHome()" class="px-3 py-1 bg-red-900/20 text-red-500 text-[9px] font-black rounded cursor-pointer border border-red-500/30">CLOSE</div>
         </div>
+        <iframe id="proxyFrame" class="w-full h-full bg-white"></iframe>
     </div>
 
     <div id="settings-screen" class="overlay-screen">
-        <div class="settings-container">
-            <div class="settings-sidebar">
-                <div class="settings-nav-item active" onclick="switchTab('cloaker', this)">Cloaker <div class="nav-line"></div></div>
-                <div class="settings-nav-item" onclick="switchTab('theme', this)">Theme <div class="nav-line"></div></div>
-                <div class="settings-nav-item" onclick="switchTab('opti', this)">Optimization <div class="nav-line"></div></div>
-            </div>
-            <div class="settings-content">
-                <div id="pane-cloaker" class="settings-pane" style="display:flex">
-                    <h3 class="font-black uppercase italic mb-6" style="color: var(--theme-main)">Custom Cloak</h3>
-                    <input type="text" id="cloak-title" class="bg-[#111] border border-[#333] p-3 rounded-lg w-full mb-4 outline-none text-white" placeholder="Website Title">
-                    <input type="text" id="cloak-favicon" class="bg-[#111] border border-[#333] p-3 rounded-lg w-full outline-none text-white" placeholder="Favicon URL">
-                    <p id="error-text" class="text-red-500 text-[10px] font-bold mt-2 opacity-0 transition">URL Not Found! Try Again.</p>
-                </div>
-                <div id="pane-theme" class="settings-pane">
-                    <h3 class="font-black uppercase italic mb-6" style="color: var(--theme-main)">Visual Theme</h3>
-                    <select id="theme-select" onchange="changeTheme(this.value)" class="bg-[#111] border border-[#333] p-4 rounded-xl text-white outline-none w-full cursor-pointer">
-                        <option value="default">Default Galaxy (Blue)</option>
-                        <option value="yellow">Yellow Galaxy (Intense)</option>
-                        <option value="red">Red Galaxy (Nebula)</option>
-                    </select>
-                </div>
-                <div id="pane-opti" class="settings-pane">
-                    <h3 class="font-black uppercase italic mb-6" style="color: var(--theme-main)">Optimization</h3>
-                    <div class="flex gap-4 mb-4">
-                        <div id="fps-60" class="fps-btn active" onclick="setFPS(60)">60 FPS</div>
-                        <div id="fps-120" class="fps-btn" onclick="setFPS(120)">120 FPS</div>
-                    </div>
-                    <p class="text-yellow-600 text-[9px] font-bold uppercase mb-4">Warning: Higher FPS can be laggy!</p>
-                    <div class="bg-[#111] p-4 rounded-xl border border-[#222] text-center font-black" style="color: var(--theme-main)">hi!</div>
-                </div>
-            </div>
+        <div class="bg-[#0f0f0f] border border-[#222] p-8 rounded-2xl w-80">
+            <h3 class="font-black uppercase mb-4" style="color: var(--theme-main)">Settings</h3>
+            <input type="text" id="cloak-title" class="w-full bg-[#111] border border-[#333] p-3 rounded mb-4 text-white" placeholder="Tab Title">
+            <button class="w-full py-3 bg-white text-black font-black rounded uppercase text-xs" onclick="saveSettings()">Apply</button>
         </div>
-        <div class="back-btn" onclick="saveAndExitSettings()">Save & Exit</div>
-    </div>
-
-    <div id="suggestions-screen" class="overlay-screen">
-        <h2 class="text-3xl font-black italic mb-4">SUGGESTIONS</h2>
-        <p class="text-blue-400">Feedback portal is currently offline.</p>
-        <div class="back-btn" onclick="hideScreens()">Back</div>
-    </div>
-
-    <div id="tos-screen" class="overlay-screen">
-        <h2 class="text-3xl font-black italic mb-4 uppercase">Terms of Service</h2>
-        <p class="text-gray-500 text-xs max-w-sm text-center">By using USERIDK758, you agree to respect the stars and the network. Educational purposes only.</p>
-        <div class="back-btn" onclick="hideScreens()">I Accept</div>
     </div>
 
     <div id="menu-btn" onclick="toggleMenu()">...</div>
     <div id="drop-menu">
-        <div class="menu-item" onclick="openScreen('settings-screen')">Settings</div>
-        <div class="menu-item" onclick="openScreen('suggestions-screen')">Suggestions</div>
-        <div class="menu-item" onclick="openScreen('tos-screen')">Terms</div>
+        <div class="p-4 text-center cursor-pointer border-b border-[#222] text-[10px] font-black uppercase" onclick="openScreen('settings-screen')">Settings</div>
+        <div class="p-4 text-center cursor-pointer text-[10px] font-black uppercase" onclick="goHome()">Dashboard</div>
     </div>
 
     <script>
-        /* --- MENU LOGIC --- */
-        function toggleMenu() {
-            const menu = document.getElementById('drop-menu');
-            menu.classList.toggle('active');
+        function handleSearch(e) { e.preventDefault(); processUrl(document.getElementById('urlInput').value); }
+
+        function processUrl(val) {
+            if (!val) return;
+            let url = val.trim();
+            if (!url.startsWith('http')) url = 'https://' + url;
+            document.getElementById('proxyFrame').src = url;
+            document.getElementById('main-content').style.opacity = "0";
+            document.getElementById('browser-view').classList.add('active');
         }
 
-        function openScreen(id) {
-            document.getElementById('drop-menu').classList.remove('active');
-            const screen = document.getElementById(id);
-            screen.style.display = 'flex';
-            setTimeout(() => screen.classList.add('active'), 10);
-        }
-
-        function hideScreens() {
-            document.querySelectorAll('.overlay-screen').forEach(s => {
-                s.classList.remove('active');
-                setTimeout(() => s.style.display = 'none', 400);
-            });
-        }
-
-        function switchTab(paneId, el) {
-            document.querySelectorAll('.settings-pane').forEach(p => p.style.display = 'none');
-            document.querySelectorAll('.settings-nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById('pane-' + paneId).style.display = 'flex';
-            el.classList.add('active');
-        }
-
-        /* --- CLOAKER LOGIC --- */
-        function saveAndExitSettings() {
-            const title = document.getElementById('cloak-title').value;
-            const fav = document.getElementById('cloak-favicon').value;
-            if(title) document.getElementById('tab-title').innerText = title;
-            if(fav) {
-                const img = new Image();
-                img.onload = () => { document.getElementById('tab-icon').href = fav; };
-                img.onerror = () => {
-                    const err = document.getElementById('error-text');
-                    err.style.opacity = 1;
-                    setTimeout(() => err.style.opacity = 0, 3000);
-                };
-                img.src = fav;
-            }
+        function goHome() {
+            document.getElementById('browser-view').classList.remove('active');
+            document.getElementById('proxyFrame').src = "";
+            document.getElementById('main-content').style.opacity = "1";
             hideScreens();
         }
 
-        /* --- THEME ENGINE --- */
-        function changeTheme(mode) {
-            const root = document.documentElement;
-            let main, glow, dim, starColor;
-
-            if (mode === 'yellow') {
-                main = '#eab308'; glow = 'rgba(234, 179, 8, 0.8)'; dim = 'rgba(234, 179, 8, 0.2)'; starColor = '#eab308';
-                document.getElementById('starCanvas').style.filter = "sepia(1) saturate(5)";
-            } else if (mode === 'red') {
-                main = '#ef4444'; glow = 'rgba(239, 68, 68, 0.8)'; dim = 'rgba(239, 68, 68, 0.2)'; starColor = '#ef4444';
-                document.getElementById('starCanvas').style.filter = "hue-rotate(320deg) saturate(3)";
-            } else {
-                main = '#3b82f6'; glow = 'rgba(59, 130, 246, 0.8)'; dim = 'rgba(59, 130, 246, 0.2)'; starColor = '#FFFFFF';
-                document.getElementById('starCanvas').style.filter = "none";
+        function openCategory(name) {
+            if (name === 'Movies') processUrl('https://cineby.gd');
+            else {
+                document.getElementById('main-content').style.opacity = "0";
+                document.getElementById('browser-view').classList.add('active');
+                document.getElementById('proxyFrame').src = "about:blank";
+                alert(name + " section is empty for now.");
             }
-
-            root.style.setProperty('--theme-main', main);
-            root.style.setProperty('--theme-glow', glow);
-            root.style.setProperty('--theme-glow-dim', dim);
-            window.currentStarColor = starColor;
         }
 
-        /* --- GRAPHICS ENGINE --- */
-        const canvas = document.getElementById('starCanvas');
-        const ctx = canvas.getContext('2d');
-        let stars = [], targetFPS = 60;
-        window.currentStarColor = "#FFFFFF";
+        function toggleMenu() { document.getElementById('drop-menu').classList.toggle('active'); }
+        function openScreen(id) { toggleMenu(); const s = document.getElementById(id); s.style.display='flex'; setTimeout(()=>s.classList.add('active'),10); }
+        function hideScreens() { document.querySelectorAll('.overlay-screen').forEach(s=>{s.classList.remove('active'); setTimeout(()=>s.style.display='none',400);}); }
+        function saveSettings() { const t=document.getElementById('cloak-title').value; if(t)document.title=t; hideScreens(); }
 
-        function initStars() {
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            stars = []; for(let i=0; i<150; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, size:Math.random()*1.5, speed:Math.random()*0.4+0.1});
-        }
-        function drawStars() {
-            ctx.fillStyle = "#050505"; ctx.fillRect(0,0,canvas.width,canvas.height);
-            ctx.fillStyle = window.currentStarColor;
-            stars.forEach(s => { ctx.fillRect(s.x, s.y, s.size, s.size); s.y += s.speed * (targetFPS/60); if(s.y > canvas.height) s.y = 0; });
-            requestAnimationFrame(drawStars);
-        }
-        initStars(); drawStars();
-
-        function setFPS(v) {
-            targetFPS = v;
-            document.getElementById('fps-label').innerText = v + " FPS MODE";
-            document.getElementById('fps-60').classList.toggle('active', v===60);
-            document.getElementById('fps-120').classList.toggle('active', v===120);
-        }
-
-        /* --- INTRO LOGIC --- */
         const nInput = document.getElementById('nameInput');
         nInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && nInput.value.trim() !== "") {
@@ -263,18 +157,26 @@
                     setTimeout(() => { w.style.opacity = "1"; w.style.transform = "scale(1)"; }, 50);
                     setTimeout(() => {
                         w.style.opacity = "0"; w.style.transform = "scale(1.2)";
-                        setTimeout(() => {
-                            document.getElementById('intro-overlay').style.opacity = "0";
-                            setTimeout(() => {
-                                document.getElementById('intro-overlay').style.display = "none";
-                                document.getElementById('main-content').style.opacity = "1";
-                                document.getElementById('main-content').style.pointerEvents = "all";
-                            }, 800);
-                        }, 500);
+                        setTimeout(() => { document.getElementById('intro-overlay').style.display="none"; document.getElementById('main-content').style.opacity="1"; }, 800);
                     }, 2500);
                 }, 600);
             }
         });
+
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+        function initStars() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            stars = []; for(let i=0; i<150; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, size:Math.random()*1.5, speed:Math.random()*0.4+0.1});
+        }
+        function drawStars() {
+            ctx.fillStyle = "#050505"; ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = "#FFF";
+            stars.forEach(s => { ctx.fillRect(s.x, s.y, s.size, s.size); s.y += s.speed; if(s.y > canvas.height) s.y = 0; });
+            requestAnimationFrame(drawStars);
+        }
+        initStars(); drawStars();
     </script>
 </body>
 </html>
