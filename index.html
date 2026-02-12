@@ -12,7 +12,6 @@
         body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; margin: 0; overflow: hidden; }
         
         #starCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-
         :root { --theme-main: #3b82f6; --theme-glow: rgba(59, 130, 246, 0.8); }
 
         /* --- Sidebar --- */
@@ -74,7 +73,7 @@
         <h1 class="text-7xl font-black italic tracking-tighter uppercase mega-glow mb-12">USERIDK758</h1>
 
         <div class="grid grid-cols-3 md:grid-cols-6 gap-4 mb-12 w-full max-w-2xl">
-            <div onclick="processUrl('https://google.com')" class="h-16 bento-card">🔍</div>
+            <div onclick="processUrl('https://duckduckgo.com')" class="h-16 bento-card">🔍</div>
             <div onclick="processUrl('https://youtube.com')" class="h-16 bento-card text-red-600">▶️</div>
             <div onclick="processUrl('https://discord.com')" class="h-16 bento-card text-indigo-500">💬</div>
             <div onclick="processUrl('https://tiktok.com')" class="h-16 bento-card text-pink-500">📱</div>
@@ -83,66 +82,64 @@
         </div>
 
         <form onsubmit="handleSearch(event)" class="w-full max-w-xl relative">
-            <input type="text" id="urlInput" placeholder="Enter URL or Search..." class="w-full bg-[#0a0a0a] border border-[#333] py-4 px-8 rounded-full text-center outline-none focus:border-blue-600 transition">
+            <input type="text" id="urlInput" placeholder="DuckDuckGo Search or URL..." class="w-full bg-[#0a0a0a] border border-[#333] py-4 px-8 rounded-full text-center outline-none focus:border-blue-600 transition">
             <button type="submit" class="absolute right-6 top-4 text-[10px] font-black uppercase text-blue-500">GO</button>
         </form>
     </div>
 
     <div id="browser-view">
         <div class="bg-[#111] p-3 flex justify-between items-center border-b border-[#333]">
-            <span id="frame-status" class="text-[9px] uppercase font-bold text-gray-500">Connection Secure</span>
+            <span id="frame-status" class="text-[9px] uppercase font-bold text-gray-500">Unblocked Node Active</span>
             <div onclick="goHome()" class="px-3 py-1 bg-red-900/20 text-red-500 text-[9px] font-black rounded cursor-pointer border border-red-500/30">CLOSE</div>
         </div>
         <iframe id="proxyFrame" class="w-full h-full bg-white"></iframe>
     </div>
 
-    <div id="settings-screen" class="overlay-screen">
-        <div class="bg-[#0f0f0f] border border-[#222] p-8 rounded-2xl w-80">
-            <h3 class="font-black uppercase mb-4" style="color: var(--theme-main)">Settings</h3>
-            <input type="text" id="cloak-title" class="w-full bg-[#111] border border-[#333] p-3 rounded mb-4 text-white" placeholder="Tab Title">
-            <button class="w-full py-3 bg-white text-black font-black rounded uppercase text-xs" onclick="saveSettings()">Apply</button>
-        </div>
-    </div>
-
     <div id="menu-btn" onclick="toggleMenu()">...</div>
     <div id="drop-menu">
-        <div class="p-4 text-center cursor-pointer border-b border-[#222] text-[10px] font-black uppercase" onclick="openScreen('settings-screen')">Settings</div>
         <div class="p-4 text-center cursor-pointer text-[10px] font-black uppercase" onclick="goHome()">Dashboard</div>
     </div>
 
     <script>
-        function handleSearch(e) { e.preventDefault(); processUrl(document.getElementById('urlInput').value); }
+        function handleSearch(e) { 
+            e.preventDefault(); 
+            let val = document.getElementById('urlInput').value.trim();
+            if (!val) return;
+            
+            // Check if it's a URL or a Search query
+            const isUrl = val.includes('.') && !val.includes(' ');
+            if (isUrl) {
+                processUrl(val);
+            } else {
+                // Default to DuckDuckGo Search
+                processUrl('https://duckduckgo.com/?q=' + encodeURIComponent(val));
+            }
+        }
 
         function processUrl(val) {
             if (!val) return;
             let url = val.trim();
             if (!url.startsWith('http')) url = 'https://' + url;
-            document.getElementById('proxyFrame').src = url;
+            
+            const frame = document.getElementById('proxyFrame');
+            frame.src = url;
+            
             document.getElementById('main-content').style.opacity = "0";
             document.getElementById('browser-view').classList.add('active');
+            document.getElementById('frame-status').innerText = "Loading Secure Tunnel...";
         }
 
         function goHome() {
             document.getElementById('browser-view').classList.remove('active');
             document.getElementById('proxyFrame').src = "";
             document.getElementById('main-content').style.opacity = "1";
-            hideScreens();
         }
 
         function openCategory(name) {
-            if (name === 'Movies') processUrl('https://cineby.gd');
-            else {
-                document.getElementById('main-content').style.opacity = "0";
-                document.getElementById('browser-view').classList.add('active');
-                document.getElementById('proxyFrame').src = "about:blank";
-                alert(name + " section is empty for now.");
-            }
+            alert(name + " section coming soon. Movies are active via sidebar.");
         }
 
         function toggleMenu() { document.getElementById('drop-menu').classList.toggle('active'); }
-        function openScreen(id) { toggleMenu(); const s = document.getElementById(id); s.style.display='flex'; setTimeout(()=>s.classList.add('active'),10); }
-        function hideScreens() { document.querySelectorAll('.overlay-screen').forEach(s=>{s.classList.remove('active'); setTimeout(()=>s.style.display='none',400);}); }
-        function saveSettings() { const t=document.getElementById('cloak-title').value; if(t)document.title=t; hideScreens(); }
 
         const nInput = document.getElementById('nameInput');
         nInput.addEventListener('keypress', (e) => {
@@ -157,7 +154,10 @@
                     setTimeout(() => { w.style.opacity = "1"; w.style.transform = "scale(1)"; }, 50);
                     setTimeout(() => {
                         w.style.opacity = "0"; w.style.transform = "scale(1.2)";
-                        setTimeout(() => { document.getElementById('intro-overlay').style.display="none"; document.getElementById('main-content').style.opacity="1"; }, 800);
+                        setTimeout(() => { 
+                            document.getElementById('intro-overlay').style.display="none"; 
+                            document.getElementById('main-content').style.opacity="1"; 
+                        }, 800);
                     }, 2500);
                 }, 600);
             }
