@@ -32,14 +32,26 @@
         #menu-btn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 60; transition: 0.3s; }
         #menu-btn:hover { border-color: #3b82f6; background: #1a1a1a; }
         
-        #drop-menu { position: fixed; bottom: 80px; right: 20px; width: 200px; background: #0f0f0f; border: 1px solid #333; border-radius: 15px; display: none; flex-direction: column; overflow: hidden; z-index: 60; transform: translateY(20px); transition: all 0.3s cubic-bezier(0.17, 0.84, 0.44, 1); opacity: 0; }
-        #drop-menu.active { display: flex; transform: translateY(0); opacity: 1; }
+        #drop-menu { 
+            position: fixed; bottom: 80px; right: 20px; width: 200px; background: #0f0f0f; border: 1px solid #333; border-radius: 15px; 
+            display: none; flex-direction: column; overflow: hidden; z-index: 60; 
+            transform: translateY(20px); transition: all 0.3s cubic-bezier(0.17, 0.84, 0.44, 1); opacity: 0;
+            pointer-events: none; /* FIXED: Prevent clicks when hidden */
+        }
+        #drop-menu.active { display: flex; transform: translateY(0); opacity: 1; pointer-events: all; }
+        
         .menu-item { padding: 15px; border-bottom: 1px solid #222; cursor: pointer; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; transition: 0.3s; text-align: center; }
         .menu-item:hover { background: #1a1a1a; color: #3b82f6; }
 
         /* Overlays */
-        .overlay-screen { position: fixed; inset: 0; background: #050505; z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.5s ease; text-align: center; padding: 20px; }
-        .overlay-screen.active { display: flex; opacity: 1; }
+        .overlay-screen { 
+            position: fixed; inset: 0; background: #050505; z-index: 200; 
+            display: none; flex-direction: column; align-items: center; justify-content: center; 
+            opacity: 0; transition: opacity 0.5s ease; text-align: center; padding: 20px;
+            pointer-events: none; /* FIXED: Prevent ghost clicks */
+        }
+        .overlay-screen.active { display: flex; opacity: 1; pointer-events: all; }
+        
         .back-btn { margin-top: 40px; padding: 10px 30px; border: 1px solid #333; border-radius: 50px; text-transform: uppercase; font-size: 0.7rem; cursor: pointer; transition: 0.3s; }
         .back-btn:hover { background: white; color: black; }
         .partner-link { display: block; margin: 10px 0; font-size: 3rem; font-weight: 900; transition: 0.3s; text-transform: uppercase; }
@@ -134,7 +146,9 @@
             <div class="flex gap-2"><div onclick="closeFrame()" class="w-3 h-3 bg-red-500 rounded-full cursor-pointer"></div><div class="w-3 h-3 bg-yellow-500 rounded-full"></div><div class="w-3 h-3 bg-green-500 rounded-full"></div></div>
             <span id="urlTitle" class="text-[10px] text-gray-400 uppercase italic px-4">Establishing Link...</span>
         </div>
-        <div class="flex-grow bg-white"><iframe id="proxyFrame" src="" class="w-full h-full border-none"></iframe></div>
+        <div class="flex-grow bg-white relative">
+            <iframe id="proxyFrame" src="" class="w-full h-full border-none"></iframe>
+        </div>
     </div>
 
     <script>
@@ -167,16 +181,21 @@
             }
         });
 
-        /* --- 2. MENU & OVERLAY --- */
+        /* --- 2. MENU & OVERLAY (NOW GHOST-PROOF) --- */
         function toggleMenu() {
             const menu = document.getElementById('drop-menu');
-            menu.style.display = 'flex';
-            setTimeout(() => menu.classList.toggle('active'), 10);
+            if(menu.classList.contains('active')) {
+                menu.classList.remove('active');
+            } else {
+                menu.style.display = 'flex';
+                setTimeout(() => menu.classList.add('active'), 10);
+            }
         }
         function showScreen(id) {
             document.getElementById('drop-menu').classList.remove('active');
-            document.getElementById(id).style.display = 'flex';
-            setTimeout(() => document.getElementById(id).classList.add('active'), 10);
+            const screen = document.getElementById(id);
+            screen.style.display = 'flex';
+            setTimeout(() => screen.classList.add('active'), 10);
         }
         function hideScreens() {
             document.querySelectorAll('.overlay-screen').forEach(s => {
