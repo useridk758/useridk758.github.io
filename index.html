@@ -14,48 +14,64 @@
         #starCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
         :root { --theme-main: #3b82f6; --theme-glow: rgba(59, 130, 246, 0.8); }
 
-        /* --- Sidebar --- */
+        /* --- Sidebar Navigation --- */
         #side-nav { position: fixed; left: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
         .side-icon { width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; filter: grayscale(1); font-size: 1.2rem; }
         .side-icon:hover { filter: grayscale(0); border-color: var(--theme-main); box-shadow: 0 0 15px var(--theme-glow); transform: scale(1.1); }
         #home-btn { position: fixed; top: 20px; left: 20px; z-index: 100; }
 
-        /* --- Intro --- */
+        /* --- Intro Overlay --- */
         #intro-overlay { position: fixed; inset: 0; z-index: 2000; background: #050505; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
         #welcome-text { display: none; font-size: 5rem; font-weight: 900; text-transform: uppercase; text-align: center; opacity: 0; transition: 0.8s cubic-bezier(0.2, 1, 0.3, 1); transform: scale(0.8); }
         .mega-glow { color: white; animation: pulseGlow 2s infinite alternate; }
         @keyframes pulseGlow { from { text-shadow: 0 0 20px var(--theme-glow); } to { text-shadow: 0 0 50px var(--theme-glow); } }
 
-        /* --- Main UI --- */
+        /* --- Main UI Dashboard --- */
         #main-content { opacity: 0; transition: opacity 0.8s ease-in; display: flex; flex-direction: column; align-items: center; width: 100%; padding: 2rem; pointer-events: none; }
         #main-content.active { opacity: 1; pointer-events: all; }
         .bento-card { background: rgba(15, 15, 15, 0.85); border: 1px solid #1f1f1f; border-radius: 20px; transition: 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-        .bento-card:hover { transform: translateY(-4px); border-color: var(--theme-main); }
+        .bento-card:hover { transform: translateY(-4px); border-color: var(--theme-main); box-shadow: 0 0 15px var(--theme-glow); }
 
         /* --- Browser Frame --- */
         #browser-view { position: fixed; inset: 20px 20px 20px 90px; background: #000; border: 1px solid #333; border-radius: 20px; z-index: 50; display: none; overflow: hidden; flex-direction: column; }
         #browser-view.active { display: flex; }
         
+        /* --- Identity Reset & Settings UI --- */
         .reset-name-btn { background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 4px 10px; border-radius: 6px; font-size: 8px; font-weight: 900; color: #666; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
         .reset-name-btn:hover { color: white; border-color: var(--theme-main); background: rgba(59, 130, 246, 0.1); }
 
-        #menu-btn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 60; }
+        /* --- Menu Buttons --- */
+        #menu-btn { position: fixed; top: 20px; right: 20px; width: 50px; height: 50px; background: #111; border: 2px solid var(--theme-main); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 150; box-shadow: 0 0 10px var(--theme-glow); }
+        #drop-menu { position: fixed; top: 80px; right: 20px; width: 180px; background: #0f0f0f; border: 1px solid #333; border-radius: 12px; display: none; flex-direction: column; z-index: 150; overflow: hidden; }
+        #drop-menu.active { display: flex; }
+        .menu-item { padding: 15px; text-align: center; cursor: pointer; border-bottom: 1px solid #222; text-[10px] font-black uppercase; transition: 0.2s; color: #888; }
+        .menu-item:hover { background: #1a1a1a; color: white; border-color: var(--theme-main); }
+
+        .overlay-screen { position: fixed; inset: 0; background: rgba(5,5,5,0.98); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 0.4s; }
+        .overlay-screen.active { display: flex; opacity: 1; }
     </style>
 </head>
 <body>
 
     <canvas id="starCanvas"></canvas>
 
-    <div id="home-btn" class="side-icon" onclick="goHome()">🏠</div>
+    <div id="home-btn" class="side-icon" onclick="goHome()" title="Home">🏠</div>
     <div id="side-nav">
         <div class="side-icon" onclick="openCategory('Music')">🎵</div>
         <div class="side-icon" onclick="openCategory('Gaming')">🕹️</div>
-        <div class="side-icon" onclick="processUrl('https://cineby.gd')">🎬</div>
+        <div class="side-icon" onclick="processUrl('https://cineby.gd')" title="Movies">🎬</div>
+    </div>
+
+    <div id="menu-btn" onclick="toggleMenu()">...</div>
+    <div id="drop-menu">
+        <div class="menu-item" onclick="openScreen('settings-screen')">Settings</div>
+        <div class="menu-item" onclick="openScreen('tos-screen')">Terms</div>
+        <div class="menu-item" onclick="goHome()">Dashboard</div>
     </div>
 
     <div id="intro-overlay">
         <div id="name-prompt" class="flex flex-col items-center gap-6">
-            <h2 class="text-2xl font-black italic uppercase" style="color: var(--theme-main)">Initialize Identity</h2>
+            <h2 class="text-2xl font-black italic uppercase" style="color: var(--theme-main)">System Handshake</h2>
             <input type="text" id="nameInput" autofocus class="bg-transparent border-b-2 border-white/20 text-3xl text-center outline-none px-4 py-2 w-64 focus:border-blue-500 transition-all" placeholder="...">
         </div>
         <h2 id="welcome-text" class="mega-glow">WELCOME,<br><span id="display-name" style="color: var(--theme-main)"></span></h2>
@@ -92,13 +108,28 @@
 
     <div id="browser-view">
         <div class="bg-[#111] p-3 flex justify-between items-center border-b border-[#333]">
-            <span id="frame-status" class="text-[9px] uppercase font-bold text-gray-500">Unblocked Node Active</span>
+            <span id="frame-status" class="text-[9px] uppercase font-bold text-gray-500">Secure Node Active</span>
             <div onclick="goHome()" class="px-3 py-1 bg-red-900/20 text-red-500 text-[9px] font-black rounded cursor-pointer border border-red-500/30">CLOSE</div>
         </div>
-        <iframe id="proxyFrame" class="w-full h-full bg-white" sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts"></iframe>
+        <iframe id="proxyFrame" class="w-full h-full bg-white"></iframe>
+    </div>
+
+    <div id="settings-screen" class="overlay-screen">
+        <div class="bg-[#0f0f0f] border border-[#222] p-8 rounded-2xl w-80 text-center">
+            <h3 class="font-black uppercase mb-4" style="color: var(--theme-main)">Settings</h3>
+            <input type="text" id="cloak-title" class="w-full bg-[#111] border border-[#333] p-3 rounded mb-6 text-white text-sm" placeholder="Custom Tab Title">
+            <button class="w-full py-3 bg-white text-black font-black rounded uppercase text-xs" onclick="saveSettings()">Save & Exit</button>
+        </div>
+    </div>
+
+    <div id="tos-screen" class="overlay-screen">
+        <h2 class="text-3xl font-black italic mb-4 uppercase">Terms</h2>
+        <p class="text-gray-500 text-[10px] max-w-xs text-center mb-8">Access granted for educational exploration. Respect the cosmic network.</p>
+        <button class="px-10 py-3 border border-white/20 rounded-full text-[10px] font-black uppercase hover:bg-white hover:text-black transition" onclick="hideScreens()">Accept</button>
     </div>
 
     <script>
+        /* --- CORE LOGIC --- */
         function handleSearch(e) { 
             e.preventDefault(); 
             let val = document.getElementById('urlInput').value.trim();
@@ -115,12 +146,41 @@
             document.getElementById('proxyFrame').src = url;
             document.getElementById('main-content').classList.remove('active');
             document.getElementById('browser-view').classList.add('active');
+            toggleMenu(true); // Close menu if open
         }
 
         function goHome() {
             document.getElementById('browser-view').classList.remove('active');
             document.getElementById('proxyFrame').src = "";
             document.getElementById('main-content').classList.add('active');
+            hideScreens();
+        }
+
+        /* --- UI HELPERS --- */
+        function toggleMenu(forceClose = false) { 
+            const m = document.getElementById('drop-menu');
+            if(forceClose) m.classList.remove('active');
+            else m.classList.toggle('active');
+        }
+
+        function openScreen(id) { 
+            toggleMenu(true); 
+            const s = document.getElementById(id); 
+            s.style.display='flex'; 
+            setTimeout(()=>s.classList.add('active'), 10); 
+        }
+
+        function hideScreens() { 
+            document.querySelectorAll('.overlay-screen').forEach(s => { 
+                s.classList.remove('active'); 
+                setTimeout(()=>s.style.display='none', 400); 
+            }); 
+        }
+
+        function saveSettings() {
+            const t = document.getElementById('cloak-title').value;
+            if(t) document.title = t;
+            hideScreens();
         }
 
         function resetIdentity() {
@@ -138,13 +198,13 @@
         }
 
         function openCategory(name) {
-            alert(name + " section coming soon.");
+            alert(name + " section currently empty. Use Sidebar for Movies!");
         }
 
-        const nInput = document.getElementById('nameInput');
-        nInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && nInput.value.trim() !== "") {
-                const name = nInput.value.trim();
+        /* --- INTRO HANDLER --- */
+        document.getElementById('nameInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && e.target.value.trim() !== "") {
+                const name = e.target.value.trim();
                 document.getElementById('name-prompt').style.opacity = "0";
                 setTimeout(() => {
                     document.getElementById('name-prompt').style.display = "none";
@@ -167,6 +227,7 @@
             }
         });
 
+        /* --- BACKGROUND ENGINE --- */
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
         let stars = [];
@@ -181,6 +242,7 @@
             requestAnimationFrame(drawStars);
         }
         initStars(); drawStars();
+        window.addEventListener('resize', initStars);
     </script>
 </body>
 </html>
