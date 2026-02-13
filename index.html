@@ -20,7 +20,7 @@
         
         #starCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
-        /* --- UI Fixes --- */
+        /* --- UI Elements --- */
         #home-btn { 
             position: fixed; top: 30px; left: 30px; 
             width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; 
@@ -56,8 +56,12 @@
         .overlay-screen { position: fixed; inset: 0; background: rgba(5,5,5,0.9); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; backdrop-blur: 15px; transition: all 0.6s var(--smooth); }
         .overlay-screen.active { display: flex; opacity: 1; }
 
-        /* --- Transition Fixes --- */
-        #welcome-text { opacity: 0; transform: scale(0.8); transition: all 0.8s var(--smooth); display: none; font-size: 5rem; font-weight: 900; text-transform: uppercase; text-align: center; }
+        .settings-card { background: #0f0f0f; border: 1px solid #333; border-radius: 28px; padding: 2rem; width: 400px; display: flex; flex-direction: column; gap: 1.2rem; }
+        .theme-btn { padding: 10px; border-radius: 8px; font-size: 9px; font-weight: 900; text-transform: uppercase; cursor: pointer; border: 1px solid #333; transition: 0.2s; }
+        .theme-btn:hover { border-color: var(--theme-main); transform: translateY(-2px); }
+
+        /* --- Animations --- */
+        #welcome-text { opacity: 0; transform: scale(0.85); transition: all 1s var(--smooth); display: none; font-size: 5rem; font-weight: 900; text-transform: uppercase; text-align: center; }
         #welcome-text.visible { opacity: 1; transform: scale(1); display: block; }
         
         #browser-view { position: fixed; inset: 20px 20px 20px 100px; background: #000; border: 1px solid #333; border-radius: 24px; z-index: 50; display: none; overflow: hidden; opacity: 0; transform: scale(0.95); transition: all 0.6s var(--smooth); }
@@ -87,8 +91,8 @@
     </div>
 
     <div id="intro-overlay" style="position:fixed; inset:0; z-index:2000; background:#050505; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: 0.8s;">
-        <div id="name-prompt" class="flex flex-col items-center gap-6 transition-all duration-500">
-            <h2 class="text-2xl font-black italic uppercase tracking-widest" style="color: var(--theme-main)">Node Identity</h2>
+        <div id="name-prompt" class="flex flex-col items-center gap-6">
+            <h2 class="text-2xl font-black italic uppercase tracking-widest" style="color: var(--theme-main)">Initialize Node</h2>
             <input type="text" id="nameInput" autofocus class="bg-transparent border-b-2 border-white/10 text-4xl text-center outline-none px-4 py-2 w-72 focus:border-blue-500 transition-all" placeholder="...">
         </div>
         <h2 id="welcome-text" class="mega-glow">WELCOME,<br><span id="display-name" style="color: var(--theme-main)"></span></h2>
@@ -105,9 +109,7 @@
                 </div>
             </nav>
         </div>
-
         <h1 class="text-8xl font-black italic tracking-tighter uppercase mega-glow mb-16">USERIDK758</h1>
-
         <div class="grid grid-cols-3 md:grid-cols-6 gap-6 mb-16 w-full max-w-3xl">
             <div onclick="processUrl('https://duckduckgo.com')" class="h-20 bento-card">🔍</div>
             <div onclick="processUrl('https://youtube.com')" class="h-20 bento-card">▶️</div>
@@ -116,33 +118,56 @@
             <div onclick="processUrl('https://twitch.tv')" class="h-20 bento-card">💜</div>
             <div onclick="processUrl('https://poki.com')" class="h-20 bento-card">🎮</div>
         </div>
-
         <form onsubmit="handleSearch(event)" class="w-full max-w-2xl relative">
             <input type="text" id="urlInput" placeholder="Enter URL or Search..." class="w-full bg-[#0a0a0a] border-2 border-[#222] py-5 px-10 rounded-full text-center outline-none focus:border-blue-600 transition-all font-bold">
             <button type="submit" class="absolute right-8 top-5 text-xs font-black uppercase text-blue-500">GO</button>
         </form>
     </div>
 
+    <div id="settings-screen" class="overlay-screen" onclick="hideScreens()">
+        <div class="settings-card" onclick="event.stopPropagation()">
+            <h3 class="font-black uppercase italic text-xl" style="color: var(--theme-main)">Configuration</h3>
+            
+            <div class="space-y-2">
+                <label class="text-[10px] uppercase font-black text-gray-500">Tab Cloaking</label>
+                <input type="text" id="cloak-title" class="w-full bg-[#111] border border-[#333] p-3 rounded-xl text-white text-xs outline-none" placeholder="New Tab Name" onkeypress="if(event.key==='Enter') applySettings()">
+                <input type="text" id="cloak-icon" class="w-full bg-[#111] border border-[#333] p-3 rounded-xl text-white text-xs outline-none" placeholder="Favicon URL" onkeypress="if(event.key==='Enter') applySettings()">
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] uppercase font-black text-gray-500">Themes</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button class="theme-btn bg-blue-600/10 text-blue-500" onclick="setTheme('#3b82f6', '#050a15', '#ffffff')">Cosmic</button>
+                    <button class="theme-btn bg-green-600/10 text-green-500" onclick="setTheme('#10b981', '#05150a', '#a7ffd6')">Emerald</button>
+                    <button class="theme-btn bg-red-600/10 text-red-500" onclick="setTheme('#ef4444', '#150505', '#ff9494')">Alert</button>
+                    <button class="theme-btn bg-purple-600/10 text-purple-500" onclick="setTheme('#a855f7', '#0e0515', '#e9d5ff')">Nebula</button>
+                </div>
+            </div>
+
+            <div class="pt-2">
+                <label class="text-[10px] uppercase font-black text-gray-500 mb-2 block">Optimization</label>
+                <div class="flex gap-2">
+                    <button id="fps-30" class="flex-1 py-2 bg-[#111] border border-[#333] text-[9px] font-black uppercase rounded-lg" onclick="setFPS(30)">Power Save</button>
+                    <button id="fps-60" class="flex-1 py-2 bg-[#111] border border-blue-500 text-[9px] font-black uppercase rounded-lg text-blue-500" onclick="setFPS(60)">Performance</button>
+                </div>
+            </div>
+
+            <button class="w-full py-4 bg-white text-black font-black rounded-xl uppercase text-xs mt-2" onclick="applySettings()">Apply & Exit</button>
+        </div>
+    </div>
+
     <div id="browser-view">
         <div class="bg-[#111] p-4 flex justify-between items-center border-b border-[#222]">
-            <span class="text-[10px] uppercase font-black text-gray-500">Encrypted Stream</span>
+            <span class="text-[10px] uppercase font-black text-gray-500">Node Active</span>
             <div onclick="goHome()" class="px-5 py-1 bg-red-950/30 text-red-500 text-[10px] font-black rounded-full border border-red-500/20 cursor-pointer">CLOSE</div>
         </div>
         <iframe id="proxyFrame" class="w-full h-full bg-white"></iframe>
     </div>
 
-    <div id="settings-screen" class="overlay-screen" onclick="hideScreens()">
-        <div class="settings-card bg-[#0f0f0f] p-10 rounded-[30px] border border-[#333] w-[400px]" onclick="event.stopPropagation()">
-            <h3 class="font-black uppercase italic text-xl mb-4" style="color: var(--theme-main)">Settings</h3>
-            <input type="text" id="cloak-title" class="w-full bg-[#111] border border-[#333] p-3 rounded-xl text-white mb-4" placeholder="Tab Title">
-            <button class="w-full py-4 bg-white text-black font-black rounded-xl uppercase text-xs" onclick="applySettings()">Save Changes</button>
-        </div>
-    </div>
-
     <div id="tos-screen" class="overlay-screen" onclick="hideScreens()">
         <div class="max-w-md text-center p-10 bg-[#0f0f0f] border border-[#222] rounded-[40px]" onclick="event.stopPropagation()">
             <h2 class="text-4xl font-black italic mb-4 uppercase">Protocols</h2>
-            <p class="text-gray-400 text-xs mb-8">Access granted. Enjoy the node.</p>
+            <p class="text-gray-400 text-xs mb-8">Access granted. Navigate with caution.</p>
             <button class="w-full py-4 border-2 border-white rounded-2xl text-xs font-black uppercase hover:bg-white hover:text-black transition" onclick="hideScreens()">Accept</button>
         </div>
     </div>
@@ -181,15 +206,33 @@
 
         function hideScreens() { document.querySelectorAll('.overlay-screen').forEach(s => { s.classList.remove('active'); setTimeout(() => s.style.display = 'none', 600); }); }
 
-        function applySettings() { const title = document.getElementById('cloak-title').value; if(title) document.title = title; hideScreens(); }
+        function applySettings() {
+            const title = document.getElementById('cloak-title').value;
+            const icon = document.getElementById('cloak-icon').value;
+            if(title) document.title = title;
+            if(icon) document.getElementById('tab-icon').href = icon;
+            hideScreens();
+        }
 
-        /* --- Identity Fixes --- */
+        function setTheme(main, bg, stars) {
+            document.documentElement.style.setProperty('--theme-main', main);
+            document.documentElement.style.setProperty('--theme-glow', main + '66');
+            document.documentElement.style.setProperty('--bg-color', bg);
+            document.documentElement.style.setProperty('--star-color', stars);
+        }
+
+        function setFPS(val) {
+            currentFPS = val;
+            document.getElementById('fps-display').innerText = val + " FPS MODE";
+            document.getElementById('fps-30').style.borderColor = val === 30 ? 'var(--theme-main)' : '#333';
+            document.getElementById('fps-60').style.borderColor = val === 60 ? 'var(--theme-main)' : '#333';
+        }
+
         function resetIdentity() {
             document.getElementById('main-content').classList.remove('active');
             const intro = document.getElementById('intro-overlay');
             const prompt = document.getElementById('name-prompt');
             const welcome = document.getElementById('welcome-text');
-            
             intro.style.display = 'flex';
             setTimeout(() => {
                 intro.style.opacity = '1';
@@ -207,21 +250,14 @@
                 const name = e.target.value.trim();
                 const prompt = document.getElementById('name-prompt');
                 const welcome = document.getElementById('welcome-text');
-                
-                // Transition 1: Fade out prompt
                 prompt.style.opacity = "0";
                 prompt.style.transform = "translateY(-20px)";
-                
                 setTimeout(() => {
                     prompt.style.display = "none";
                     document.getElementById('display-name').innerText = name;
                     document.getElementById('nav-name').innerText = name;
-                    
-                    // Transition 2: Fade in Welcome
                     welcome.style.display = "block";
                     setTimeout(() => { welcome.classList.add('visible'); }, 50);
-                    
-                    // Final Transition: Dashboard entry
                     setTimeout(() => {
                         document.getElementById('intro-overlay').style.opacity = "0";
                         setTimeout(() => { 
@@ -233,12 +269,17 @@
             }
         });
 
-        // Background logic remains active
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
         let starList = [];
         function initStars() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; starList = []; for(let i=0; i<150; i++) starList.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, size:Math.random()*1.8, speed:Math.random()*0.5+0.1}); }
-        function drawStars() { ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-color').trim(); ctx.fillRect(0,0,canvas.width,canvas.height); ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star-color').trim(); starList.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill(); s.y += s.speed; if(s.y > canvas.height) s.y = 0; }); setTimeout(() => requestAnimationFrame(drawStars), 1000 / currentFPS); }
+        function drawStars() {
+            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-color').trim();
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star-color').trim();
+            starList.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill(); s.y += s.speed; if(s.y > canvas.height) s.y = 0; });
+            setTimeout(() => requestAnimationFrame(drawStars), 1000 / currentFPS);
+        }
         initStars(); drawStars();
         window.addEventListener('resize', initStars);
         window.addEventListener('click', () => toggleMenu(null, true));
