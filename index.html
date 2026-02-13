@@ -27,7 +27,8 @@
         @keyframes pulseGlow { from { text-shadow: 0 0 20px var(--theme-glow); } to { text-shadow: 0 0 50px var(--theme-glow); } }
 
         /* --- Main UI --- */
-        #main-content { opacity: 0; transition: opacity 0.8s ease-in; display: flex; flex-direction: column; align-items: center; width: 100%; padding: 2rem; }
+        #main-content { opacity: 0; transition: opacity 0.8s ease-in; display: flex; flex-direction: column; align-items: center; width: 100%; padding: 2rem; pointer-events: none; }
+        #main-content.active { opacity: 1; pointer-events: all; }
         .bento-card { background: rgba(15, 15, 15, 0.85); border: 1px solid #1f1f1f; border-radius: 20px; transition: 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
         .bento-card:hover { transform: translateY(-4px); border-color: var(--theme-main); }
 
@@ -35,11 +36,10 @@
         #browser-view { position: fixed; inset: 20px 20px 20px 90px; background: #000; border: 1px solid #333; border-radius: 20px; z-index: 50; display: none; overflow: hidden; flex-direction: column; }
         #browser-view.active { display: flex; }
         
-        .overlay-screen { position: fixed; inset: 0; background: rgba(5,5,5,0.98); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 0.4s; }
-        .overlay-screen.active { display: flex; opacity: 1; }
+        .reset-name-btn { background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 4px 10px; border-radius: 6px; font-size: 8px; font-weight: 900; color: #666; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        .reset-name-btn:hover { color: white; border-color: var(--theme-main); background: rgba(59, 130, 246, 0.1); }
+
         #menu-btn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 60; }
-        #drop-menu { position: fixed; bottom: 80px; right: 20px; width: 180px; background: #0f0f0f; border: 1px solid #333; border-radius: 12px; display: none; flex-direction: column; z-index: 60; }
-        #drop-menu.active { display: flex; }
     </style>
 </head>
 <body>
@@ -66,7 +66,10 @@
             <nav class="bg-[#0f0f0f]/80 border border-[#1f1f1f] rounded-full px-8 py-3 flex items-center gap-6 backdrop-blur-md">
                 <div class="font-black uppercase tracking-tighter" style="color: var(--theme-main)">USERIDK758</div>
                 <div class="text-gray-500 text-[10px] uppercase">Node: <span id="nav-name" class="text-white">...</span></div>
-                <div id="fps-label" class="text-gray-400 text-[9px] font-bold uppercase">60 FPS</div>
+                <div class="flex items-center gap-3">
+                    <div id="fps-label" class="text-gray-400 text-[9px] font-bold uppercase">60 FPS</div>
+                    <div class="reset-name-btn" onclick="resetIdentity()">Edit Name</div>
+                </div>
             </nav>
         </div>
 
@@ -92,12 +95,7 @@
             <span id="frame-status" class="text-[9px] uppercase font-bold text-gray-500">Unblocked Node Active</span>
             <div onclick="goHome()" class="px-3 py-1 bg-red-900/20 text-red-500 text-[9px] font-black rounded cursor-pointer border border-red-500/30">CLOSE</div>
         </div>
-        <iframe id="proxyFrame" class="w-full h-full bg-white"></iframe>
-    </div>
-
-    <div id="menu-btn" onclick="toggleMenu()">...</div>
-    <div id="drop-menu">
-        <div class="p-4 text-center cursor-pointer text-[10px] font-black uppercase" onclick="goHome()">Dashboard</div>
+        <iframe id="proxyFrame" class="w-full h-full bg-white" sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts"></iframe>
     </div>
 
     <script>
@@ -105,60 +103,66 @@
             e.preventDefault(); 
             let val = document.getElementById('urlInput').value.trim();
             if (!val) return;
-            
-            // Check if it's a URL or a Search query
             const isUrl = val.includes('.') && !val.includes(' ');
-            if (isUrl) {
-                processUrl(val);
-            } else {
-                // Default to DuckDuckGo Search
-                processUrl('https://duckduckgo.com/?q=' + encodeURIComponent(val));
-            }
+            if (isUrl) processUrl(val);
+            else processUrl('https://duckduckgo.com/?q=' + encodeURIComponent(val));
         }
 
         function processUrl(val) {
             if (!val) return;
             let url = val.trim();
             if (!url.startsWith('http')) url = 'https://' + url;
-            
-            const frame = document.getElementById('proxyFrame');
-            frame.src = url;
-            
-            document.getElementById('main-content').style.opacity = "0";
+            document.getElementById('proxyFrame').src = url;
+            document.getElementById('main-content').classList.remove('active');
             document.getElementById('browser-view').classList.add('active');
-            document.getElementById('frame-status').innerText = "Loading Secure Tunnel...";
         }
 
         function goHome() {
             document.getElementById('browser-view').classList.remove('active');
             document.getElementById('proxyFrame').src = "";
-            document.getElementById('main-content').style.opacity = "1";
+            document.getElementById('main-content').classList.add('active');
+        }
+
+        function resetIdentity() {
+            document.getElementById('main-content').classList.remove('active');
+            const intro = document.getElementById('intro-overlay');
+            intro.style.display = 'flex';
+            setTimeout(() => {
+                intro.style.opacity = '1';
+                document.getElementById('name-prompt').style.display = 'flex';
+                document.getElementById('name-prompt').style.opacity = '1';
+                document.getElementById('welcome-text').style.display = 'none';
+                document.getElementById('nameInput').value = "";
+                document.getElementById('nameInput').focus();
+            }, 10);
         }
 
         function openCategory(name) {
-            alert(name + " section coming soon. Movies are active via sidebar.");
+            alert(name + " section coming soon.");
         }
-
-        function toggleMenu() { document.getElementById('drop-menu').classList.toggle('active'); }
 
         const nInput = document.getElementById('nameInput');
         nInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && nInput.value.trim() !== "") {
+                const name = nInput.value.trim();
                 document.getElementById('name-prompt').style.opacity = "0";
                 setTimeout(() => {
                     document.getElementById('name-prompt').style.display = "none";
-                    document.getElementById('display-name').innerText = nInput.value;
-                    document.getElementById('nav-name').innerText = nInput.value;
+                    document.getElementById('display-name').innerText = name;
+                    document.getElementById('nav-name').innerText = name;
                     const w = document.getElementById('welcome-text');
                     w.style.display = "block";
                     setTimeout(() => { w.style.opacity = "1"; w.style.transform = "scale(1)"; }, 50);
                     setTimeout(() => {
                         w.style.opacity = "0"; w.style.transform = "scale(1.2)";
                         setTimeout(() => { 
-                            document.getElementById('intro-overlay').style.display="none"; 
-                            document.getElementById('main-content').style.opacity="1"; 
-                        }, 800);
-                    }, 2500);
+                            document.getElementById('intro-overlay').style.opacity = '0';
+                            setTimeout(() => {
+                                document.getElementById('intro-overlay').style.display="none"; 
+                                document.getElementById('main-content').classList.add('active'); 
+                            }, 800);
+                        }, 500);
+                    }, 2000);
                 }, 600);
             }
         });
