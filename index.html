@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA OS | EVENT HORIZON v8.8</title>
+    <title>NEBULA OS | SUPERNOVA V9.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -13,269 +13,216 @@
             --bg-prime: #010101;
             --surface: #080808;
             --border: rgba(255,255,255,0.06);
-            --font-main: 'Inter', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-            --bezier-fast: cubic-bezier(0.4, 0, 0.2, 1);
-            --bezier-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+            /* Mouse Variables for Hardware Acceleration */
+            --m-x: 0px; --m-y: 0px;
+            --r-x: 0px; --r-y: 0px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; user-select: none; outline: none; }
-        body { background: var(--bg-prime); color: #fff; font-family: var(--font-main); overflow: hidden; height: 100vh; }
+        body { background: var(--bg-prime); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* --- KERNEL LAYERS --- */
+        /* --- THE FIXED MOUSE KERNEL --- */
+        #c-dot {
+            position: fixed; top: 0; left: 0; width: 5px; height: 5px; background: #fff; border-radius: 50%; z-index: 10000; pointer-events: none;
+            transform: translate3d(var(--m-x), var(--m-y), 0);
+            transition: transform 0.02s linear;
+        }
+        #c-ring {
+            position: fixed; top: 0; left: 0; width: 35px; height: 35px; border: 1.5px solid var(--theme-main); border-radius: 50%; z-index: 9999; pointer-events: none;
+            transform: translate3d(calc(var(--r-x) - 15px), calc(var(--r-y) - 15px), 0);
+            transition: width 0.3s, height 0.3s, background 0.3s, border-color 0.3s;
+            mix-blend-mode: difference;
+        }
+        .hover-state #c-ring { width: 60px; height: 60px; background: rgba(255, 255, 255, 0.1); border-color: #fff; }
+
+        /* --- BACKGROUND ENGINE --- */
         #render-pipeline { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
-        #cursor-dot { position: fixed; width: 4px; height: 4px; background: #fff; border-radius: 50%; z-index: 10000; pointer-events: none; }
-        #cursor-ring { position: fixed; width: 30px; height: 30px; border: 1.5px solid var(--theme-main); border-radius: 50%; z-index: 9999; pointer-events: none; mix-blend-mode: difference; transition: width 0.3s, height 0.3s, background 0.3s; }
 
-        /* --- NAVIGATION INTERFACE --- */
-        #top-interface { position: fixed; top: 0; left: 0; width: 100%; height: 90px; display: flex; align-items: center; justify-content: center; z-index: 900; opacity: 0; transition: 1s var(--bezier-smooth); }
-        .central-dock { background: rgba(10, 10, 10, 0.7); backdrop-filter: blur(30px); border: 1px solid var(--border); border-radius: 50px; padding: 12px 35px; display: flex; align-items: center; gap: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        /* --- OS TOP BAR --- */
+        #top-interface { position: fixed; top: 0; left: 0; width: 100%; height: 80px; display: flex; align-items: center; justify-content: center; z-index: 900; opacity: 0; transition: 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        .central-dock { background: rgba(10, 10, 10, 0.7); backdrop-filter: blur(30px); border: 1px solid var(--border); border-radius: 50px; padding: 10px 30px; display: flex; align-items: center; gap: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
 
-        .dock-btn { width: 50px; height: 50px; border-radius: 18px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; transition: 0.4s var(--bezier-smooth); position: relative; }
-        .dock-btn:hover { transform: scale(1.18) translateY(-6px); border-color: var(--theme-main); box-shadow: 0 15px 30px var(--theme-glow); }
-        .dock-btn:active { transform: scale(0.92); }
+        .dock-btn { width: 45px; height: 45px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: 0.3s; position: relative; }
+        .dock-btn:hover { border-color: var(--theme-main); transform: translateY(-3px); }
 
-        /* --- WINDOW ENGINE --- */
-        .process-window { position: fixed; background: var(--surface); border: 1px solid var(--border); border-radius: 28px; display: none; flex-direction: column; opacity: 0; transform: scale(0.92) translateY(30px); transition: 0.6s var(--bezier-smooth); z-index: 1000; backdrop-filter: blur(40px); box-shadow: 0 40px 80px rgba(0,0,0,0.9); overflow: hidden; }
-        .process-window.active { display: flex; opacity: 1; transform: scale(1) translateY(0); }
-        .p-header { padding: 18px 28px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); }
-        .p-title { font-size: 11px; font-weight: 950; text-transform: uppercase; letter-spacing: 3px; color: var(--theme-main); }
-        .p-content { padding: 35px; flex-grow: 1; overflow-y: auto; }
+        /* --- DESKTOP GRID --- */
+        #desktop-icons { position: fixed; top: 120px; left: 40px; display: grid; grid-template-columns: repeat(1, 1fr); gap: 30px; z-index: 100; }
+        .icon { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 80px; transition: 0.3s; }
+        .icon-box { width: 60px; height: 60px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; backdrop-filter: blur(10px); }
+        .icon:hover .icon-box { background: rgba(255,255,255,0.08); border-color: var(--theme-main); transform: scale(1.05); }
+        .icon-label { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.5); }
 
-        /* --- MAIN DASHBOARD --- */
-        #dashboard { width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 1.5s var(--bezier-smooth); opacity: 0; margin-top: -5vh; }
-        .main-brand { font-size: clamp(6rem, 18vw, 14rem); font-weight: 900; letter-spacing: -0.07em; font-style: italic; text-transform: uppercase; line-height: 0.8; }
-        .brand-gradient { background: linear-gradient(to bottom, #fff 40%, #222); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        /* --- WINDOW SYSTEM --- */
+        .process-window { position: fixed; background: var(--surface); border: 1px solid var(--border); border-radius: 28px; display: none; flex-direction: column; opacity: 0; transform: scale(0.95); transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1000; backdrop-filter: blur(40px); overflow: hidden; }
+        .process-window.active { display: flex; opacity: 1; transform: scale(1); }
+        .p-header { padding: 15px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); }
+        .p-title { font-size: 10px; font-weight: 950; text-transform: uppercase; letter-spacing: 2px; color: var(--theme-main); }
+        .p-content { padding: 30px; flex-grow: 1; overflow-y: auto; }
 
-        /* --- THE TERMINAL (ALT + T) --- */
-        #terminal-win { width: 700px; height: 450px; }
-        .term-scroll { font-family: var(--font-mono); font-size: 13px; color: #22c55e; height: 320px; overflow-y: auto; padding-right: 10px; }
-        .term-prompt { display: flex; gap: 12px; margin-top: 15px; align-items: center; }
-        .term-prompt span { color: #22c55e; font-weight: bold; }
-        #term-input { background: transparent; border: none; color: #fff; width: 100%; font-family: var(--font-mono); }
+        /* --- DASHBOARD --- */
+        #dashboard { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 1.5s; }
+        .brand { font-size: 12vw; font-weight: 900; italic; line-height: 0.8; background: linear-gradient(to bottom, #fff, #444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* --- SYSTEM TOASTS --- */
-        #toast-manager { position: fixed; bottom: 40px; right: 40px; display: flex; flex-direction: column; gap: 15px; z-index: 9999; }
-        .toast-msg { background: var(--surface); border: 1px solid var(--border); border-left: 5px solid var(--theme-main); padding: 22px 35px; border-radius: 12px; font-size: 11px; font-weight: 900; text-transform: uppercase; transform: translateX(150%); transition: 0.6s var(--bezier-smooth); }
-        .toast-msg.active { transform: translateX(0); }
+        /* --- TERMINAL --- */
+        .term-scroll { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #22c55e; height: 300px; overflow-y: auto; }
+        #term-input { background: transparent; border: none; color: #fff; width: 100%; font-family: 'JetBrains Mono'; }
 
-        /* --- BOOT & GATE --- */
-        #boot-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 1.2s ease-out; }
-        .boot-loader { width: 200px; height: 2px; background: #111; position: relative; overflow: hidden; margin-bottom: 20px; }
-        .boot-bar { position: absolute; left: -100%; width: 100%; height: 100%; background: var(--theme-main); animation: boot-load 2s infinite linear; }
-        @keyframes boot-load { 0% { left: -100%; } 100% { left: 100%; } }
+        /* --- BOOT & AUTH --- */
+        #boot { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #gate { position: fixed; inset: 0; background: var(--bg-prime); z-index: 9500; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .gate-in { background: transparent; border: none; border-bottom: 2px solid #222; font-size: 4rem; font-weight: 900; text-align: center; color: #fff; text-transform: uppercase; width: 500px; }
 
-        #gate-screen { position: fixed; inset: 0; background: var(--bg-prime); z-index: 9500; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(50px); }
-        .gate-label { font-[900] text-[11px] uppercase tracking-[12px] text-gray-500 mb-8; }
-        #user-auth-input { background: transparent; border: none; border-bottom: 3px solid #1a1a1a; width: 500px; font-size: 4.5rem; font-weight: 900; text-align: center; color: #fff; text-transform: uppercase; transition: 0.6s var(--bezier-smooth); }
-        #user-auth-input:focus { border-color: var(--theme-main); width: 600px; }
-
-        /* --- PROXY PORT --- */
-        #proxy-container { position: fixed; inset: 25px 25px 25px 110px; background: #000; border-radius: 40px; border: 1px solid #1a1a1a; display: none; z-index: 850; overflow: hidden; opacity: 0; transition: 0.8s var(--bezier-smooth); }
-
+        /* --- PROXY --- */
+        #proxy-container { position: fixed; inset: 30px 30px 30px 110px; background: #000; border-radius: 30px; display: none; z-index: 800; border: 1px solid #222; overflow: hidden; }
     </style>
 </head>
 <body>
 
     <canvas id="render-pipeline"></canvas>
-    <div id="cursor-dot"></div>
-    <div id="cursor-ring"></div>
-    <div id="toast-manager"></div>
+    <div id="c-dot"></div>
+    <div id="c-ring"></div>
 
-    <div id="master-node" class="dock-btn fixed bottom-10 left-10 hidden z-[900]" onclick="OS.toggle('win-master')">✏️</div>
+    <div id="boot">
+        <h2 class="text-blue-500 font-black italic text-2xl tracking-tighter">NEBULA OS v9.0</h2>
+        <div class="w-48 h-1 bg-white/5 mt-4 overflow-hidden"><div class="h-full bg-blue-500 animate-[loading_2s_infinite]"></div></div>
+    </div>
+
+    <div id="gate">
+        <p class="text-[9px] font-black uppercase tracking-[10px] text-gray-500 mb-6">Security Gateway</p>
+        <input type="text" id="auth-in" class="gate-in" placeholder="..." onkeypress="if(event.key==='Enter')OS.auth()">
+    </div>
 
     <header id="top-interface">
         <div class="central-dock">
-            <div class="dock-btn" onclick="OS.home()">🏠</div>
-            <div class="dock-btn" onclick="OS.toggle('win-search')">🔍</div>
-            <div class="dock-btn" onclick="OS.proxy('https://cineby.gd')">🎬</div>
-            <div class="dock-btn" onclick="OS.toggle('win-settings')">⚙️</div>
-            <div class="h-8 w-[1px] bg-white/10 mx-3"></div>
-            <div class="flex flex-col items-center">
-                <span id="os-clock" class="text-xs font-black tracking-widest">00:00</span>
-                <span class="text-[8px] font-bold text-blue-500 uppercase">Aether-Core</span>
-            </div>
+            <div class="dock-btn hoverable" onclick="OS.home()">🏠</div>
+            <div class="dock-btn hoverable" onclick="OS.toggle('win-search')">🔍</div>
+            <div class="dock-btn hoverable" onclick="OS.proxy('https://cineby.gd')">🎬</div>
+            <div class="dock-btn hoverable" onclick="OS.toggle('win-settings')">⚙️</div>
+            <div class="h-6 w-[1px] bg-white/10"></div>
+            <span id="clock" class="text-xs font-black font-mono">00:00</span>
         </div>
     </header>
 
-    <main id="dashboard">
-        <h1 class="main-brand brand-gradient">USERIDK</h1>
-        <div class="flex gap-24 mt-16">
-            <div class="text-center">
-                <p id="cpu-ms" class="text-4xl font-black font-mono tracking-tighter">00</p>
-                <p class="text-[9px] font-black uppercase text-blue-500 tracking-[5px] mt-2">Latency</p>
-            </div>
-            <div class="text-center">
-                <p id="gpu-fps" class="text-4xl font-black font-mono tracking-tighter">60</p>
-                <p class="text-[9px] font-black uppercase text-blue-500 tracking-[5px] mt-2">Stability</p>
-            </div>
+    <div id="desktop-icons">
+        <div class="icon hoverable" onclick="OS.toggle('win-terminal')">
+            <div class="icon-box">⚡</div>
+            <span class="icon-label">Terminal</span>
         </div>
-        <div class="mt-28 flex items-center gap-6 opacity-40">
-            <div class="w-12 h-[1px] bg-white"></div>
-            <p class="text-[10px] font-black uppercase tracking-[1em]">Node: <span id="active-user" class="text-white">---</span></p>
-            <div class="w-12 h-[1px] bg-white"></div>
+        <div class="icon hoverable" onclick="OS.proxy('https://youtube.com')">
+            <div class="icon-box">📺</div>
+            <span class="icon-label">Media</span>
+        </div>
+    </div>
+
+    <main id="dashboard">
+        <h1 class="brand">USERIDK</h1>
+        <div class="flex gap-16 mt-12">
+            <div class="text-center"><p class="text-3xl font-black font-mono" id="stat-latency">0</p><p class="text-[8px] font-black text-blue-500 uppercase tracking-widest">Input Delay</p></div>
+            <div class="text-center"><p class="text-3xl font-black font-mono" id="stat-mem">0</p><p class="text-[8px] font-black text-blue-500 uppercase tracking-widest">Mem Usage</p></div>
         </div>
     </main>
 
-    <section id="win-search" class="process-window w-[550px]">
-        <div class="p-header"><span class="p-title">Aether Search</span><button onclick="OS.toggle('win-search')">✕</button></div>
+    <section id="win-search" class="process-window w-[500px]">
+        <div class="p-header"><span class="p-title">Search Bypass</span><button onclick="OS.toggle('win-search')">✕</button></div>
         <div class="p-content">
-            <input type="text" id="search-query" class="w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white font-mono text-sm mb-8" placeholder="Enter target URL or Query..." onkeypress="if(event.key==='Enter')OS.runSearch()">
-            <div class="grid grid-cols-2 gap-5">
-                <div class="p-5 bg-white/5 rounded-2xl border border-white/5 hover:border-blue-500 transition-all text-center cursor-pointer" onclick="OS.proxy('https://google.com')">
-                    <p class="text-[10px] font-black uppercase tracking-widest">Google</p>
-                </div>
-                <div class="p-5 bg-white/5 rounded-2xl border border-white/5 hover:border-emerald-500 transition-all text-center cursor-pointer" onclick="OS.proxy('https://youtube.com')">
-                    <p class="text-[10px] font-black uppercase tracking-widest">YouTube</p>
-                </div>
-            </div>
+            <input type="text" id="q-in" class="w-full bg-white/5 border border-white/10 p-5 rounded-xl text-white font-mono text-sm hoverable" placeholder="Query or URL..." onkeypress="if(event.key==='Enter')OS.runSearch()">
         </div>
     </section>
 
-    <section id="win-settings" class="process-window w-[480px]">
-        <div class="p-header"><span class="p-title">Kernel Control</span><button onclick="OS.toggle('win-settings')">✕</button></div>
-        <div class="p-content space-y-10">
-            <div>
-                <h4 class="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-6">Visual Theme</h4>
-                <div class="flex gap-5">
-                    <div class="w-12 h-12 rounded-2xl bg-blue-600 cursor-pointer shadow-lg hover:scale-110 transition-transform" onclick="OS.setTheme('#3b82f6')"></div>
-                    <div class="w-12 h-12 rounded-2xl bg-rose-600 cursor-pointer shadow-lg hover:scale-110 transition-transform" onclick="OS.setTheme('#e11d48')"></div>
-                    <div class="w-12 h-12 rounded-2xl bg-amber-600 cursor-pointer shadow-lg hover:scale-110 transition-transform" onclick="OS.setTheme('#d97706')"></div>
-                </div>
-            </div>
-            <button class="w-full py-5 bg-white text-black font-black uppercase text-xs rounded-2xl hover:bg-red-600 hover:text-white transition-all" onclick="OS.flush()">Flush Memory & Reset</button>
-        </div>
-    </section>
-
-    <section id="terminal-win" class="process-window">
-        <div class="p-header"><span class="p-title">Nebula Console</span><button onclick="OS.toggle('terminal-win')">✕</button></div>
+    <section id="win-terminal" class="process-window w-[600px] h-[400px]">
+        <div class="p-header"><span class="p-title">System Console</span><button onclick="OS.toggle('win-terminal')">✕</button></div>
         <div class="p-content" style="background: #000;">
-            <div class="term-scroll" id="term-log">Nebula Kernel v8.8.0-Stable<br>Establishing connection to core... Done.<br>Type 'help' for instruction list.</div>
-            <div class="term-prompt">
-                <span>&gt;</span>
-                <input type="text" id="term-input" spellcheck="false" autocomplete="off" onkeypress="OS.exec(event)">
-            </div>
+            <div id="term-log" class="term-scroll">Nebula Kernel Initialized... Type 'help' to begin.</div>
+            <div class="flex gap-2 mt-4 text-[#22c55e]"><span>></span><input type="text" id="term-in" class="hoverable" onkeypress="OS.exec(event)"></div>
         </div>
     </section>
 
-    <div id="boot-screen">
-        <h2 class="text-3xl font-black italic text-blue-500 tracking-tighter mb-4">NEBULA</h2>
-        <div class="boot-loader"><div class="boot-bar"></div></div>
-        <p class="text-[8px] font-mono text-gray-700 uppercase tracking-widest" id="boot-status">Loading Kernel Modules...</p>
-    </div>
-
-    <div id="gate-screen">
-        <p class="gate-label">Identify Identity</p>
-        <input type="text" id="user-auth-input" spellcheck="false" placeholder="..." onkeypress="if(event.key==='Enter')OS.auth()">
-    </div>
+    <section id="win-settings" class="process-window w-[400px]">
+        <div class="p-header"><span class="p-title">Kernel Config</span><button onclick="OS.toggle('win-settings')">✕</button></div>
+        <div class="p-content space-y-6">
+            <button class="w-full py-4 bg-white text-black font-black uppercase text-[10px] rounded-xl hoverable" onclick="location.reload()">Flush Session</button>
+        </div>
+    </section>
 
     <div id="proxy-container">
-        <iframe id="proxy-view" class="w-full h-full border-none bg-white"></iframe>
+        <iframe id="proxy-view" class="w-full h-full border-none"></iframe>
     </div>
 
     <script>
         /**
-         * NEBULA OS CORE | Class-Based Engine Architecture
+         * NEBULA ENGINE v9.0 | SUPERNOVA CORE
          */
-        class NebulaEngine {
+        class NebulaOS {
             constructor() {
-                this.state = {
-                    user: null,
-                    isMaster: false,
-                    theme: '#3b82f6',
-                    activeWindows: new Set(),
-                    startTime: Date.now()
-                };
-                
-                this.elements = {
-                    boot: document.getElementById('boot-screen'),
-                    gate: document.getElementById('gate-screen'),
-                    dash: document.getElementById('dashboard'),
-                    nav: document.getElementById('top-interface'),
-                    ring: document.getElementById('cursor-ring'),
-                    dot: document.getElementById('cursor-dot'),
-                    clock: document.getElementById('os-clock')
-                };
-
+                this.mouse = { x: 0, y: 0, rx: 0, ry: 0 };
+                this.state = { activeWindows: new Set(), user: null };
                 this.init();
             }
 
             init() {
-                this.bindGlobalEvents();
+                this.handleInput();
+                this.renderLoop();
                 this.startClock();
-                this.startGraphics();
-                this.runBootSequence();
-                this.monitorSystem();
+                this.bootSequence();
+                setInterval(() => this.updateStats(), 2000);
             }
 
-            bindGlobalEvents() {
-                window.onmousemove = (e) => this.handleCursor(e);
-                window.onkeydown = (e) => {
-                    if(e.altKey && e.key === 't') this.toggle('terminal-win');
+            handleInput() {
+                const root = document.documentElement;
+                window.addEventListener('mousemove', (e) => {
+                    this.mouse.x = e.clientX;
+                    this.mouse.y = e.clientY;
+                    root.style.setProperty('--m-x', `${this.mouse.x}px`);
+                    root.style.setProperty('--m-y', `${this.mouse.y}px`);
+                });
+
+                // Lerp Ring for smoothness
+                const syncRing = () => {
+                    this.mouse.rx += (this.mouse.x - this.mouse.rx) * 0.15;
+                    this.mouse.ry += (this.mouse.y - this.mouse.ry) * 0.15;
+                    root.style.setProperty('--r-x', `${this.mouse.rx}px`);
+                    root.style.setProperty('--r-y', `${this.mouse.ry}px`);
+                    requestAnimationFrame(syncRing);
                 };
+                syncRing();
+
+                // Global Hover Bridge
+                document.addEventListener('mouseover', (e) => {
+                    if (e.target.classList.contains('hoverable')) document.body.classList.add('hover-state');
+                });
+                document.addEventListener('mouseout', (e) => {
+                    if (e.target.classList.contains('hoverable')) document.body.classList.remove('hover-state');
+                });
             }
 
-            runBootSequence() {
-                const logs = ["Kernel Syncing", "Aether Tunnel Up", "UI Rendering", "Ready"];
-                let i = 0;
-                const interval = setInterval(() => {
-                    document.getElementById('boot-status').innerText = logs[i];
-                    i++;
-                    if(i >= logs.length) {
-                        clearInterval(interval);
-                        setTimeout(() => {
-                            this.elements.boot.style.opacity = '0';
-                            setTimeout(() => {
-                                this.elements.boot.style.display = 'none';
-                                this.elements.gate.style.display = 'flex';
-                                document.getElementById('user-auth-input').focus();
-                            }, 1000);
-                        }, 500);
-                    }
-                }, 400);
+            bootSequence() {
+                setTimeout(() => {
+                    document.getElementById('boot').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('boot').style.display = 'none';
+                        document.getElementById('gate').style.display = 'flex';
+                        document.getElementById('auth-in').focus();
+                    }, 1000);
+                }, 2000);
             }
 
             auth() {
-                const name = document.getElementById('user-auth-input').value.trim();
-                if(!name) return;
-                this.state.user = name;
-                this.state.isMaster = (name.toLowerCase() === 'devtoolsanasun');
-                
-                this.elements.gate.style.opacity = '0';
+                const val = document.getElementById('auth-in').value;
+                if (!val) return;
+                this.state.user = val;
+                document.getElementById('gate').style.opacity = '0';
                 setTimeout(() => {
-                    this.elements.gate.style.display = 'none';
-                    this.elements.dash.style.opacity = '1';
-                    this.elements.nav.style.opacity = '1';
-                    document.getElementById('active-user').innerText = this.state.isMaster ? 'MASTER' : name;
-                    if(this.state.isMaster) document.getElementById('master-node').classList.remove('hidden');
-                    this.notify(`Session Registered: ${name}`);
+                    document.getElementById('gate').style.display = 'none';
+                    document.getElementById('dashboard').style.opacity = '1';
+                    document.getElementById('top-interface').style.opacity = '1';
                 }, 1000);
-            }
-
-            handleCursor(e) {
-                this.elements.dot.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-                this.elements.ring.animate({
-                    left: (e.clientX - 15) + 'px',
-                    top: (e.clientY - 15) + 'px'
-                }, { duration: 450, fill: 'forwards' });
-
-                const target = document.elementFromPoint(e.clientX, e.clientY);
-                if(target && (target.classList.contains('dock-btn') || target.tagName === 'INPUT' || target.classList.contains('cursor-pointer'))) {
-                    this.elements.ring.style.width = '60px';
-                    this.elements.ring.style.height = '60px';
-                    this.elements.ring.style.background = 'rgba(255,255,255,0.1)';
-                } else {
-                    this.elements.ring.style.width = '30px';
-                    this.elements.ring.style.height = '30px';
-                    this.elements.ring.style.background = 'transparent';
-                }
             }
 
             toggle(id) {
                 const win = document.getElementById(id);
-                if(this.state.activeWindows.has(id)) {
+                if (this.state.activeWindows.has(id)) {
                     win.classList.remove('active');
-                    setTimeout(() => win.style.display = 'none', 600);
+                    setTimeout(() => win.style.display = 'none', 500);
                     this.state.activeWindows.delete(id);
                 } else {
                     win.style.display = 'flex';
@@ -285,127 +232,77 @@
             }
 
             proxy(url) {
-                this.notify("Bypassing Gateway...");
-                const cont = document.getElementById('proxy-container');
-                const frame = document.getElementById('proxy-view');
-                frame.src = url;
-                this.elements.dash.style.opacity = '0';
-                cont.style.display = 'block';
-                setTimeout(() => cont.style.opacity = '1', 100);
-                this.state.activeWindows.forEach(id => this.toggle(id));
+                const p = document.getElementById('proxy-container');
+                document.getElementById('proxy-view').src = url;
+                document.getElementById('dashboard').style.opacity = '0';
+                p.style.display = 'block';
+                setTimeout(() => p.style.opacity = '1', 50);
             }
 
             home() {
-                const cont = document.getElementById('proxy-container');
-                cont.style.opacity = '0';
+                const p = document.getElementById('proxy-container');
+                p.style.opacity = '0';
                 setTimeout(() => {
-                    cont.style.display = 'none';
-                    this.elements.dash.style.opacity = '1';
+                    p.style.display = 'none';
+                    document.getElementById('dashboard').style.opacity = '1';
                 }, 800);
             }
 
             runSearch() {
-                let val = document.getElementById('search-query').value.trim();
-                if(!val) return;
-                if(!val.includes('.') || val.includes(' ')) {
-                    val = `https://www.google.com/search?q=${encodeURIComponent(val)}`;
-                } else if(!val.startsWith('http')) {
-                    val = `https://${val}`;
-                }
-                this.proxy(val);
+                let v = document.getElementById('q-in').value;
+                if (!v.includes('.') || v.includes(' ')) v = 'https://google.com/search?q=' + v;
+                else if (!v.startsWith('http')) v = 'https://' + v;
+                this.proxy(v);
                 this.toggle('win-search');
             }
 
-            notify(msg) {
-                const manager = document.getElementById('toast-manager');
-                const t = document.createElement('div');
-                t.className = 'toast-msg';
-                t.innerText = msg;
-                manager.appendChild(t);
-                setTimeout(() => t.classList.add('active'), 50);
-                setTimeout(() => {
-                    t.classList.remove('active');
-                    setTimeout(() => t.remove(), 600);
-                }, 4000);
+            exec(e) {
+                if (e.key === 'Enter') {
+                    const cmd = e.target.value;
+                    const log = document.getElementById('term-log');
+                    log.innerHTML += `<br>> ${cmd}<br><span class="text-gray-500">Processing... Success.</span>`;
+                    e.target.value = '';
+                    log.scrollTop = log.scrollHeight;
+                }
             }
 
             startClock() {
                 setInterval(() => {
                     const d = new Date();
-                    this.elements.clock.innerText = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                    document.getElementById('clock').innerText = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 }, 1000);
             }
 
-            monitorSystem() {
-                setInterval(() => {
-                    document.getElementById('cpu-ms').innerText = Math.floor(Math.random() * 8 + 12);
-                    document.getElementById('gpu-fps').innerText = Math.floor(Math.random() * 2 + 59);
-                }, 2500);
+            updateStats() {
+                document.getElementById('stat-latency').innerText = Math.floor(Math.random() * 5 + 2) + 'ms';
+                document.getElementById('stat-mem').innerText = Math.floor(Math.random() * 10 + 45) + 'MB';
             }
 
-            startGraphics() {
+            renderLoop() {
                 const canvas = document.getElementById('render-pipeline');
                 const ctx = canvas.getContext('2d');
-                let particles = [];
+                let stars = [];
                 const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
                 window.onresize = resize; resize();
 
-                for(let i=0; i<300; i++) {
-                    particles.push({
-                        x: Math.random() * canvas.width,
-                        y: Math.random() * canvas.height,
-                        z: Math.random() * canvas.width,
-                        o: Math.random()
-                    });
-                }
+                for(let i=0; i<250; i++) stars.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2, v: Math.random()*0.5});
 
                 const draw = () => {
-                    ctx.fillStyle = '#010101';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = 'white';
-                    particles.forEach(p => {
-                        let sx = (p.x - canvas.width/2) * (canvas.width/p.z) + canvas.width/2;
-                        let sy = (p.y - canvas.height/2) * (canvas.width/p.z) + canvas.height/2;
-                        let size = (1 - p.z / canvas.width) * 2;
-                        ctx.globalAlpha = 1 - p.z / canvas.width;
-                        ctx.beginPath(); ctx.arc(sx, sy, size, 0, Math.PI*2); ctx.fill();
-                        p.z -= 0.5; if(p.z <= 0) p.z = canvas.width;
+                    ctx.fillStyle = '#010101'; ctx.fillRect(0,0,canvas.width,canvas.height);
+                    ctx.fillStyle = '#fff';
+                    stars.forEach(s => {
+                        ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI*2); ctx.fill();
+                        s.y += s.v; if (s.y > canvas.height) s.y = 0;
                     });
                     requestAnimationFrame(draw);
                 };
                 draw();
             }
-
-            exec(e) {
-                if(e.key === 'Enter') {
-                    const cmd = e.target.value.toLowerCase().trim();
-                    const log = document.getElementById('term-log');
-                    let res = "";
-                    if(cmd === 'help') res = "Available: status, clear, whoami, bypass [url]";
-                    else if(cmd === 'status') res = "System healthy. All modules green.";
-                    else if(cmd === 'clear') { log.innerHTML = ""; e.target.value = ""; return; }
-                    else if(cmd === 'whoami') res = `Active User: ${this.state.user} | Master: ${this.state.isMaster}`;
-                    else if(cmd.startsWith('bypass ')) this.proxy(cmd.split(' ')[1]);
-                    else res = `Unknown command: ${cmd}`;
-                    
-                    log.innerHTML += `<br><span style="color:white">> ${cmd}</span><br>${res}`;
-                    e.target.value = "";
-                    log.scrollTop = log.scrollHeight;
-                }
-            }
-
-            setTheme(c) {
-                document.documentElement.style.setProperty('--theme-main', c);
-                this.notify("Kernel Palette Synced");
-            }
-
-            flush() {
-                this.notify("Emergency Memory Flush...");
-                setTimeout(() => location.reload(), 1500);
-            }
         }
 
-        const OS = new NebulaEngine();
+        const OS = new NebulaOS();
+
+        @keyframes loading { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
     </script>
 </body>
 </html>
