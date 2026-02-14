@@ -8,17 +8,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* SYSTEM OS v7.6.0
-           - FIXED TERMS OF SERVICE
-           - PRESERVED OG IDENTITY & TELEMETRY
-           - FULL KERNEL INTEGRATION
+        /* SYSTEM OS v7.7.0 - HOTFIX 
+           - RESTORED SEARCH HUB
+           - FIXED SETTINGS & PARTNERS
+           - RE-LINKED IDENTITY RESET
         */
 
         :root { 
             --theme-main: #3b82f6; 
             --theme-glow: rgba(59, 130, 246, 0.6); 
             --bg-color: #050505;
-            --star-color: #ffffff;
             --panel-bg: rgba(10, 10, 10, 0.95);
             --smooth: cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -30,86 +29,59 @@
             background-color: var(--bg-color); 
             color: white; 
             overflow: hidden; 
-            transition: background 0.8s var(--smooth);
             user-select: none;
             height: 100vh;
         }
 
         /* --- Cursor --- */
         #cursor-dot { position: fixed; width: 6px; height: 6px; background: white; border-radius: 50%; z-index: 10000; pointer-events: none; }
-        #cursor-ring { position: fixed; width: 25px; height: 25px; border: 1px solid var(--theme-main); border-radius: 50%; z-index: 9999; pointer-events: none; transition: transform 0.2s var(--smooth); }
+        #cursor-ring { position: fixed; width: 25px; height: 25px; border: 1px solid var(--theme-main); border-radius: 50%; z-index: 9999; pointer-events: none; }
 
         #starCanvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
 
-        /* --- UI Elements --- */
+        /* --- UI Components --- */
         #home-btn, .side-icon, #menu-btn { 
             background: #111; border: 1px solid #333; border-radius: 12px; 
             display: flex; align-items: center; justify-content: center; cursor: pointer; 
-            transition: 0.4s var(--smooth); font-size: 1.2rem;
+            transition: 0.4s var(--smooth);
         }
-        #home-btn:hover, .side-icon:hover, #menu-btn:hover { 
-            border-color: var(--theme-main); transform: translateY(-5px) scale(1.1); 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5), 0 0 15px var(--theme-glow); 
-        }
+        #home-btn:hover, .side-icon:hover, #menu-btn:hover { border-color: var(--theme-main); transform: scale(1.1); }
 
         #home-btn { position: fixed; top: 30px; left: 30px; width: 50px; height: 50px; z-index: 500; }
         #side-nav { position: fixed; left: 30px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
-        .side-icon { width: 50px; height: 50px; }
-        #menu-btn { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; z-index: 200; font-weight: 900; letter-spacing: 2px; }
+        .side-icon { width: 50px; height: 50px; font-size: 1.2rem; }
+        #menu-btn { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; z-index: 200; font-weight: 900; }
 
-        /* --- Context Menu --- */
-        #context-menu {
-            position: fixed; width: 180px; background: var(--panel-bg); 
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
-            display: none; flex-direction: column; z-index: 5000;
-            backdrop-blur: 20px; padding: 8px; box-shadow: 0 15px 30px rgba(0,0,0,0.8);
+        /* --- Search Hub (OG Version) --- */
+        #search-hub {
+            position: fixed; left: 100px; top: 50%; transform: translateY(-50%) scale(0.9);
+            background: var(--panel-bg); border: 1px solid #333; border-radius: 24px;
+            padding: 25px; display: none; opacity: 0; flex-direction: column; gap: 15px;
+            width: 320px; backdrop-blur: 30px; transition: 0.5s var(--smooth); z-index: 90;
         }
-        .ctx-item {
-            padding: 10px 14px; font-size: 10px; font-weight: 800; text-transform: uppercase;
-            color: #888; border-radius: 8px; cursor: pointer; transition: 0.2s;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .ctx-item:hover { background: rgba(255,255,255,0.05); color: white; padding-left: 18px; }
-        .ctx-sep { height: 1px; background: rgba(255,255,255,0.05); margin: 6px 0; }
+        #search-hub.show { display: flex; opacity: 1; transform: translateY(-50%) scale(1); }
+        .search-input { background: #000; border: 1px solid #333; border-radius: 12px; padding: 12px; width: 100%; color: white; outline: none; font-size: 12px; }
 
-        /* --- Notifications --- */
-        #notif-container { position: fixed; top: 30px; right: 30px; z-index: 6000; display: flex; flex-direction: column; gap: 10px; }
-        .notif {
-            background: rgba(15,15,15,0.95); border-left: 3px solid var(--theme-main);
-            padding: 15px 25px; border-radius: 8px; font-size: 10px; font-weight: 900;
-            text-transform: uppercase; letter-spacing: 1px; transform: translateX(120%);
-            transition: 0.5s var(--smooth); backdrop-blur: 10px;
-        }
-        .notif.show { transform: translateX(0); }
-
-        /* --- Overlays & Screens --- */
+        /* --- Overlays --- */
         .overlay-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; backdrop-blur: 20px; transition: 0.6s var(--smooth); }
         .overlay-screen.active { display: flex; opacity: 1; }
         .card-ui { background: #0f0f0f; border: 1px solid #222; border-radius: 30px; padding: 35px; width: 420px; display: flex; flex-direction: column; gap: 15px; }
 
-        /* --- OG Welcome Style --- */
+        /* --- OG Welcome & Content --- */
         #welcome-text { opacity: 0; transform: scale(0.9); filter: blur(10px); transition: 1.2s var(--smooth); display: none; font-size: 6rem; font-weight: 900; text-transform: uppercase; text-align: center; }
         #welcome-text.visible { opacity: 1; transform: scale(1); filter: blur(0px); display: block; }
         .outlined-blue { color: transparent; -webkit-text-stroke: 2px var(--theme-main); text-shadow: 0 0 30px var(--theme-glow); }
 
-        /* --- Main Dashboard --- */
-        #main-content { 
-            opacity: 0; transform: translateY(40px); transition: 1.2s var(--smooth); 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            height: 85vh; pointer-events: none; margin-top: -8vh; 
-        }
+        #main-content { opacity: 0; transform: translateY(40px); transition: 1.2s var(--smooth); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 85vh; pointer-events: none; margin-top: -8vh; }
         #main-content.active { opacity: 1; transform: translateY(0); pointer-events: all; }
-        .mega-glow-text { font-size: 8rem; font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -2px; }
+        .mega-glow-text { font-size: 8rem; font-weight: 900; font-style: italic; text-transform: uppercase; }
 
-        /* --- Telemetry --- */
-        .telemetry-grid { margin-top: 50px; display: flex; gap: 60px; opacity: 0.4; transition: 0.5s; }
-        #main-content:hover .telemetry-grid { opacity: 1; }
-        .stat-box { text-align: center; }
-        .stat-val { font-size: 1.8rem; font-weight: 900; letter-spacing: -1px; }
-        .stat-label { font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: var(--theme-main); margin-top: 4px; }
+        /* --- Context Menu --- */
+        #context-menu { position: fixed; width: 180px; background: var(--panel-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: none; flex-direction: column; z-index: 5000; backdrop-blur: 20px; padding: 8px; }
+        .ctx-item { padding: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; color: #888; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; }
+        .ctx-item:hover { background: rgba(255,255,255,0.05); color: white; }
 
-        /* --- Browser View --- */
-        #browser-view { position: fixed; inset: 20px 20px 20px 100px; background: #000; border: 1px solid #333; border-radius: 24px; z-index: 50; display: none; overflow: hidden; opacity: 0; transition: 0.6s var(--smooth); }
+        #browser-view { position: fixed; inset: 20px 20px 20px 100px; background: #000; border: 1px solid #333; border-radius: 24px; z-index: 50; display: none; opacity: 0; transition: 0.6s var(--smooth); }
         #browser-view.active { display: flex; opacity: 1; }
     </style>
 </head>
@@ -118,90 +90,96 @@
     <canvas id="starCanvas"></canvas>
     <div id="cursor-dot"></div>
     <div id="cursor-ring"></div>
-    <div id="notif-container"></div>
-    <div id="system-log" style="position:fixed; bottom:20px; left:100px; font-family:'JetBrains Mono'; font-size:8px; color:#444; pointer-events:none; display:flex; flex-direction:column-reverse;"></div>
+    <div id="notif-container" class="fixed top-8 right-8 z-[6000] flex flex-col gap-2"></div>
 
     <div id="context-menu">
-        <div class="ctx-item" onclick="goHome()">Dashboard <span>🏠</span></div>
-        <div class="ctx-sep"></div>
-        <div class="ctx-item" onclick="openScreen('settings-screen')">Settings <span>⚙️</span></div>
-        <div class="ctx-item" onclick="openScreen('partners-screen')">Partners <span>🤝</span></div>
-        <div class="ctx-item" onclick="openScreen('tos-screen')">Terms <span>📋</span></div>
-        <div class="ctx-sep"></div>
-        <div class="ctx-item" onclick="resetIdentity()" style="color: #ef4444;">Wipe Memory <span>⚠️</span></div>
+        <div class="ctx-item" onclick="goHome()">Dashboard 🏠</div>
+        <div class="ctx-item" onclick="openScreen('settings-screen')">Settings ⚙️</div>
+        <div class="ctx-item" onclick="openScreen('partners-screen')">Partners 🤝</div>
+        <div class="ctx-item" onclick="resetIdentity()" style="color: #ef4444;">Reset ⚠️</div>
     </div>
 
     <div id="home-btn" onclick="goHome()">🏠</div>
 
     <div id="side-nav">
-        <div class="side-icon" onclick="processUrl('https://google.com')">🔍</div>
+        <div class="side-icon" onclick="toggleSearchHub()">🔍</div>
         <div class="side-icon" onclick="processUrl('https://cineby.gd')">🎬</div>
     </div>
 
+    <div id="search-hub">
+        <h3 class="text-[10px] font-black uppercase text-blue-500">Global Search</h3>
+        <form onsubmit="handleSearch(event)">
+            <input type="text" id="urlInput" class="search-input" placeholder="Enter URL or Search..." autocomplete="off">
+        </form>
+        <div class="grid grid-cols-4 gap-2">
+            <div class="side-icon" onclick="processUrl('https://youtube.com')">▶️</div>
+            <div class="side-icon" onclick="processUrl('https://discord.com')">💬</div>
+            <div class="side-icon" onclick="processUrl('https://tiktok.com')">📱</div>
+            <div class="side-icon" onclick="processUrl('https://poki.com')">🎮</div>
+        </div>
+    </div>
+
     <div id="menu-btn" onclick="toggleMenu(event)">...</div>
-    <div id="drop-menu" style="position:fixed; bottom:95px; right:30px; width:220px; background:rgba(15,15,15,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:20px; display:none; flex-direction:column; z-index:200; overflow:hidden; backdrop-blur:25px;">
-        <div class="menu-item p-4 text-[10px] font-black uppercase text-gray-400 hover:text-white cursor-pointer" onclick="openScreen('settings-screen')">⚙️ Settings</div>
-        <div class="menu-item p-4 text-[10px] font-black uppercase text-gray-400 hover:text-white cursor-pointer border-t border-white/5" onclick="openScreen('partners-screen')">🤝 Partners</div>
-        <div class="menu-item p-4 text-[10px] font-black uppercase text-gray-400 hover:text-white cursor-pointer border-t border-white/5" onclick="openScreen('tos-screen')">📋 Terms</div>
+    <div id="drop-menu" class="fixed bottom-[95px] right-[30px] w-48 bg-[#111]/90 border border-white/10 rounded-xl hidden flex-col z-[200]">
+        <div class="p-4 text-[10px] font-black uppercase cursor-pointer hover:bg-white/5" onclick="openScreen('settings-screen')">⚙️ Settings</div>
+        <div class="p-4 text-[10px] font-black uppercase cursor-pointer hover:bg-white/5 border-t border-white/5" onclick="openScreen('partners-screen')">🤝 Partners</div>
+        <div class="p-4 text-[10px] font-black uppercase cursor-pointer hover:bg-white/5 border-t border-white/5" onclick="openScreen('tos-screen')">📋 Terms</div>
     </div>
 
     <div id="intro-overlay" style="position:fixed; inset:0; z-index:2000; background:#050505; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: 1s;">
         <div id="name-prompt" class="flex flex-col items-center gap-6">
-            <h2 class="text-xl font-black uppercase tracking-[0.4em] text-blue-500">Identity</h2>
-            <input type="text" id="nameInput" autofocus class="bg-transparent border-b-2 border-white/10 text-4xl text-center outline-none w-72 focus:border-blue-500 transition-all" placeholder="...">
+            <h2 class="text-xl font-black uppercase text-blue-500">Identity</h2>
+            <input type="text" id="nameInput" autofocus class="bg-transparent border-b-2 border-white/10 text-4xl text-center outline-none w-72" placeholder="...">
         </div>
         <h2 id="welcome-text" class="outlined-blue">WELCOME,<br><span id="display-name" style="color:white; -webkit-text-stroke: 0px;"></span></h2>
     </div>
 
     <div id="main-content">
-        <nav class="bg-[#0f0f0f]/95 border border-[#222] rounded-full px-8 py-3 flex items-center gap-6 backdrop-blur-xl mb-16">
+        <nav class="bg-[#0f0f0f]/95 border border-[#222] rounded-full px-8 py-3 flex items-center gap-6 mb-16">
             <div class="font-black uppercase text-lg text-blue-500">USERIDK758</div>
             <div class="text-[10px] font-black text-gray-500">60 FPS</div>
-            <div class="text-[9px] font-black px-4 py-1 border border-white/10 rounded-full cursor-pointer hover:bg-white hover:text-black transition-all" onclick="resetIdentity()">RESET IDENTITY</div>
+            <div class="text-[9px] font-black px-4 py-1 border border-white/10 rounded-full cursor-pointer hover:bg-white hover:text-black" onclick="resetIdentity()">RESET IDENTITY</div>
         </nav>
         <h1 class="mega-glow-text">USERIDK</h1>
-        <p class="mt-4 text-gray-500 font-bold uppercase tracking-[0.5em] text-[10px]">Node Active: <span id="nav-name" class="text-white">...</span></p>
+        <div class="mt-12 flex gap-12 opacity-60">
+            <div class="text-center"><p class="text-2xl font-black" id="lat-val">0.2ms</p><p class="text-[8px] uppercase text-blue-500">Latency</p></div>
+            <div class="text-center"><p class="text-2xl font-black">99.9%</p><p class="text-[8px] uppercase text-blue-500">Stability</p></div>
+            <div class="text-center"><p class="text-2xl font-black">AES</p><p class="text-[8px] uppercase text-blue-500">Crypt</p></div>
+        </div>
+    </div>
 
-        <div class="telemetry-grid">
-            <div class="stat-box">
-                <p class="stat-val" id="latency-val">0.2ms</p>
-                <p class="stat-label">Latency</p>
-            </div>
-            <div class="stat-box">
-                <p class="stat-val">99.9%</p>
-                <p class="stat-label">Stability</p>
-            </div>
-            <div class="stat-box">
-                <p class="stat-val">AES</p>
-                <p class="stat-label">Encryption</p>
+    <div id="settings-screen" class="overlay-screen" onclick="hideScreens()">
+        <div class="card-ui" onclick="event.stopPropagation()">
+            <h3 class="font-black italic text-xl text-blue-500">SETTINGS</h3>
+            <input type="text" id="cloak-title" class="search-input" placeholder="Custom Tab Title">
+            <input type="text" id="cloak-icon" class="search-input" placeholder="Favicon URL">
+            <button class="py-4 bg-white text-black font-black rounded-xl text-[10px] uppercase" onclick="applySettings()">Save Changes</button>
+        </div>
+    </div>
+
+    <div id="partners-screen" class="overlay-screen" onclick="hideScreens()">
+        <div class="card-ui" onclick="event.stopPropagation()">
+            <h3 class="font-black italic text-xl text-blue-500">PARTNERS</h3>
+            <div class="space-y-2">
+                <div class="p-4 bg-[#111] border border-white/5 rounded-xl flex justify-between cursor-pointer hover:border-blue-500" onclick="window.open('https://tiktok.com', '_blank')">TikTok <span>📱</span></div>
+                <div class="p-4 bg-[#111] border border-white/5 rounded-xl flex justify-between cursor-pointer hover:border-blue-500" onclick="window.open('https://github.com', '_blank')">GitHub <span>🐙</span></div>
             </div>
         </div>
     </div>
 
     <div id="tos-screen" class="overlay-screen" onclick="hideScreens()">
         <div class="card-ui" onclick="event.stopPropagation()">
-            <h3 class="font-black uppercase italic text-2xl text-blue-500">Terms of Service</h3>
-            <div class="text-[9px] text-gray-400 font-mono leading-relaxed h-64 overflow-y-auto pr-2 space-y-4">
-                <p><span class="text-white font-bold">1. SYSTEM USAGE:</span> This interface is a specialized dashboard designed for decentralized web navigation. By accessing this node, you agree to operate within legal frameworks.</p>
-                <p><span class="text-white font-bold">2. DATA PRIVACY:</span> We operate on a "Zero-Retention" policy. Session data is transient and cleared upon identity reset or termination.</p>
-                <p><span class="text-white font-bold">3. USER IDENTITY:</span> Your "Identity" is stored locally. Resetting the identity wipes all local configurations and theme preferences.</p>
-                <p><span class="text-white font-bold">4. PROXY CONDUCT:</span> Users are responsible for content accessed via external links. We do not control third-party partner content.</p>
-                <p><span class="text-white font-bold">5. LIMITATION:</span> This system is provided "as-is." We are not responsible for latency fluctuations or connection stability.</p>
-            </div>
-            <button class="py-4 bg-white text-black font-black rounded-2xl text-[10px] uppercase mt-4 hover:bg-blue-500 hover:text-white transition-all" onclick="hideScreens()">I ACCEPT TERMS</button>
+            <h3 class="font-black italic text-xl text-blue-500">TERMS</h3>
+            <p class="text-[10px] text-gray-400">Zero-retention policy. All session data is transient.</p>
+            <button class="py-4 bg-white text-black font-black rounded-xl text-[10px] uppercase" onclick="hideScreens()">Accept</button>
         </div>
     </div>
-
-    <div id="settings-screen" class="overlay-screen" onclick="hideScreens()"><div class="card-ui" onclick="event.stopPropagation()"><h3 class="font-black text-blue-500">SETTINGS</h3><button onclick="hideScreens()" class="text-[10px] mt-4 uppercase">Close</button></div></div>
-    <div id="partners-screen" class="overlay-screen" onclick="hideScreens()"><div class="card-ui" onclick="event.stopPropagation()"><h3 class="font-black text-blue-500">PARTNERS</h3><p class="text-[10px]">TikTok, GitHub, Discord</p><button onclick="hideScreens()" class="text-[10px] mt-4 uppercase">Close</button></div></div>
 
     <div id="browser-view">
         <iframe id="proxyFrame" class="w-full h-full bg-white border-none"></iframe>
     </div>
 
     <script>
-        const STATE = { fps: 60 };
-
         function handleContextMenu(e) {
             e.preventDefault();
             const m = document.getElementById('context-menu');
@@ -209,19 +187,26 @@
             return false;
         }
 
-        window.onclick = () => { document.getElementById('context-menu').style.display = 'none'; };
+        window.onclick = () => { 
+            document.getElementById('context-menu').style.display = 'none';
+            document.getElementById('drop-menu').style.display = 'none';
+        };
 
-        function notify(msg) {
-            const container = document.getElementById('notif-container');
-            const n = document.createElement('div');
-            n.className = 'notif'; n.innerText = msg;
-            container.appendChild(n);
-            setTimeout(() => n.classList.add('show'), 10);
-            setTimeout(() => { n.classList.remove('show'); setTimeout(() => n.remove(), 500); }, 3000);
+        function toggleSearchHub() {
+            const h = document.getElementById('search-hub');
+            if(h.classList.contains('show')) { h.classList.remove('show'); setTimeout(()=>h.style.display='none', 500); }
+            else { h.style.display='flex'; setTimeout(()=>h.classList.add('show'), 10); document.getElementById('urlInput').focus(); }
+        }
+
+        function handleSearch(e) {
+            e.preventDefault();
+            let val = document.getElementById('urlInput').value.trim();
+            if(!val) return;
+            processUrl(val.includes('.') ? (val.startsWith('http') ? val : 'https://' + val) : 'https://duckduckgo.com/?q=' + encodeURIComponent(val));
+            toggleSearchHub();
         }
 
         function processUrl(url) {
-            notify("Establishing Tunnel...");
             document.getElementById('proxyFrame').src = url;
             document.getElementById('main-content').classList.remove('active');
             const bv = document.getElementById('browser-view');
@@ -238,13 +223,12 @@
         function toggleMenu(e) {
             e.stopPropagation();
             const m = document.getElementById('drop-menu');
-            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
         }
 
         function openScreen(id) {
             const s = document.getElementById(id);
             s.style.display = 'flex'; setTimeout(() => s.classList.add('active'), 50);
-            document.getElementById('drop-menu').style.display = 'none';
         }
 
         function hideScreens() {
@@ -253,13 +237,23 @@
             });
         }
 
+        function applySettings() {
+            const t = document.getElementById('cloak-title').value;
+            const i = document.getElementById('cloak-icon').value;
+            if(t) document.title = t;
+            if(i) document.getElementById('tab-icon').href = i;
+            hideScreens();
+        }
+
         function resetIdentity() {
             document.getElementById('main-content').classList.remove('active');
             const intro = document.getElementById('intro-overlay');
             intro.style.display = 'flex'; intro.style.opacity = '1';
             document.getElementById('name-prompt').style.display = 'flex';
+            document.getElementById('name-prompt').style.opacity = '1';
             document.getElementById('welcome-text').style.display = 'none';
             document.getElementById('nameInput').value = '';
+            document.getElementById('nameInput').focus();
         }
 
         document.getElementById('nameInput').addEventListener('keypress', (e) => {
@@ -269,7 +263,6 @@
                 setTimeout(() => {
                     document.getElementById('name-prompt').style.display = "none";
                     document.getElementById('display-name').innerText = name;
-                    document.getElementById('nav-name').innerText = name;
                     const welcome = document.getElementById('welcome-text');
                     welcome.style.display = "block"; setTimeout(() => welcome.classList.add('visible'), 100);
                     setTimeout(() => {
@@ -278,23 +271,17 @@
                             document.getElementById('intro-overlay').style.display="none"; 
                             document.getElementById('main-content').classList.add('active'); 
                         }, 1000);
-                    }, 2800);
+                    }, 2500);
                 }, 800);
             }
         });
 
-        // Telemetry loop
-        setInterval(() => {
-            document.getElementById('latency-val').innerText = (Math.random()*0.4 + 0.1).toFixed(1) + 'ms';
-        }, 2000);
-
-        // Particle System
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
         let stars = [];
         function init() {
             canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            stars = []; for(let i=0; i<200; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, s:Math.random()*1.5, v:Math.random()*0.5});
+            stars = []; for(let i=0; i<200; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, s:Math.random()*1.5, v:Math.random()*0.4});
         }
         function draw() {
             ctx.fillStyle = "#050505"; ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -305,7 +292,7 @@
             });
             requestAnimationFrame(draw);
         }
-        init(); draw();
+        window.onresize = init; init(); draw();
 
         const dot = document.getElementById('cursor-dot');
         const ring = document.getElementById('cursor-ring');
@@ -313,6 +300,8 @@
             dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px';
             ring.animate({ left: (e.clientX-12)+'px', top: (e.clientY-12)+'px' }, {duration:400, fill:'forwards'});
         };
+
+        setInterval(() => { document.getElementById('lat-val').innerText = (Math.random()*0.3 + 0.1).toFixed(1) + 'ms'; }, 2000);
     </script>
 </body>
 </html>
