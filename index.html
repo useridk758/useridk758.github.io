@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA OS | V9.2 PRESTIGE</title>
+    <title>NEBULA OS | V9.3 AETHER</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
@@ -16,52 +16,46 @@
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; user-select: none; }
         body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* --- HARDWARE ACCELERATED MOUSE --- */
-        #c-dot {
-            position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10000; pointer-events: none;
-            transform: translate3d(var(--m-x), var(--m-y), 0);
-        }
-        #c-ring {
-            position: fixed; top: 0; left: 0; width: 35px; height: 35px; border: 1.5px solid var(--theme-main); border-radius: 50%; z-index: 9999; pointer-events: none;
+        /* --- MOUSE KERNEL --- */
+        #c-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10000; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); }
+        #c-ring { 
+            position: fixed; top: 0; left: 0; width: 35px; height: 35px; border: 1.5px solid var(--theme-main); border-radius: 50%; z-index: 9999; pointer-events: none; 
             transform: translate3d(calc(var(--r-x) - 15px), calc(var(--r-y) - 15px), 0);
-            mix-blend-mode: difference;
-            transition: width 0.3s cubic-bezier(0.23, 1, 0.32, 1), height 0.3s cubic-bezier(0.23, 1, 0.32, 1), background 0.3s;
+            mix-blend-mode: difference; transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
         }
-        .hover-state #c-ring { width: 65px; height: 65px; background: rgba(255,255,255,0.15); border-color: #fff; }
+        .hover-state #c-ring { width: 65px; height: 65px; background: rgba(255,255,255,0.1); border-color: #fff; }
 
-        /* --- BOOT & LOGIN --- */
-        #boot { position: fixed; inset: 0; background: #000; z-index: 9000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        #gate { position: fixed; inset: 0; background: #010101; z-index: 8000; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 0.8s; }
-        
+        /* --- LOGIN & WELCOME PHASE --- */
+        #gate { position: fixed; inset: 0; background: #010101; z-index: 8000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #welcome-sequence { position: fixed; inset: 0; background: #010101; z-index: 8500; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 1.5s; }
+        .gate-in { background: transparent; border: none; border-bottom: 4px solid #111; text-6xl font-black text-center text-white outline-none w-[80%] transition: 0.5s; }
+        .gate-in:focus { border-color: var(--theme-main); }
+
         /* --- DOCK (BOTTOM CENTER) --- */
-        .dock-container { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1000; opacity: 0; transition: 1s ease-out; }
-        .dock { display: flex; gap: 20px; background: rgba(15,15,15,0.8); padding: 15px 30px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(25px); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-        .btn { width: 55px; height: 55px; background: #1a1a1a; border-radius: 18px; display: flex; align-items: center; justify-content: center; border: 1px solid #333; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-size: 1.4rem; }
-        .btn:hover { transform: translateY(-15px) scale(1.2); border-color: var(--theme-main); box-shadow: 0 10px 20px var(--theme-glow); }
+        .dock-wrap { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1000; opacity: 0; transition: 1.5s; display: none; }
+        .dock { display: flex; gap: 20px; background: rgba(15,15,15,0.7); padding: 12px 25px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(30px); }
+        .btn { width: 55px; height: 55px; background: #111; border-radius: 18px; display: flex; align-items: center; justify-content: center; border: 1px solid #222; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-size: 1.4rem; }
+        .btn:hover { transform: translateY(-12px) scale(1.1); border-color: var(--theme-main); }
 
-        /* --- FULL SCREEN SEARCH --- */
-        #win-search { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; display: none; 
-            flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(50px); opacity: 0; transition: 0.5s;
-        }
-        #win-search.active { display: flex; opacity: 1; }
-        .search-huge { font-size: 5rem; font-weight: 900; background: transparent; border: none; border-bottom: 4px solid #222; width: 80%; text-align: center; color: #fff; outline: none; transition: 0.5s; }
-        .search-huge:focus { border-color: var(--theme-main); }
+        /* --- TERMINAL (ALT + T) --- */
+        #term-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); z-index: 5000; display: none; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; }
+        .term-box { width: 600px; background: #080808; border: 1px solid #222; border-radius: 20px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
+        .term-header { padding: 12px 20px; background: #111; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        .term-body { padding: 20px; height: 300px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #22c55e; }
+        .term-input-line { display: flex; gap: 10px; padding: 15px 20px; background: #050505; border-top: 1px solid #222; }
+        #term-field { background: transparent; border: none; outline: none; color: #fff; width: 100%; font-family: 'JetBrains Mono'; }
 
-        /* --- SETTINGS PANEL --- */
-        .win-settings { 
-            position: fixed; right: -400px; top: 0; width: 380px; height: 100vh; background: #080808; 
-            border-left: 1px solid #222; z-index: 1500; transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1); padding: 50px 30px;
-        }
-        .win-settings.active { right: 0; }
-        .setting-card { background: #111; padding: 20px; border-radius: 20px; border: 1px solid #222; margin-bottom: 20px; }
+        /* --- MAIN UI --- */
+        #desktop { height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 2s; }
+        .hero { font-size: 12vw; font-weight: 900; italic; background: linear-gradient(to bottom, #fff, #333); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* --- HERO --- */
-        #desktop { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 2s; }
-        .hero { font-size: 14vw; font-weight: 900; italic; line-height: 0.8; letter-spacing: -0.05em; }
+        /* --- SEARCH & SETTINGS --- */
+        .win { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 4000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(40px); }
+        .win-active { display: flex; }
+        .search-field { width: 70%; background: transparent; border: none; border-bottom: 3px solid #222; text-6xl font-black text-center text-white outline-none focus:border-blue-500 transition: 0.5s; }
 
-        @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
-        .heartbeat { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; animation: pulse 1s infinite; }
+        .settings-panel { position: fixed; right: -400px; top: 0; width: 350px; height: 100vh; background: #080808; border-left: 1px solid #222; z-index: 3000; transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1); padding: 60px 30px; }
+        .settings-panel.active { right: 0; }
     </style>
 </head>
 <body>
@@ -70,98 +64,111 @@
     <div id="c-dot"></div>
     <div id="c-ring"></div>
 
-    <div id="boot">
-        <h1 class="text-blue-500 font-black italic text-5xl tracking-tighter">NEBULA</h1>
-        <div class="w-64 h-1 bg-white/5 mt-8 rounded-full overflow-hidden">
-            <div id="boot-bar" class="h-full bg-blue-600" style="width: 0%;"></div>
-        </div>
+    <div id="gate">
+        <p class="text-[10px] font-black tracking-[10px] text-gray-600 mb-8 uppercase">Kernel Authentication</p>
+        <input type="text" id="user-input" class="gate-in hoverable" placeholder="..." onkeypress="if(event.key==='Enter')OS.startSequence()">
     </div>
 
-    <div id="gate">
-        <input type="text" id="auth-field" class="bg-transparent border-b-4 border-white/5 text-8xl font-black text-center text-white outline-none w-full hoverable" placeholder="IDENTIFY" onkeypress="if(event.key==='Enter')OS.login()">
+    <div id="welcome-sequence">
+        <h2 id="welcome-text" class="text-4xl font-black italic mb-4"></h2>
+        <p class="text-[9px] font-mono tracking-[5px] text-blue-500 uppercase" id="load-status">Decrypting Profile...</p>
     </div>
 
     <main id="desktop">
-        <h1 class="hero text-white/10">USERIDK</h1>
+        <h1 class="hero">USERIDK</h1>
+        <div class="mt-12 flex gap-20">
+            <div class="text-center"><p class="text-4xl font-black font-mono" id="stat-fps">60</p><p class="text-[8px] font-black uppercase tracking-widest text-blue-500">Stability</p></div>
+            <div class="text-center"><p class="text-4xl font-black font-mono" id="stat-up">0s</p><p class="text-[8px] font-black uppercase tracking-widest text-blue-500">Uptime</p></div>
+        </div>
     </main>
 
-    <div id="win-search">
-        <button class="absolute top-10 right-10 text-2xl hoverable" onclick="OS.toggleSearch()">✕</button>
-        <p class="text-blue-500 font-black tracking-[1em] mb-10">CORE SEARCH ENGINE</p>
-        <input type="text" id="search-in" class="search-huge hoverable" placeholder="ENTER TARGET URL..." onkeypress="if(event.key==='Enter')OS.runSearch()">
-    </div>
-
-    <div id="win-settings" class="win-settings">
-        <div class="flex justify-between items-center mb-10">
-            <h2 class="text-xl font-black uppercase italic">System Core</h2>
-            <button class="hoverable" onclick="OS.toggleSettings()">✕</button>
-        </div>
-        
-        <div class="setting-card">
-            <div class="flex items-center gap-4 mb-2">
-                <div class="heartbeat"></div>
-                <span class="text-[10px] font-black uppercase text-gray-400">Kernel Status</span>
+    <div id="term-overlay">
+        <div class="term-box">
+            <div class="term-header">
+                <span class="text-[9px] font-black uppercase tracking-widest">Aether System Console</span>
+                <span class="text-[9px] opacity-40">nebula-v9.3</span>
             </div>
-            <p class="font-mono text-sm text-green-500">ACTIVE & SECURE</p>
-        </div>
-
-        <div class="setting-card">
-            <p class="text-[10px] font-black uppercase text-gray-400 mb-4">Appearance</p>
-            <div class="flex gap-4">
-                <div class="w-10 h-10 bg-blue-600 rounded-lg hoverable" onclick="OS.setTheme('#3b82f6')"></div>
-                <div class="w-10 h-10 bg-rose-600 rounded-lg hoverable" onclick="OS.setTheme('#f43f5e')"></div>
-                <div class="w-10 h-10 bg-emerald-600 rounded-lg hoverable" onclick="OS.setTheme('#10b981')"></div>
+            <div class="term-body" id="term-log">
+                Nebula OS [Version 9.3.0]<br>
+                (c) 2026 USERIDK Corp. All rights reserved.<br><br>
+                Type 'help' for available commands.
+            </div>
+            <div class="term-input-line">
+                <span class="text-blue-500 font-bold">$</span>
+                <input type="text" id="term-field" autocomplete="off" spellcheck="false" onkeypress="OS.handleTerm(event)">
             </div>
         </div>
-
-        <button class="w-full py-5 bg-white text-black font-black uppercase text-xs rounded-2xl hoverable" onclick="location.reload()">Reboot System</button>
     </div>
 
-    <div id="dock-wrap" class="dock-container">
+    <div id="win-search" class="win">
+        <button class="absolute top-10 right-10 hoverable" onclick="OS.toggle('win-search')">✕ CLOSE</button>
+        <input type="text" id="search-in" class="search-field hoverable" placeholder="URL OR QUERY..." onkeypress="if(event.key==='Enter')OS.runSearch()">
+    </div>
+
+    <div id="win-settings" class="settings-panel">
+        <h2 class="text-2xl font-black italic mb-10">CORE CONFIG</h2>
+        <div class="space-y-6">
+            <div class="p-5 bg-white/5 border border-white/5 rounded-2xl">
+                <p class="text-[9px] font-black uppercase text-gray-500 mb-2">Interface Color</p>
+                <div class="flex gap-4">
+                    <div class="w-8 h-8 rounded-full bg-blue-500 hoverable" onclick="OS.setTheme('#3b82f6')"></div>
+                    <div class="w-8 h-8 rounded-full bg-rose-500 hoverable" onclick="OS.setTheme('#f43f5e')"></div>
+                    <div class="w-8 h-8 rounded-full bg-amber-500 hoverable" onclick="OS.setTheme('#f59e0b')"></div>
+                </div>
+            </div>
+            <button class="w-full py-4 bg-white text-black font-black uppercase text-xs rounded-xl hoverable" onclick="location.reload()">Reset Kernel</button>
+        </div>
+        <button class="absolute bottom-10 left-10 hoverable" onclick="OS.toggleSettings()">✕ BACK</button>
+    </div>
+
+    <div id="dock-wrap" class="dock-wrap">
         <div class="dock">
             <div class="btn hoverable" onclick="OS.home()">🏠</div>
-            <div class="btn hoverable" onclick="OS.toggleSearch()">🔍</div>
+            <div class="btn hoverable" onclick="OS.toggle('win-search')">🔍</div>
             <div class="btn hoverable" onclick="OS.proxy('https://cineby.gd')">🎬</div>
             <div class="btn hoverable" onclick="OS.toggleSettings()">⚙️</div>
         </div>
     </div>
 
-    <div id="proxy-container" class="fixed inset-0 z-[1200] bg-black hidden">
-        <div class="absolute top-5 left-1/2 -translate-x-1/2 flex gap-4 bg-black/80 p-2 rounded-full border border-white/10 z-[1300]">
-            <button class="px-6 py-2 bg-white text-black font-black rounded-full hoverable text-xs" onclick="OS.home()">EXIT PORTAL</button>
-        </div>
+    <div id="proxy-container" class="fixed inset-0 z-[6000] bg-black hidden">
+        <button class="absolute top-6 left-1/2 -translate-x-1/2 px-8 py-3 bg-white text-black font-black rounded-full z-[7000] hoverable" onclick="OS.home()">EXIT PORTAL</button>
         <iframe id="proxy-frame" class="w-full h-full border-none bg-white"></iframe>
     </div>
 
     <script>
-        class NebulaV9 {
+        class NebulaAether {
             constructor() {
-                this.m = { x: 0, y: 0, rx: 0, ry: 0 };
+                this.mouse = { x: 0, y: 0, rx: 0, ry: 0 };
+                this.uptime = 0;
                 this.init();
             }
 
             init() {
                 this.setupInput();
                 this.setupGraphics();
-                this.bootCycle();
+                this.handleGlobalKeys();
+                setInterval(() => {
+                    this.uptime++;
+                    document.getElementById('stat-up').innerText = this.uptime + 's';
+                }, 1000);
             }
 
             setupInput() {
                 const r = document.documentElement;
                 window.addEventListener('mousemove', (e) => {
-                    this.m.x = e.clientX; this.m.y = e.clientY;
-                    r.style.setProperty('--m-x', `${this.m.x}px`);
-                    r.style.setProperty('--m-y', `${this.m.y}px`);
+                    this.mouse.x = e.clientX; this.mouse.y = e.clientY;
+                    r.style.setProperty('--m-x', `${this.mouse.x}px`);
+                    r.style.setProperty('--m-y', `${this.mouse.y}px`);
                 });
 
-                const sync = () => {
-                    this.m.rx += (this.m.x - this.m.rx) * 0.12; // Smooth LERP
-                    this.m.ry += (this.m.y - this.m.ry) * 0.12;
-                    r.style.setProperty('--r-x', `${this.m.rx}px`);
-                    r.style.setProperty('--r-y', `${this.m.ry}px`);
-                    requestAnimationFrame(sync);
+                const lerp = () => {
+                    this.mouse.rx += (this.mouse.x - this.mouse.rx) * 0.12;
+                    this.mouse.ry += (this.mouse.y - this.mouse.ry) * 0.12;
+                    r.style.setProperty('--r-x', `${this.mouse.rx}px`);
+                    r.style.setProperty('--r-y', `${this.mouse.ry}px`);
+                    requestAnimationFrame(lerp);
                 };
-                sync();
+                lerp();
 
                 document.addEventListener('mouseover', (e) => {
                     if(e.target.classList.contains('hoverable')) document.body.classList.add('hover-state');
@@ -171,41 +178,101 @@
                 });
             }
 
-            bootCycle() {
-                let bar = document.getElementById('boot-bar');
-                let p = 0;
-                let iv = setInterval(() => {
-                    p += Math.random() * 20;
-                    bar.style.width = p + '%';
-                    if(p >= 100) {
-                        clearInterval(iv);
-                        document.getElementById('boot').style.display = 'none';
-                        let g = document.getElementById('gate');
-                        g.style.display = 'flex';
-                        setTimeout(() => g.style.opacity = '1', 50);
-                        document.getElementById('auth-field').focus();
+            handleGlobalKeys() {
+                window.addEventListener('keydown', (e) => {
+                    if(e.altKey && e.key.toLowerCase() === 't') {
+                        this.toggleTerminal();
                     }
-                }, 100);
+                });
             }
 
-            login() {
+            startSequence() {
+                const name = document.getElementById('user-input').value.trim();
+                if(!name) return;
+
+                // Transition to Welcome
                 document.getElementById('gate').style.display = 'none';
-                document.getElementById('desktop').style.opacity = '1';
-                document.getElementById('dock-wrap').style.opacity = '1';
+                const seq = document.getElementById('welcome-sequence');
+                seq.style.display = 'flex';
+                setTimeout(() => seq.style.opacity = '1', 50);
+
+                document.getElementById('welcome-text').innerText = `WELCOME, ${name.toUpperCase()}`;
+
+                // Artificial Delay for "Cinematic" feel
+                const logs = ["Syncing Aether...", "Loading UI Modules...", "Establishing Proxy Handshake...", "Kernel Ready."];
+                let i = 0;
+                const iv = setInterval(() => {
+                    document.getElementById('load-status').innerText = logs[i];
+                    i++;
+                    if(i >= logs.length) {
+                        clearInterval(iv);
+                        setTimeout(() => this.revealDesktop(), 1000);
+                    }
+                }, 800);
             }
 
-            toggleSearch() {
-                const s = document.getElementById('win-search');
-                if(s.classList.contains('active')) {
-                    s.classList.remove('active');
-                    setTimeout(() => s.style.display = 'none', 500);
+            revealDesktop() {
+                document.getElementById('welcome-sequence').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('welcome-sequence').style.display = 'none';
+                    const d = document.getElementById('desktop');
+                    d.style.display = 'flex';
+                    setTimeout(() => d.style.opacity = '1', 50);
+                    const dock = document.getElementById('dock-wrap');
+                    dock.style.display = 'block';
+                    setTimeout(() => dock.style.opacity = '1', 100);
+                }, 1500);
+            }
+
+            toggleTerminal() {
+                const term = document.getElementById('term-overlay');
+                if(term.style.display === 'flex') {
+                    term.style.opacity = '0';
+                    setTimeout(() => term.style.display = 'none', 300);
                 } else {
-                    s.style.display = 'flex';
+                    term.style.display = 'flex';
                     setTimeout(() => {
-                        s.classList.add('active');
-                        document.getElementById('search-in').focus();
+                        term.style.opacity = '1';
+                        document.getElementById('term-field').focus();
                     }, 50);
                 }
+            }
+
+            handleTerm(e) {
+                if(e.key === 'Enter') {
+                    const input = e.target.value.toLowerCase().trim();
+                    const log = document.getElementById('term-log');
+                    let output = "";
+
+                    if(input === 'help') {
+                        output = "AVAILABLE COMMANDS:<br> - help: Show this list<br> - clear: Wipe console<br> - proxy [url]: Rapid tunnel<br> - exit: Close terminal";
+                    } else if(input === 'clear') {
+                        log.innerHTML = "Nebula OS Console Cleared.";
+                        e.target.value = ""; return;
+                    } else if(input === 'exit') {
+                        this.toggleTerminal();
+                        e.target.value = ""; return;
+                    } else if(input.startsWith('proxy ')) {
+                        this.proxy(input.split(' ')[1]);
+                        output = "Tunneling to target...";
+                    } else {
+                        output = `Command not recognized: ${input}`;
+                    }
+
+                    log.innerHTML += `<br><span class="text-white">$ ${input}</span><br>${output}`;
+                    e.target.value = "";
+                    log.scrollTop = log.scrollHeight;
+                }
+            }
+
+            toggle(id) {
+                const el = document.getElementById(id);
+                el.classList.toggle('win-active');
+                if(el.classList.contains('win-active')) document.getElementById('search-in').focus();
+            }
+
+            toggleSettings() {
+                document.getElementById('win-settings').classList.toggle('active');
             }
 
             runSearch() {
@@ -213,11 +280,7 @@
                 if(!v.includes('.')) v = 'https://google.com/search?q=' + v;
                 else if(!v.startsWith('http')) v = 'https://' + v;
                 this.proxy(v);
-                this.toggleSearch();
-            }
-
-            toggleSettings() {
-                document.getElementById('win-settings').classList.toggle('active');
+                this.toggle('win-search');
             }
 
             proxy(url) {
@@ -235,18 +298,18 @@
             }
 
             setupGraphics() {
-                const canvas = document.getElementById('stars');
-                const ctx = canvas.getContext('2d');
+                const c = document.getElementById('stars');
+                const ctx = c.getContext('2d');
                 let parts = [];
-                const res = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+                const res = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
                 window.onresize = res; res();
-                for(let i=0; i<200; i++) parts.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2});
+                for(let i=0; i<200; i++) parts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*2});
                 const draw = () => {
-                    ctx.fillStyle = '#010101'; ctx.fillRect(0,0,canvas.width,canvas.height);
+                    ctx.fillStyle = '#010101'; ctx.fillRect(0,0,c.width,c.height);
                     ctx.fillStyle = '#fff';
                     parts.forEach(p => {
                         ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill();
-                        p.y += 0.4; if(p.y > canvas.height) p.y = 0;
+                        p.y += 0.3; if(p.y > c.height) p.y = 0;
                     });
                     requestAnimationFrame(draw);
                 };
@@ -254,7 +317,7 @@
             }
         }
 
-        const OS = new NebulaV9();
+        const OS = new NebulaAether();
     </script>
 </body>
 </html>
