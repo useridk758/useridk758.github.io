@@ -3,304 +3,409 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="tab-title">USERIDK758 | Cosmic Arcade</title>
-    <link id="tab-icon" rel="icon" type="image/jpg" href="https://www.nhm.ac.uk/content/dam/nhm-www/discover/what-is-space/what-is-space-milky-way-full-width.jpg">
+    <title>NEBULA OS | EVENT HORIZON v8.8</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --theme-main: #3b82f6; 
-            --theme-glow: rgba(59, 130, 246, 0.6); 
-            --bg-color: #050505;
-            --panel-bg: rgba(10, 10, 10, 0.95);
-            --smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        :root {
+            --theme-main: #3b82f6;
+            --theme-glow: rgba(59, 130, 246, 0.4);
+            --bg-prime: #010101;
+            --surface: #080808;
+            --border: rgba(255,255,255,0.06);
+            --font-main: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --bezier-fast: cubic-bezier(0.4, 0, 0.2, 1);
+            --bezier-smooth: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: white; overflow: hidden; height: 100vh; }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; user-select: none; outline: none; }
+        body { background: var(--bg-prime); color: #fff; font-family: var(--font-main); overflow: hidden; height: 100vh; }
 
-        /* Cursor */
-        #cursor-dot { position: fixed; width: 6px; height: 6px; background: white; border-radius: 50%; z-index: 10000; pointer-events: none; }
-        #cursor-ring { position: fixed; width: 25px; height: 25px; border: 1px solid var(--theme-main); border-radius: 50%; z-index: 9999; pointer-events: none; }
-        #starCanvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+        /* --- KERNEL LAYERS --- */
+        #render-pipeline { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+        #cursor-dot { position: fixed; width: 4px; height: 4px; background: #fff; border-radius: 50%; z-index: 10000; pointer-events: none; }
+        #cursor-ring { position: fixed; width: 30px; height: 30px; border: 1.5px solid var(--theme-main); border-radius: 50%; z-index: 9999; pointer-events: none; mix-blend-mode: difference; transition: width 0.3s, height 0.3s, background 0.3s; }
 
-        /* Notifications */
-        #notif-container { position: fixed; top: 30px; right: 90px; z-index: 9000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .notif { background: rgba(15, 15, 15, 0.9); border-left: 3px solid var(--theme-main); padding: 15px 25px; border-radius: 8px; font-size: 10px; font-weight: 900; text-transform: uppercase; transform: translateX(120%); transition: 0.5s var(--smooth); backdrop-filter: blur(10px); }
-        .notif.active { transform: translateX(0); }
+        /* --- NAVIGATION INTERFACE --- */
+        #top-interface { position: fixed; top: 0; left: 0; width: 100%; height: 90px; display: flex; align-items: center; justify-content: center; z-index: 900; opacity: 0; transition: 1s var(--bezier-smooth); }
+        .central-dock { background: rgba(10, 10, 10, 0.7); backdrop-filter: blur(30px); border: 1px solid var(--border); border-radius: 50px; padding: 12px 35px; display: flex; align-items: center; gap: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
 
-        /* Icons & Hover Physics */
-        #pencil-btn, #home-btn, .side-icon, #menu-btn { 
-            background: #111; border: 1px solid #333; border-radius: 12px; 
-            display: flex; align-items: center; justify-content: center; 
-            cursor: pointer; transition: 0.3s var(--smooth); 
-        }
-        #pencil-btn:hover, #home-btn:hover, .side-icon:hover, #menu-btn:hover { border-color: var(--theme-main); transform: scale(1.15); filter: brightness(1.2); box-shadow: 0 0 20px var(--theme-glow); }
-        
-        #pencil-btn { position: fixed; top: 30px; right: 30px; width: 50px; height: 50px; display: none; z-index: 500; font-size: 1.2rem; }
-        #home-btn { position: fixed; top: 30px; left: 30px; width: 50px; height: 50px; z-index: 500; }
-        #side-nav { position: fixed; left: 30px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
-        .side-icon { width: 50px; height: 50px; font-size: 1.2rem; }
-        #menu-btn { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; z-index: 200; font-weight: 900; }
+        .dock-btn { width: 50px; height: 50px; border-radius: 18px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; transition: 0.4s var(--bezier-smooth); position: relative; }
+        .dock-btn:hover { transform: scale(1.18) translateY(-6px); border-color: var(--theme-main); box-shadow: 0 15px 30px var(--theme-glow); }
+        .dock-btn:active { transform: scale(0.92); }
 
-        /* Main Menu Positioning */
-        #main-content { opacity: 0; transform: translateY(0px); transition: 1.2s var(--smooth); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; pointer-events: none; margin-top: -10vh; /* Moved text up */ }
-        #main-content.active { opacity: 1; pointer-events: all; }
-        #top-nav { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); z-index: 150; }
+        /* --- WINDOW ENGINE --- */
+        .process-window { position: fixed; background: var(--surface); border: 1px solid var(--border); border-radius: 28px; display: none; flex-direction: column; opacity: 0; transform: scale(0.92) translateY(30px); transition: 0.6s var(--bezier-smooth); z-index: 1000; backdrop-filter: blur(40px); box-shadow: 0 40px 80px rgba(0,0,0,0.9); overflow: hidden; }
+        .process-window.active { display: flex; opacity: 1; transform: scale(1) translateY(0); }
+        .p-header { padding: 18px 28px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); }
+        .p-title { font-size: 11px; font-weight: 950; text-transform: uppercase; letter-spacing: 3px; color: var(--theme-main); }
+        .p-content { padding: 35px; flex-grow: 1; overflow-y: auto; }
 
-        /* Overlays */
-        .overlay-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; backdrop-filter: blur(20px); transition: 0.6s var(--smooth); }
-        .overlay-screen.active { display: flex; opacity: 1; }
-        .card-ui { background: #0f0f0f; border: 1px solid #222; border-radius: 30px; padding: 35px; width: 440px; display: flex; flex-direction: column; gap: 20px; }
-        
-        #browser-view { position: fixed; inset: 20px 20px 20px 100px; background: black; border: 1px solid #333; border-radius: 30px; z-index: 50; display: none; opacity: 0; transition: 0.6s; }
+        /* --- MAIN DASHBOARD --- */
+        #dashboard { width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 1.5s var(--bezier-smooth); opacity: 0; margin-top: -5vh; }
+        .main-brand { font-size: clamp(6rem, 18vw, 14rem); font-weight: 900; letter-spacing: -0.07em; font-style: italic; text-transform: uppercase; line-height: 0.8; }
+        .brand-gradient { background: linear-gradient(to bottom, #fff 40%, #222); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        #intro-overlay { position: fixed; inset: 0; z-index: 2000; background: #050505; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 1s var(--smooth); }
-        #welcome-text { display: none; font-size: 6rem; font-weight: 900; text-transform: uppercase; text-align: center; }
-        .outlined-blue { color: transparent; -webkit-text-stroke: 2px var(--theme-main); text-shadow: 0 0 30px var(--theme-glow); }
+        /* --- THE TERMINAL (ALT + T) --- */
+        #terminal-win { width: 700px; height: 450px; }
+        .term-scroll { font-family: var(--font-mono); font-size: 13px; color: #22c55e; height: 320px; overflow-y: auto; padding-right: 10px; }
+        .term-prompt { display: flex; gap: 12px; margin-top: 15px; align-items: center; }
+        .term-prompt span { color: #22c55e; font-weight: bold; }
+        #term-input { background: transparent; border: none; color: #fff; width: 100%; font-family: var(--font-mono); }
+
+        /* --- SYSTEM TOASTS --- */
+        #toast-manager { position: fixed; bottom: 40px; right: 40px; display: flex; flex-direction: column; gap: 15px; z-index: 9999; }
+        .toast-msg { background: var(--surface); border: 1px solid var(--border); border-left: 5px solid var(--theme-main); padding: 22px 35px; border-radius: 12px; font-size: 11px; font-weight: 900; text-transform: uppercase; transform: translateX(150%); transition: 0.6s var(--bezier-smooth); }
+        .toast-msg.active { transform: translateX(0); }
+
+        /* --- BOOT & GATE --- */
+        #boot-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 1.2s ease-out; }
+        .boot-loader { width: 200px; height: 2px; background: #111; position: relative; overflow: hidden; margin-bottom: 20px; }
+        .boot-bar { position: absolute; left: -100%; width: 100%; height: 100%; background: var(--theme-main); animation: boot-load 2s infinite linear; }
+        @keyframes boot-load { 0% { left: -100%; } 100% { left: 100%; } }
+
+        #gate-screen { position: fixed; inset: 0; background: var(--bg-prime); z-index: 9500; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(50px); }
+        .gate-label { font-[900] text-[11px] uppercase tracking-[12px] text-gray-500 mb-8; }
+        #user-auth-input { background: transparent; border: none; border-bottom: 3px solid #1a1a1a; width: 500px; font-size: 4.5rem; font-weight: 900; text-align: center; color: #fff; text-transform: uppercase; transition: 0.6s var(--bezier-smooth); }
+        #user-auth-input:focus { border-color: var(--theme-main); width: 600px; }
+
+        /* --- PROXY PORT --- */
+        #proxy-container { position: fixed; inset: 25px 25px 25px 110px; background: #000; border-radius: 40px; border: 1px solid #1a1a1a; display: none; z-index: 850; overflow: hidden; opacity: 0; transition: 0.8s var(--bezier-smooth); }
+
     </style>
 </head>
-<body oncontextmenu="return false">
+<body>
 
-    <canvas id="starCanvas"></canvas>
+    <canvas id="render-pipeline"></canvas>
     <div id="cursor-dot"></div>
     <div id="cursor-ring"></div>
-    <div id="notif-container"></div>
+    <div id="toast-manager"></div>
 
-    <div id="pencil-btn" onclick="window.open('https://github.com', '_blank')">✏️</div>
-    <div id="home-btn" onclick="goHome()">🏠</div>
+    <div id="master-node" class="dock-btn fixed bottom-10 left-10 hidden z-[900]" onclick="OS.toggle('win-master')">✏️</div>
 
-    <div id="side-nav">
-        <div class="side-icon" onclick="toggleSearchHub()">🔍</div>
-        <div class="side-icon" onclick="processUrl('https://cineby.gd')">🎬</div>
-    </div>
-
-    <div id="search-hub" class="fixed left-[100px] top-1/2 -translate-y-1/2 w-80 bg-[#0a0a0a]/95 border border-[#333] rounded-3xl p-6 hidden flex-col gap-4 z-[90] backdrop-blur-3xl transition-all duration-500 scale-90 opacity-0">
-        <h3 class="text-[10px] font-black uppercase text-blue-500">Search Protocol 🔍</h3>
-        <form id="search-form" onsubmit="handleSearch(event)">
-            <input type="text" id="urlInput" class="w-full bg-black border border-[#333] rounded-xl p-3 text-xs outline-none text-white" placeholder="Type URL & Press Enter 🚀" autocomplete="off">
-        </form>
-    </div>
-
-    <div id="menu-btn" onclick="toggleMenu(event)">...</div>
-    <div id="drop-menu" class="fixed bottom-[95px] right-[30px] w-48 bg-[#111]/90 border border-white/10 rounded-xl hidden flex-col z-[200]">
-        <div class="p-4 text-[10px] font-black uppercase cursor-pointer hover:bg-white/5" onclick="goHome()">🏠 Dashboard</div>
-        <div class="p-4 text-[10px] font-black uppercase cursor-pointer hover:bg-white/5 border-t border-white/5" onclick="openScreen('settings-screen')">⚙️ Settings</div>
-        <div class="p-4 text-[10px] font-black uppercase cursor-pointer hover:bg-white/5 border-t border-white/5" onclick="openScreen('tos-screen')">📋 Terms</div>
-    </div>
-
-    <div id="intro-overlay">
-        <div id="name-prompt" class="flex flex-col items-center gap-6 transition-opacity duration-500">
-            <h2 class="text-xl font-black uppercase text-blue-500 tracking-widest">Identify</h2>
-            <input type="text" id="nameInput" autofocus class="bg-transparent border-b-2 border-white/10 text-4xl text-center outline-none w-72 focus:border-blue-500 transition-all" placeholder="...">
+    <header id="top-interface">
+        <div class="central-dock">
+            <div class="dock-btn" onclick="OS.home()">🏠</div>
+            <div class="dock-btn" onclick="OS.toggle('win-search')">🔍</div>
+            <div class="dock-btn" onclick="OS.proxy('https://cineby.gd')">🎬</div>
+            <div class="dock-btn" onclick="OS.toggle('win-settings')">⚙️</div>
+            <div class="h-8 w-[1px] bg-white/10 mx-3"></div>
+            <div class="flex flex-col items-center">
+                <span id="os-clock" class="text-xs font-black tracking-widest">00:00</span>
+                <span class="text-[8px] font-bold text-blue-500 uppercase">Aether-Core</span>
+            </div>
         </div>
-        <h2 id="welcome-text" class="outlined-blue scale-75 opacity-0 transition-all duration-1000">WELCOME,<br><span id="display-name" style="color:white; -webkit-text-stroke: 0px;"></span></h2>
-    </div>
+    </header>
 
-    <div id="top-nav" class="opacity-0 transition-all duration-1000">
-        <nav class="bg-[#0f0f0f]/95 border border-[#222] rounded-full px-8 py-3 flex items-center gap-6">
-            <div class="font-black uppercase text-lg text-blue-500">USERIDK758</div>
-            <div class="text-[9px] font-black px-4 py-1 border border-white/10 rounded-full cursor-pointer hover:bg-white hover:text-black transition-all" onclick="resetIdentity()">RESET IDENTITY</div>
-        </nav>
-    </div>
+    <main id="dashboard">
+        <h1 class="main-brand brand-gradient">USERIDK</h1>
+        <div class="flex gap-24 mt-16">
+            <div class="text-center">
+                <p id="cpu-ms" class="text-4xl font-black font-mono tracking-tighter">00</p>
+                <p class="text-[9px] font-black uppercase text-blue-500 tracking-[5px] mt-2">Latency</p>
+            </div>
+            <div class="text-center">
+                <p id="gpu-fps" class="text-4xl font-black font-mono tracking-tighter">60</p>
+                <p class="text-[9px] font-black uppercase text-blue-500 tracking-[5px] mt-2">Stability</p>
+            </div>
+        </div>
+        <div class="mt-28 flex items-center gap-6 opacity-40">
+            <div class="w-12 h-[1px] bg-white"></div>
+            <p class="text-[10px] font-black uppercase tracking-[1em]">Node: <span id="active-user" class="text-white">---</span></p>
+            <div class="w-12 h-[1px] bg-white"></div>
+        </div>
+    </main>
 
-    <div id="main-content">
-        <h1 class="text-8xl font-black italic uppercase">USERIDK</h1>
-        <p class="mt-4 text-gray-500 font-bold uppercase tracking-[0.5em] text-[10px]">Active Node: <span id="nav-name" class="text-white">...</span></p>
-    </div>
-
-    <div id="settings-screen" class="overlay-screen" onclick="hideScreens()">
-        <div class="card-ui" onclick="event.stopPropagation()">
-            <h3 class="font-black italic text-xl text-blue-500">SETTINGS</h3>
-            <div class="space-y-4">
-                <p class="text-[10px] font-black text-gray-400 uppercase">Themes</p>
-                <div class="flex gap-4">
-                    <div class="w-8 h-8 rounded-full bg-blue-500 cursor-pointer" onclick="setTheme('#3b82f6')"></div>
-                    <div class="w-8 h-8 rounded-full bg-emerald-500 cursor-pointer" onclick="setTheme('#10b981')"></div>
-                    <div class="w-8 h-8 rounded-full bg-rose-500 cursor-pointer" onclick="setTheme('#f43f5e')"></div>
+    <section id="win-search" class="process-window w-[550px]">
+        <div class="p-header"><span class="p-title">Aether Search</span><button onclick="OS.toggle('win-search')">✕</button></div>
+        <div class="p-content">
+            <input type="text" id="search-query" class="w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white font-mono text-sm mb-8" placeholder="Enter target URL or Query..." onkeypress="if(event.key==='Enter')OS.runSearch()">
+            <div class="grid grid-cols-2 gap-5">
+                <div class="p-5 bg-white/5 rounded-2xl border border-white/5 hover:border-blue-500 transition-all text-center cursor-pointer" onclick="OS.proxy('https://google.com')">
+                    <p class="text-[10px] font-black uppercase tracking-widest">Google</p>
+                </div>
+                <div class="p-5 bg-white/5 rounded-2xl border border-white/5 hover:border-emerald-500 transition-all text-center cursor-pointer" onclick="OS.proxy('https://youtube.com')">
+                    <p class="text-[10px] font-black uppercase tracking-widest">YouTube</p>
                 </div>
             </div>
-            <button class="py-4 bg-white text-black font-black rounded-xl text-[10px] uppercase mt-4" onclick="hideScreens()">Close</button>
         </div>
+    </section>
+
+    <section id="win-settings" class="process-window w-[480px]">
+        <div class="p-header"><span class="p-title">Kernel Control</span><button onclick="OS.toggle('win-settings')">✕</button></div>
+        <div class="p-content space-y-10">
+            <div>
+                <h4 class="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-6">Visual Theme</h4>
+                <div class="flex gap-5">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-600 cursor-pointer shadow-lg hover:scale-110 transition-transform" onclick="OS.setTheme('#3b82f6')"></div>
+                    <div class="w-12 h-12 rounded-2xl bg-rose-600 cursor-pointer shadow-lg hover:scale-110 transition-transform" onclick="OS.setTheme('#e11d48')"></div>
+                    <div class="w-12 h-12 rounded-2xl bg-amber-600 cursor-pointer shadow-lg hover:scale-110 transition-transform" onclick="OS.setTheme('#d97706')"></div>
+                </div>
+            </div>
+            <button class="w-full py-5 bg-white text-black font-black uppercase text-xs rounded-2xl hover:bg-red-600 hover:text-white transition-all" onclick="OS.flush()">Flush Memory & Reset</button>
+        </div>
+    </section>
+
+    <section id="terminal-win" class="process-window">
+        <div class="p-header"><span class="p-title">Nebula Console</span><button onclick="OS.toggle('terminal-win')">✕</button></div>
+        <div class="p-content" style="background: #000;">
+            <div class="term-scroll" id="term-log">Nebula Kernel v8.8.0-Stable<br>Establishing connection to core... Done.<br>Type 'help' for instruction list.</div>
+            <div class="term-prompt">
+                <span>&gt;</span>
+                <input type="text" id="term-input" spellcheck="false" autocomplete="off" onkeypress="OS.exec(event)">
+            </div>
+        </div>
+    </section>
+
+    <div id="boot-screen">
+        <h2 class="text-3xl font-black italic text-blue-500 tracking-tighter mb-4">NEBULA</h2>
+        <div class="boot-loader"><div class="boot-bar"></div></div>
+        <p class="text-[8px] font-mono text-gray-700 uppercase tracking-widest" id="boot-status">Loading Kernel Modules...</p>
     </div>
 
-    <div id="tos-screen" class="overlay-screen" onclick="hideScreens()">
-        <div class="card-ui" onclick="event.stopPropagation()">
-            <h3 class="font-black italic text-xl text-blue-500">TERMS</h3>
-            <p class="text-[10px] text-gray-400">Private tunnel access for authorized users only.</p>
-            <button class="py-4 bg-white text-black font-black rounded-xl text-[10px] uppercase mt-4" onclick="hideScreens()">Accept</button>
-        </div>
+    <div id="gate-screen">
+        <p class="gate-label">Identify Identity</p>
+        <input type="text" id="user-auth-input" spellcheck="false" placeholder="..." onkeypress="if(event.key==='Enter')OS.auth()">
     </div>
 
-    <div id="browser-view">
-        <iframe id="proxyFrame" class="w-full h-full bg-white border-none rounded-3xl"></iframe>
+    <div id="proxy-container">
+        <iframe id="proxy-view" class="w-full h-full border-none bg-white"></iframe>
     </div>
 
     <script>
-        let particleActive = true;
+        /**
+         * NEBULA OS CORE | Class-Based Engine Architecture
+         */
+        class NebulaEngine {
+            constructor() {
+                this.state = {
+                    user: null,
+                    isMaster: false,
+                    theme: '#3b82f6',
+                    activeWindows: new Set(),
+                    startTime: Date.now()
+                };
+                
+                this.elements = {
+                    boot: document.getElementById('boot-screen'),
+                    gate: document.getElementById('gate-screen'),
+                    dash: document.getElementById('dashboard'),
+                    nav: document.getElementById('top-interface'),
+                    ring: document.getElementById('cursor-ring'),
+                    dot: document.getElementById('cursor-dot'),
+                    clock: document.getElementById('os-clock')
+                };
 
-        function notify(msg) {
-            const container = document.getElementById('notif-container');
-            const n = document.createElement('div');
-            n.className = 'notif'; n.innerText = msg;
-            container.appendChild(n);
-            setTimeout(() => n.classList.add('active'), 10);
-            setTimeout(() => { n.classList.remove('active'); setTimeout(() => n.remove(), 500); }, 3000);
-        }
-
-        function setTheme(color) {
-            document.documentElement.style.setProperty('--theme-main', color);
-            document.documentElement.style.setProperty('--theme-glow', color + '99');
-            notify("Theme Updated");
-        }
-
-        function toggleSearchHub() {
-            const h = document.getElementById('search-hub');
-            if(h.classList.contains('opacity-100')) {
-                h.classList.remove('opacity-100', 'scale-100'); h.classList.add('opacity-0', 'scale-90');
-                setTimeout(() => h.classList.add('hidden'), 500);
-            } else {
-                h.classList.remove('hidden');
-                setTimeout(() => { h.classList.add('opacity-100', 'scale-100'); h.classList.remove('opacity-0', 'scale-90'); }, 10);
-                document.getElementById('urlInput').focus();
+                this.init();
             }
-        }
 
-        function handleSearch(e) {
-            e.preventDefault();
-            const val = document.getElementById('urlInput').value.trim();
-            if(val) processUrl(val);
-            toggleSearchHub();
-        }
+            init() {
+                this.bindGlobalEvents();
+                this.startClock();
+                this.startGraphics();
+                this.runBootSequence();
+                this.monitorSystem();
+            }
 
-        function processUrl(url) {
-            if(!url.startsWith('http')) url = 'https://' + url;
-            notify(`Initializing Proxy Tunnel: ${url.substring(0,25)}...`);
-            document.getElementById('proxyFrame').src = url;
-            document.getElementById('main-content').classList.remove('active');
-            document.getElementById('top-nav').classList.remove('opacity-100');
-            const bv = document.getElementById('browser-view');
-            bv.style.display = 'block'; setTimeout(() => bv.classList.add('active'), 50);
-        }
+            bindGlobalEvents() {
+                window.onmousemove = (e) => this.handleCursor(e);
+                window.onkeydown = (e) => {
+                    if(e.altKey && e.key === 't') this.toggle('terminal-win');
+                };
+            }
 
-        function goHome() {
-            const bv = document.getElementById('browser-view');
-            bv.classList.remove('active');
-            setTimeout(() => { 
-                bv.style.display = 'none'; 
-                document.getElementById('main-content').classList.add('active'); 
-                document.getElementById('top-nav').classList.add('opacity-100');
-            }, 600);
-            hideScreens();
-        }
-
-        function toggleMenu(e) {
-            e.stopPropagation();
-            const m = document.getElementById('drop-menu');
-            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
-        }
-
-        function openScreen(id) {
-            const s = document.getElementById(id);
-            s.style.display = 'flex'; setTimeout(() => s.classList.add('active'), 50);
-            document.getElementById('drop-menu').style.display = 'none';
-        }
-
-        function hideScreens() {
-            document.querySelectorAll('.overlay-screen').forEach(s => {
-                s.classList.remove('active'); setTimeout(() => s.style.display = 'none', 600);
-            });
-        }
-
-        function resetIdentity() {
-            notify("Identity Flushed");
-            document.getElementById('main-content').classList.remove('active');
-            document.getElementById('top-nav').classList.remove('opacity-100');
-            document.getElementById('pencil-btn').style.display = 'none';
-            
-            setTimeout(() => {
-                const intro = document.getElementById('intro-overlay');
-                const prompt = document.getElementById('name-prompt');
-                const welcome = document.getElementById('welcome-text');
-                
-                intro.style.display = 'flex';
-                intro.style.opacity = '1';
-                prompt.style.display = 'flex';
-                prompt.style.opacity = '1';
-                welcome.style.display = 'none';
-                welcome.classList.remove('opacity-100');
-                
-                document.getElementById('nameInput').value = '';
-                document.getElementById('nameInput').focus();
-            }, 600);
-        }
-
-        document.getElementById('nameInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && e.target.value.trim() !== "") {
-                const rawName = e.target.value.trim();
-                const isMaster = rawName === "devtoolsanasun";
-                const prompt = document.getElementById('name-prompt');
-                const welcome = document.getElementById('welcome-text');
-                
-                prompt.style.opacity = "0";
-                
-                setTimeout(() => {
-                    prompt.style.display = "none";
-                    welcome.style.display = "block";
-                    
-                    if(isMaster) {
-                        welcome.innerHTML = 'WELCOME,<br><span style="color:white; -webkit-text-stroke: 0px;">MASTER</span>';
-                        document.getElementById('nav-name').innerText = "MASTER";
-                        document.getElementById('pencil-btn').style.display = 'flex';
-                        notify("Admin Key Accepted");
-                    } else {
-                        welcome.innerHTML = 'WELCOME,<br><span style="color:white; -webkit-text-stroke: 0px;">' + rawName + '</span>';
-                        document.getElementById('nav-name').innerText = rawName;
-                        document.getElementById('pencil-btn').style.display = 'none';
-                        notify(`User Linked: ${rawName}`);
+            runBootSequence() {
+                const logs = ["Kernel Syncing", "Aether Tunnel Up", "UI Rendering", "Ready"];
+                let i = 0;
+                const interval = setInterval(() => {
+                    document.getElementById('boot-status').innerText = logs[i];
+                    i++;
+                    if(i >= logs.length) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            this.elements.boot.style.opacity = '0';
+                            setTimeout(() => {
+                                this.elements.boot.style.display = 'none';
+                                this.elements.gate.style.display = 'flex';
+                                document.getElementById('user-auth-input').focus();
+                            }, 1000);
+                        }, 500);
                     }
-                    
-                    setTimeout(() => {
-                        welcome.classList.add('opacity-100', 'scale-100');
-                    }, 50);
+                }, 400);
+            }
 
-                    setTimeout(() => {
-                        document.getElementById('intro-overlay').style.opacity = "0";
-                        setTimeout(() => { 
-                            document.getElementById('intro-overlay').style.display = "none"; 
-                            document.getElementById('main-content').classList.add('active'); 
-                            document.getElementById('top-nav').classList.add('opacity-100');
-                        }, 1000);
-                    }, 2500);
+            auth() {
+                const name = document.getElementById('user-auth-input').value.trim();
+                if(!name) return;
+                this.state.user = name;
+                this.state.isMaster = (name.toLowerCase() === 'devtoolsanasun');
+                
+                this.elements.gate.style.opacity = '0';
+                setTimeout(() => {
+                    this.elements.gate.style.display = 'none';
+                    this.elements.dash.style.opacity = '1';
+                    this.elements.nav.style.opacity = '1';
+                    document.getElementById('active-user').innerText = this.state.isMaster ? 'MASTER' : name;
+                    if(this.state.isMaster) document.getElementById('master-node').classList.remove('hidden');
+                    this.notify(`Session Registered: ${name}`);
+                }, 1000);
+            }
+
+            handleCursor(e) {
+                this.elements.dot.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+                this.elements.ring.animate({
+                    left: (e.clientX - 15) + 'px',
+                    top: (e.clientY - 15) + 'px'
+                }, { duration: 450, fill: 'forwards' });
+
+                const target = document.elementFromPoint(e.clientX, e.clientY);
+                if(target && (target.classList.contains('dock-btn') || target.tagName === 'INPUT' || target.classList.contains('cursor-pointer'))) {
+                    this.elements.ring.style.width = '60px';
+                    this.elements.ring.style.height = '60px';
+                    this.elements.ring.style.background = 'rgba(255,255,255,0.1)';
+                } else {
+                    this.elements.ring.style.width = '30px';
+                    this.elements.ring.style.height = '30px';
+                    this.elements.ring.style.background = 'transparent';
+                }
+            }
+
+            toggle(id) {
+                const win = document.getElementById(id);
+                if(this.state.activeWindows.has(id)) {
+                    win.classList.remove('active');
+                    setTimeout(() => win.style.display = 'none', 600);
+                    this.state.activeWindows.delete(id);
+                } else {
+                    win.style.display = 'flex';
+                    setTimeout(() => win.classList.add('active'), 10);
+                    this.state.activeWindows.add(id);
+                }
+            }
+
+            proxy(url) {
+                this.notify("Bypassing Gateway...");
+                const cont = document.getElementById('proxy-container');
+                const frame = document.getElementById('proxy-view');
+                frame.src = url;
+                this.elements.dash.style.opacity = '0';
+                cont.style.display = 'block';
+                setTimeout(() => cont.style.opacity = '1', 100);
+                this.state.activeWindows.forEach(id => this.toggle(id));
+            }
+
+            home() {
+                const cont = document.getElementById('proxy-container');
+                cont.style.opacity = '0';
+                setTimeout(() => {
+                    cont.style.display = 'none';
+                    this.elements.dash.style.opacity = '1';
                 }, 800);
             }
-        });
 
-        // Background
-        const canvas = document.getElementById('starCanvas');
-        const ctx = canvas.getContext('2d');
-        let stars = [];
-        function init() {
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            stars = []; for(let i=0; i<200; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, s:Math.random()*1.5, v:Math.random()*0.4});
-        }
-        function draw() {
-            ctx.fillStyle = "#050505"; ctx.fillRect(0,0,canvas.width,canvas.height);
-            ctx.fillStyle = "white";
-            stars.forEach(p => {
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill();
-                p.y += p.v; if(p.y > canvas.height) p.y = 0;
-            });
-            requestAnimationFrame(draw);
-        }
-        window.onresize = init; init(); draw();
+            runSearch() {
+                let val = document.getElementById('search-query').value.trim();
+                if(!val) return;
+                if(!val.includes('.') || val.includes(' ')) {
+                    val = `https://www.google.com/search?q=${encodeURIComponent(val)}`;
+                } else if(!val.startsWith('http')) {
+                    val = `https://${val}`;
+                }
+                this.proxy(val);
+                this.toggle('win-search');
+            }
 
-        const dot = document.getElementById('cursor-dot');
-        const ring = document.getElementById('cursor-ring');
-        window.onmousemove = (e) => {
-            dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px';
-            ring.animate({ left: (e.clientX-12)+'px', top: (e.clientY-12)+'px' }, {duration:400, fill:'forwards'});
-        };
+            notify(msg) {
+                const manager = document.getElementById('toast-manager');
+                const t = document.createElement('div');
+                t.className = 'toast-msg';
+                t.innerText = msg;
+                manager.appendChild(t);
+                setTimeout(() => t.classList.add('active'), 50);
+                setTimeout(() => {
+                    t.classList.remove('active');
+                    setTimeout(() => t.remove(), 600);
+                }, 4000);
+            }
+
+            startClock() {
+                setInterval(() => {
+                    const d = new Date();
+                    this.elements.clock.innerText = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                }, 1000);
+            }
+
+            monitorSystem() {
+                setInterval(() => {
+                    document.getElementById('cpu-ms').innerText = Math.floor(Math.random() * 8 + 12);
+                    document.getElementById('gpu-fps').innerText = Math.floor(Math.random() * 2 + 59);
+                }, 2500);
+            }
+
+            startGraphics() {
+                const canvas = document.getElementById('render-pipeline');
+                const ctx = canvas.getContext('2d');
+                let particles = [];
+                const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+                window.onresize = resize; resize();
+
+                for(let i=0; i<300; i++) {
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        z: Math.random() * canvas.width,
+                        o: Math.random()
+                    });
+                }
+
+                const draw = () => {
+                    ctx.fillStyle = '#010101';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = 'white';
+                    particles.forEach(p => {
+                        let sx = (p.x - canvas.width/2) * (canvas.width/p.z) + canvas.width/2;
+                        let sy = (p.y - canvas.height/2) * (canvas.width/p.z) + canvas.height/2;
+                        let size = (1 - p.z / canvas.width) * 2;
+                        ctx.globalAlpha = 1 - p.z / canvas.width;
+                        ctx.beginPath(); ctx.arc(sx, sy, size, 0, Math.PI*2); ctx.fill();
+                        p.z -= 0.5; if(p.z <= 0) p.z = canvas.width;
+                    });
+                    requestAnimationFrame(draw);
+                };
+                draw();
+            }
+
+            exec(e) {
+                if(e.key === 'Enter') {
+                    const cmd = e.target.value.toLowerCase().trim();
+                    const log = document.getElementById('term-log');
+                    let res = "";
+                    if(cmd === 'help') res = "Available: status, clear, whoami, bypass [url]";
+                    else if(cmd === 'status') res = "System healthy. All modules green.";
+                    else if(cmd === 'clear') { log.innerHTML = ""; e.target.value = ""; return; }
+                    else if(cmd === 'whoami') res = `Active User: ${this.state.user} | Master: ${this.state.isMaster}`;
+                    else if(cmd.startsWith('bypass ')) this.proxy(cmd.split(' ')[1]);
+                    else res = `Unknown command: ${cmd}`;
+                    
+                    log.innerHTML += `<br><span style="color:white">> ${cmd}</span><br>${res}`;
+                    e.target.value = "";
+                    log.scrollTop = log.scrollHeight;
+                }
+            }
+
+            setTheme(c) {
+                document.documentElement.style.setProperty('--theme-main', c);
+                this.notify("Kernel Palette Synced");
+            }
+
+            flush() {
+                this.notify("Emergency Memory Flush...");
+                setTimeout(() => location.reload(), 1500);
+            }
+        }
+
+        const OS = new NebulaEngine();
     </script>
 </body>
 </html>
