@@ -15,19 +15,18 @@
             --star-color: #ffffff;
             --smooth: cubic-bezier(0.4, 0, 0.2, 1);
         }
-        * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: white; margin: 0; overflow: hidden; transition: background 0.8s var(--smooth); }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: white; margin: 0; overflow: hidden; }
         
-        #starCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        #starCanvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
 
-        /* --- UI Elements --- */
+        /* --- Sidebar & Home --- */
         #home-btn { 
             position: fixed; top: 30px; left: 30px; 
             width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; 
             display: flex; align-items: center; justify-content: center; cursor: pointer; 
-            z-index: 500; transition: all 0.4s var(--smooth); font-size: 1.2rem;
+            z-index: 500; transition: all 0.4s var(--smooth);
         }
-        #home-btn:hover { border-color: var(--theme-main); transform: scale(1.1) rotate(-5deg); box-shadow: 0 0 20px var(--theme-glow); }
+        #home-btn:hover { border-color: var(--theme-main); transform: scale(1.1); box-shadow: 0 0 20px var(--theme-glow); }
 
         #side-nav { position: fixed; left: 30px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
         .side-icon { 
@@ -35,212 +34,169 @@
             display: flex; align-items: center; justify-content: center; cursor: pointer; 
             transition: all 0.4s var(--smooth); font-size: 1.2rem; 
         }
-        .side-icon:hover { border-color: var(--theme-main); box-shadow: 0 0 25px var(--theme-glow); transform: scale(1.15) translateX(8px); }
+        .side-icon:hover, .side-icon.active { border-color: var(--theme-main); box-shadow: 0 0 25px var(--theme-glow); transform: scale(1.1); }
 
-        /* --- Dashboard --- */
-        #main-content { opacity: 0; transform: translateY(30px); transition: all 1s var(--smooth); display: flex; flex-direction: column; align-items: center; width: 100%; padding: 2rem; pointer-events: none; }
-        #main-content.active { opacity: 1; transform: translateY(0); pointer-events: all; }
-        
-        .bento-card { background: rgba(15, 15, 15, 0.8); border: 1px solid #222; border-radius: 20px; transition: all 0.4s var(--smooth); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-        .bento-card:hover { transform: translateY(-12px) scale(1.08); border-color: var(--theme-main); box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 20px var(--theme-glow); }
+        /* --- Search Hub Expansion --- */
+        #search-hub {
+            position: fixed; left: 95px; top: 50%; transform: translateY(-50%) translateX(-20px);
+            background: rgba(15, 15, 15, 0.95); border: 1px solid #333; border-radius: 24px;
+            padding: 20px; display: none; opacity: 0; flex-direction: column; gap: 20px;
+            width: 350px; backdrop-blur: 20px; transition: all 0.5s var(--smooth); z-index: 90;
+        }
+        #search-hub.show { display: flex; opacity: 1; transform: translateY(-50%) translateX(0); }
 
-        /* --- Menu & Overlays --- */
-        #menu-btn { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 200; transition: 0.4s; }
-        #menu-btn:hover { border-color: var(--theme-main); transform: scale(1.1); }
-        
-        #drop-menu { position: fixed; bottom: 95px; right: 30px; width: 220px; background: #0f0f0f; border: 1px solid #333; border-radius: 15px; display: none; flex-direction: column; z-index: 200; overflow: hidden; opacity: 0; transform: translateY(20px); transition: all 0.4s var(--smooth); }
-        #drop-menu.show { display: flex; transform: translateY(0); opacity: 1; }
-        .menu-item { padding: 18px; text-align: center; cursor: pointer; border-bottom: 1px solid #222; font-size: 11px; font-weight: 900; text-transform: uppercase; transition: 0.3s; color: #777; }
-        .menu-item:hover { background: #1a1a1a; color: white; border-left: 5px solid var(--theme-main); }
+        .search-input {
+            background: #000; border: 1px solid #444; border-radius: 12px;
+            padding: 12px 15px; width: 100%; color: white; outline: none;
+            font-size: 13px; transition: 0.3s;
+        }
+        .search-input:focus { border-color: var(--theme-main); box-shadow: 0 0 15px var(--theme-glow); }
 
-        .overlay-screen { position: fixed; inset: 0; background: rgba(5,5,5,0.9); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; backdrop-blur: 15px; transition: all 0.6s var(--smooth); }
+        .emoji-grid { display: grid; grid-cols: 4; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .emoji-item { 
+            background: #1a1a1a; border: 1px solid #333; border-radius: 10px; height: 50px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s;
+        }
+        .emoji-item:hover { background: var(--theme-main); transform: scale(1.1); }
+
+        /* --- Dash & Screens --- */
+        #main-content { opacity: 0; transform: scale(0.9); transition: all 1s var(--smooth); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; pointer-events: none; }
+        #main-content.active { opacity: 1; transform: scale(1); pointer-events: all; }
+
+        .overlay-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; backdrop-blur: 10px; transition: 0.5s; }
         .overlay-screen.active { display: flex; opacity: 1; }
 
-        .settings-card { background: #0f0f0f; border: 1px solid #333; border-radius: 28px; padding: 2rem; width: 400px; display: flex; flex-direction: column; gap: 1.2rem; }
-        
-        /* --- Animations --- */
-        #welcome-text { opacity: 0; transform: scale(0.85); transition: all 1s var(--smooth); display: none; font-size: 5rem; font-weight: 900; text-transform: uppercase; text-align: center; }
-        #welcome-text.visible { opacity: 1; transform: scale(1); display: block; }
-        
-        #browser-view { position: fixed; inset: 20px 20px 20px 100px; background: #000; border: 1px solid #333; border-radius: 24px; z-index: 50; display: none; overflow: hidden; opacity: 0; transform: scale(0.95); transition: all 0.6s var(--smooth); }
-        #browser-view.active { display: flex; opacity: 1; transform: scale(1); }
-        
-        .mega-glow { animation: pulseGlow 2s infinite alternate; }
-        @keyframes pulseGlow { from { text-shadow: 0 0 10px var(--theme-glow); } to { text-shadow: 0 0 30px var(--theme-glow); } }
+        #browser-view { position: fixed; inset: 20px 20px 20px 95px; background: #000; border: 1px solid #333; border-radius: 24px; z-index: 50; display: none; overflow: hidden; opacity: 0; transition: 0.6s var(--smooth); }
+        #browser-view.active { display: flex; opacity: 1; }
+
+        #menu-btn { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 200; }
+        #drop-menu { position: fixed; bottom: 95px; right: 30px; width: 200px; background: #0f0f0f; border: 1px solid #333; border-radius: 15px; display: none; flex-direction: column; z-index: 200; overflow: hidden; opacity: 0; transform: translateY(10px); transition: 0.3s; }
+        #drop-menu.show { display: flex; opacity: 1; transform: translateY(0); }
+        .menu-item { padding: 15px; text-align: center; cursor: pointer; border-bottom: 1px solid #222; font-size: 11px; font-weight: 900; text-transform: uppercase; color: #777; transition: 0.2s; }
+        .menu-item:hover { background: #1a1a1a; color: white; }
+
+        .mega-glow { animation: pulseGlow 2s infinite alternate; text-shadow: 0 0 20px var(--theme-glow); }
+        @keyframes pulseGlow { from { opacity: 0.8; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <canvas id="starCanvas"></canvas>
-
     <div id="home-btn" onclick="goHome()">🏠</div>
 
     <div id="side-nav">
-        <div class="side-icon" onclick="processUrl('https://poki.com')">🕹️</div>
+        <div class="side-icon" id="search-trigger" onclick="toggleSearchHub(event)">🔍</div>
         <div class="side-icon" onclick="processUrl('https://cineby.gd')">🎬</div>
-        <div class="side-icon" onclick="processUrl('https://discord.com')">💬</div>
+        <div class="side-icon" onclick="openScreen('settings-screen')">⚙️</div>
     </div>
 
-    <div id="menu-btn" onclick="toggleMenu(event)">...</div>
-    <div id="drop-menu">
-        <div class="menu-item" onclick="openScreen('settings-screen', event)">Settings</div>
-        <div class="menu-item" onclick="openScreen('tos-screen', event)">Terms</div>
-        <div class="menu-item" onclick="goHome(event)">Dashboard</div>
-    </div>
-
-    <div id="intro-overlay" style="position:fixed; inset:0; z-index:2000; background:#050505; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: 0.8s;">
-        <div id="name-prompt" class="flex flex-col items-center gap-6">
-            <h2 class="text-2xl font-black italic uppercase tracking-widest" style="color: var(--theme-main)">Initialize Node</h2>
-            <input type="text" id="nameInput" autofocus class="bg-transparent border-b-2 border-white/10 text-4xl text-center outline-none px-4 py-2 w-72 focus:border-blue-500 transition-all" placeholder="...">
-        </div>
-        <h2 id="welcome-text" class="mega-glow">WELCOME,<br><span id="display-name" style="color: var(--theme-main)"></span></h2>
-    </div>
-
-    <div id="main-content">
-        <div class="w-full flex flex-col items-center mb-12">
-            <nav class="bg-[#0f0f0f]/90 border border-[#222] rounded-full px-10 py-4 flex items-center gap-8 backdrop-blur-xl">
-                <div class="font-black uppercase tracking-tighter text-xl" style="color: var(--theme-main)">USERIDK758</div>
-                <div class="text-gray-500 text-[10px] uppercase font-bold">Node: <span id="nav-name" class="text-white">...</span></div>
-                <div class="flex items-center gap-4">
-                    <div id="fps-display" class="text-gray-400 text-[10px] font-black">60 FPS</div>
-                    <div class="text-[9px] border border-white/20 px-3 py-1 rounded-full cursor-pointer hover:bg-white hover:text-black transition" onclick="resetIdentity()">EDIT NAME</div>
-                </div>
-            </nav>
-        </div>
-
-        <h1 class="text-8xl font-black italic tracking-tighter uppercase mega-glow mb-16">USERIDK758</h1>
-
-        <div class="grid grid-cols-3 md:grid-cols-6 gap-6 mb-16 w-full max-w-3xl">
-            <div onclick="processUrl('https://duckduckgo.com')" class="h-20 bento-card">🔍</div>
-            <div onclick="processUrl('https://youtube.com')" class="h-20 bento-card">▶️</div>
-            <div onclick="processUrl('https://discord.com')" class="h-20 bento-card">💬</div>
-            <div onclick="processUrl('https://tiktok.com')" class="h-20 bento-card">📱</div>
-            <div onclick="processUrl('https://twitch.tv')" class="h-20 bento-card">💜</div>
-            <div onclick="processUrl('https://poki.com')" class="h-20 bento-card">🎮</div>
-        </div>
-
-        <form id="urlForm" onsubmit="handleSearch(event)" class="w-full max-w-2xl relative">
-            <input type="text" id="urlInput" placeholder="Enter URL or Search query..." class="w-full bg-[#0a0a0a] border-2 border-[#222] py-5 px-10 rounded-full text-center outline-none focus:border-blue-600 transition-all font-bold text-white shadow-lg">
-            <button type="submit" class="absolute right-8 top-5 text-xs font-black uppercase text-blue-500 hover:text-white transition">EXECUTE</button>
+    <div id="search-hub">
+        <h3 class="text-[10px] font-black uppercase text-gray-500 tracking-widest">Global Search</h3>
+        <form onsubmit="handleSearch(event)">
+            <input type="text" id="urlInput" class="search-input" placeholder="URL or Query..." autocomplete="off">
         </form>
+        <div class="h-[1px] bg-white/10 w-full"></div>
+        <h3 class="text-[10px] font-black uppercase text-gray-500 tracking-widest">Quick Nodes</h3>
+        <div class="emoji-grid">
+            <div class="emoji-item" onclick="processUrl('https://youtube.com')">▶️</div>
+            <div class="emoji-item" onclick="processUrl('https://discord.com')">💬</div>
+            <div class="emoji-item" onclick="processUrl('https://poki.com')">🎮</div>
+            <div class="emoji-item" onclick="processUrl('https://tiktok.com')">📱</div>
+        </div>
+    </div>
+
+    <div id="intro-overlay" style="position:fixed; inset:0; z-index:2000; background:#050505; display:flex; align-items:center; justify-content:center; transition: 0.8s;">
+        <input type="text" id="nameInput" autofocus class="bg-transparent border-b-2 border-white/10 text-4xl text-center outline-none w-72 focus:border-blue-500 transition-all" placeholder="Enter Name">
+        <h2 id="welcome-text" class="mega-glow text-6xl font-black hidden uppercase">Welcome,<br><span id="display-name" style="color:var(--theme-main)"></span></h2>
+    </div>
+
+    <div id="main-content" class="active">
+        <h1 class="text-9xl font-black italic tracking-tighter uppercase mega-glow mb-4">USERIDK</h1>
+        <p class="text-gray-500 font-bold tracking-[0.5em] uppercase text-xs">Accessing Cosmic Node: <span id="nav-name">...</span></p>
     </div>
 
     <div id="browser-view">
-        <div class="bg-[#111] p-4 flex justify-between items-center border-b border-[#222]">
-            <span id="browser-status" class="text-[10px] uppercase font-black text-gray-500 tracking-widest">Connected to Node</span>
-            <div onclick="goHome()" class="px-5 py-1 bg-red-950/30 text-red-500 text-[10px] font-black rounded-full border border-red-500/20 cursor-pointer hover:bg-red-600 hover:text-white transition">TERMINATE</div>
-        </div>
         <iframe id="proxyFrame" class="w-full h-full bg-white border-none"></iframe>
     </div>
 
     <div id="settings-screen" class="overlay-screen" onclick="hideScreens()">
-        <div class="settings-card" onclick="event.stopPropagation()">
-            <h3 class="font-black uppercase italic text-xl" style="color: var(--theme-main)">Node Config</h3>
-            <div class="space-y-2">
-                <label class="text-[10px] uppercase font-black text-gray-500">Cloaking</label>
-                <input type="text" id="cloak-title" class="w-full bg-[#111] border border-[#333] p-3 rounded-xl text-white text-xs outline-none" placeholder="Tab Title">
-                <input type="text" id="cloak-icon" class="w-full bg-[#111] border border-[#333] p-3 rounded-xl text-white text-xs outline-none" placeholder="Tab Icon URL">
-            </div>
-            <div class="space-y-2">
-                <label class="text-[10px] uppercase font-black text-gray-500">Theme Engine</label>
-                <div class="grid grid-cols-2 gap-2">
-                    <button class="theme-btn bg-blue-600/10 text-blue-500" onclick="setTheme('#3b82f6', '#050a15', '#ffffff')">Cosmic</button>
-                    <button class="theme-btn bg-emerald-600/10 text-emerald-500" onclick="setTheme('#10b981', '#05150a', '#a7ffd6')">Emerald</button>
-                    <button class="theme-btn bg-red-600/10 text-red-500" onclick="setTheme('#ef4444', '#150505', '#ff9494')">Alert</button>
-                    <button class="theme-btn bg-purple-600/10 text-purple-500" onclick="setTheme('#a855f7', '#0e0515', '#e9d5ff')">Nebula</button>
-                </div>
-            </div>
-            <div class="pt-2">
-                <label class="text-[10px] uppercase font-black text-gray-500 block mb-2">Performance</label>
-                <div class="flex gap-2">
-                    <button id="fps-30" class="flex-1 py-2 bg-[#111] border border-[#333] text-[9px] font-black uppercase rounded-lg" onclick="setFPS(30)">Power Save</button>
-                    <button id="fps-60" class="flex-1 py-2 bg-[#111] border border-blue-500 text-[9px] font-black uppercase rounded-lg text-blue-500" onclick="setFPS(60)">Performance</button>
-                </div>
-            </div>
-            <button class="w-full py-4 bg-white text-black font-black rounded-xl uppercase text-xs mt-2" onclick="applySettings()">Save Node Data</button>
+        <div class="bg-[#0f0f0f] p-8 border border-white/10 rounded-3xl w-80" onclick="event.stopPropagation()">
+            <h2 class="font-black uppercase mb-4 text-blue-500">Settings</h2>
+            <button class="w-full py-3 bg-white/5 border border-white/10 rounded-xl text-xs font-black mb-2 hover:bg-white/10" onclick="setTheme('#ef4444', '#150505', '#ff9494')">RED ALERT</button>
+            <button class="w-full py-3 bg-white/5 border border-white/10 rounded-xl text-xs font-black mb-4 hover:bg-white/10" onclick="setTheme('#3b82f6', '#050a15', '#ffffff')">COSMIC BLUE</button>
+            <button class="w-full py-4 bg-white text-black font-black rounded-xl text-xs uppercase" onclick="hideScreens()">Save</button>
         </div>
     </div>
 
-    <div id="tos-screen" class="overlay-screen" onclick="hideScreens()">
-        <div class="max-w-md text-center p-10 bg-[#0f0f0f] border border-[#222] rounded-[40px]" onclick="event.stopPropagation()">
-            <h2 class="text-4xl font-black italic mb-4 uppercase">Protocols</h2>
-            <p class="text-gray-400 text-xs mb-8">Access granted. Your connection is routed through client-side frames. Use responsibly.</p>
-            <button class="w-full py-4 border-2 border-white rounded-2xl text-xs font-black uppercase hover:bg-white hover:text-black transition" onclick="hideScreens()">Acknowledge</button>
-        </div>
+    <div id="menu-btn" onclick="toggleMenu(event)">...</div>
+    <div id="drop-menu">
+        <div class="menu-item" onclick="openScreen('settings-screen')">Config</div>
+        <div class="menu-item" onclick="goHome()">Exit Node</div>
     </div>
 
     <script>
         let currentFPS = 60;
 
-        /* --- THE CORE URL LOGIC --- */
-        function handleSearch(e) { 
-            e.preventDefault(); 
-            let input = document.getElementById('urlInput');
-            let val = input.value.trim();
-            
-            if (!val) return;
-
-            // Simple Regex to check if it's a URL or a Search query
-            const urlPattern = /^(http|https):\/\/[^ "]+$|.*?\..*?/;
-            
-            if (urlPattern.test(val)) {
-                // If it doesn't have http, add it
-                let finalUrl = val.includes('://') ? val : 'https://' + val;
-                processUrl(finalUrl);
+        function toggleSearchHub(e) {
+            if(e) e.stopPropagation();
+            const hub = document.getElementById('search-hub');
+            const trigger = document.getElementById('search-trigger');
+            if(hub.classList.contains('show')) {
+                hub.classList.remove('show');
+                setTimeout(() => hub.style.display = 'none', 500);
+                trigger.classList.remove('active');
             } else {
-                // Otherwise, search it on DuckDuckGo
-                processUrl('https://duckduckgo.com/?q=' + encodeURIComponent(val));
+                hub.style.display = 'flex';
+                setTimeout(() => hub.classList.add('show'), 10);
+                trigger.classList.add('active');
+                document.getElementById('urlInput').focus();
             }
-            
-            input.value = ""; // Clear input after sending
+        }
+
+        function handleSearch(e) {
+            e.preventDefault();
+            let val = document.getElementById('urlInput').value.trim();
+            if (!val) return;
+            let url = (val.includes('.') && !val.includes(' ')) ? (val.startsWith('http') ? val : 'https://' + val) : 'https://duckduckgo.com/?q=' + encodeURIComponent(val);
+            processUrl(url);
+            toggleSearchHub();
         }
 
         function processUrl(url) {
-            const frame = document.getElementById('proxyFrame');
+            document.getElementById('proxyFrame').src = url;
+            document.getElementById('main-content').classList.remove('active');
             const bv = document.getElementById('browser-view');
-            const main = document.getElementById('main-content');
-            const status = document.getElementById('browser-status');
-
-            status.innerText = "Connecting to: " + url.split('/')[2];
-            frame.src = url;
-            
-            main.classList.remove('active');
             bv.style.display = 'flex';
             setTimeout(() => bv.classList.add('active'), 50);
-            toggleMenu(null, true);
         }
 
-        function goHome(e) { 
-            if(e) e.stopPropagation();
+        function goHome() {
             const bv = document.getElementById('browser-view');
             bv.classList.remove('active');
-            setTimeout(() => { 
-                bv.style.display = 'none'; 
-                document.getElementById('proxyFrame').src = ""; 
-                document.getElementById('main-content').classList.add('active'); 
-            }, 600);
-            hideScreens(); 
-            toggleMenu(null, true);
-        }
-
-        /* --- UI Logic --- */
-        function toggleMenu(e, forceClose = false) { 
-            if(e) e.stopPropagation();
-            const m = document.getElementById('drop-menu');
-            if(forceClose) { m.classList.remove('show'); setTimeout(() => m.style.display = 'none', 400); return; }
-            if(m.classList.contains('show')) { m.classList.remove('show'); setTimeout(() => m.style.display = 'none', 400); } 
-            else { m.style.display = 'flex'; setTimeout(() => m.classList.add('show'), 10); }
-        }
-
-        function openScreen(id, e) { if(e) e.stopPropagation(); toggleMenu(null, true); const s = document.getElementById(id); s.style.display = 'flex'; setTimeout(() => s.classList.add('active'), 50); }
-        function hideScreens() { document.querySelectorAll('.overlay-screen').forEach(s => { s.classList.remove('active'); setTimeout(() => s.style.display = 'none', 600); }); }
-
-        function applySettings() {
-            const title = document.getElementById('cloak-title').value;
-            const icon = document.getElementById('cloak-icon').value;
-            if(title) document.title = title;
-            if(icon) document.getElementById('tab-icon').href = icon;
+            setTimeout(() => { bv.style.display = 'none'; document.getElementById('main-content').classList.add('active'); }, 600);
             hideScreens();
+        }
+
+        function toggleMenu(e) {
+            e.stopPropagation();
+            const m = document.getElementById('drop-menu');
+            m.classList.toggle('show');
+            m.style.display = m.classList.contains('show') ? 'flex' : 'none';
+        }
+
+        function openScreen(id) {
+            hideScreens();
+            const s = document.getElementById(id);
+            s.style.display = 'flex';
+            setTimeout(() => s.classList.add('active'), 10);
+        }
+
+        function hideScreens() {
+            document.querySelectorAll('.overlay-screen').forEach(s => {
+                s.classList.remove('active');
+                setTimeout(() => s.style.display = 'none', 500);
+            });
+            document.getElementById('drop-menu').classList.remove('show');
         }
 
         function setTheme(main, bg, stars) {
@@ -250,68 +206,48 @@
             document.documentElement.style.setProperty('--star-color', stars);
         }
 
-        function setFPS(val) {
-            currentFPS = val;
-            document.getElementById('fps-display').innerText = val + " FPS MODE";
-            document.getElementById('fps-30').style.borderColor = val === 30 ? 'var(--theme-main)' : '#333';
-            document.getElementById('fps-60').style.borderColor = val === 60 ? 'var(--theme-main)' : '#333';
-        }
-
-        function resetIdentity() {
-            document.getElementById('main-content').classList.remove('active');
-            const intro = document.getElementById('intro-overlay');
-            const prompt = document.getElementById('name-prompt');
-            const welcome = document.getElementById('welcome-text');
-            intro.style.display = 'flex';
-            setTimeout(() => {
-                intro.style.opacity = '1';
-                prompt.style.display = 'flex';
-                prompt.style.opacity = '1';
-                welcome.classList.remove('visible');
-                welcome.style.display = 'none';
-                document.getElementById('nameInput').focus();
-            }, 100);
-        }
-
         document.getElementById('nameInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && e.target.value.trim() !== "") {
                 const name = e.target.value.trim();
-                const prompt = document.getElementById('name-prompt');
+                const input = document.getElementById('nameInput');
                 const welcome = document.getElementById('welcome-text');
-                prompt.style.opacity = "0";
-                prompt.style.transform = "translateY(-20px)";
+                input.style.opacity = "0";
                 setTimeout(() => {
-                    prompt.style.display = "none";
+                    input.style.display = "none";
                     document.getElementById('display-name').innerText = name;
                     document.getElementById('nav-name').innerText = name;
-                    welcome.style.display = "block";
-                    setTimeout(() => { welcome.classList.add('visible'); }, 50);
+                    welcome.classList.remove('hidden');
                     setTimeout(() => {
                         document.getElementById('intro-overlay').style.opacity = "0";
-                        setTimeout(() => { 
-                            document.getElementById('intro-overlay').style.display="none"; 
-                            document.getElementById('main-content').classList.add('active'); 
-                        }, 800);
-                    }, 2000);
-                }, 600);
+                        setTimeout(() => document.getElementById('intro-overlay').style.display="none", 800);
+                    }, 1500);
+                }, 500);
             }
         });
 
-        /* --- Starfield Background --- */
+        window.onclick = () => {
+            document.getElementById('search-hub').classList.remove('show');
+            document.getElementById('drop-menu').classList.remove('show');
+        };
+
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
         let starList = [];
-        function initStars() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; starList = []; for(let i=0; i<150; i++) starList.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, size:Math.random()*1.8, speed:Math.random()*0.5+0.1}); }
+        function initStars() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            starList = Array.from({length: 150}, () => ({x:Math.random()*canvas.width, y:Math.random()*canvas.height, size:Math.random()*1.5, speed:Math.random()*0.5+0.1}));
+        }
         function drawStars() {
-            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-color').trim();
+            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-color');
             ctx.fillRect(0,0,canvas.width,canvas.height);
-            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star-color').trim();
-            starList.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill(); s.y += s.speed; if(s.y > canvas.height) s.y = 0; });
-            setTimeout(() => requestAnimationFrame(drawStars), 1000 / currentFPS);
+            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star-color');
+            starList.forEach(s => {
+                ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill();
+                s.y += s.speed; if(s.y > canvas.height) s.y = 0;
+            });
+            requestAnimationFrame(drawStars);
         }
         initStars(); drawStars();
-        window.addEventListener('resize', initStars);
-        window.addEventListener('click', () => toggleMenu(null, true));
     </script>
 </body>
 </html>
