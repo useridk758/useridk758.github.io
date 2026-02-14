@@ -37,9 +37,10 @@
         /* --- Search Hub --- */
         #search-hub {
             position: fixed; left: 100px; top: 50%; transform: translateY(-50%) scale(0.9);
-            background: rgba(10, 10, 10, 0.8); border: 1px solid #333; border-radius: 24px;
+            background: rgba(10, 10, 10, 0.85); border: 1px solid #333; border-radius: 24px;
             padding: 25px; display: none; opacity: 0; flex-direction: column; gap: 15px;
-            width: 320px; backdrop-blur: 20px; transition: 0.5s var(--smooth); z-index: 90;
+            width: 320px; backdrop-blur: 30px; transition: 0.5s var(--smooth); z-index: 90;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.8);
         }
         #search-hub.show { display: flex; opacity: 1; transform: translateY(-50%) scale(1); }
         .search-input { background: #000; border: 1px solid #333; border-radius: 12px; padding: 12px; width: 100%; color: white; outline: none; font-size: 12px; transition: 0.3s; }
@@ -48,11 +49,10 @@
         /* --- Premium Drop Menu --- */
         #drop-menu { 
             position: fixed; bottom: 95px; right: 30px; width: 220px; 
-            background: rgba(15, 15, 15, 0.7); border: 1px solid rgba(255,255,255,0.1); 
+            background: rgba(15, 15, 15, 0.8); border: 1px solid rgba(255,255,255,0.1); 
             border-radius: 20px; display: none; flex-direction: column; z-index: 200; 
             overflow: hidden; opacity: 0; transform: translateY(20px); 
             backdrop-blur: 25px; transition: 0.4s var(--smooth);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
         #drop-menu.show { display: flex; opacity: 1; transform: translateY(0); }
         .menu-item { 
@@ -61,18 +61,14 @@
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .menu-item:hover { background: rgba(255,255,255,0.05); color: white; padding-left: 25px; }
-        .menu-item:last-child { border: none; }
 
-        /* --- Overlays & Cards --- */
+        /* --- Overlays & Transitions --- */
         .overlay-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; backdrop-blur: 20px; transition: 0.6s var(--smooth); }
         .overlay-screen.active { display: flex; opacity: 1; }
-        .card-ui { background: #0f0f0f; border: 1px solid #222; border-radius: 30px; padding: 35px; width: 420px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
+        .card-ui { background: #0f0f0f; border: 1px solid #222; border-radius: 30px; padding: 35px; width: 420px; display: flex; flex-direction: column; gap: 15px; }
 
-        .theme-btn, .opt-btn { padding: 10px; border-radius: 8px; font-size: 9px; font-weight: 900; border: 1px solid #333; background: #151515; transition: 0.2s; color: #555; cursor: pointer; }
-        .theme-btn:hover, .opt-btn:hover { border-color: #555; color: #eee; }
         .active-opt { border-color: var(--theme-main) !important; color: white !important; box-shadow: 0 0 15px var(--theme-glow); transform: scale(1.05); }
 
-        /* --- Transitions --- */
         #welcome-text { opacity: 0; transform: scale(0.9); filter: blur(10px); transition: 1.2s var(--smooth); display: none; font-size: 6rem; font-weight: 900; text-transform: uppercase; text-align: center; }
         #welcome-text.visible { opacity: 1; transform: scale(1); filter: blur(0px); display: block; }
         .outlined-blue { color: transparent; -webkit-text-stroke: 2px var(--theme-main); text-shadow: 0 0 30px var(--theme-glow); }
@@ -99,21 +95,15 @@
 
     <div id="menu-btn" onclick="toggleMenu(event)">...</div>
     <div id="drop-menu">
-        <div class="menu-item" onclick="openScreen('settings-screen', event)">
-            <span>⚙️</span> Settings
-        </div>
-        <div class="menu-item" onclick="openScreen('tos-screen', event)">
-            <span>📋</span> Terms
-        </div>
-        <div class="menu-item" onclick="goHome(event)">
-            <span>🏠</span> Dashboard
-        </div>
+        <div class="menu-item" onclick="openScreen('settings-screen', event)">⚙️ Settings</div>
+        <div class="menu-item" onclick="openScreen('tos-screen', event)">📋 Terms</div>
+        <div class="menu-item" onclick="goHome(event)">🏠 Dashboard</div>
     </div>
 
-    <div id="search-hub">
+    <div id="search-hub" onclick="event.stopPropagation()">
         <h3 class="text-[10px] font-black uppercase text-blue-500 tracking-[0.2em]">Global Search</h3>
         <form onsubmit="handleSearch(event)">
-            <input type="text" id="urlInput" class="search-input" placeholder="Enter URL or query..." autocomplete="off">
+            <input type="text" id="urlInput" class="search-input" placeholder="Enter URL..." autocomplete="off">
         </form>
         <div class="grid grid-cols-4 gap-2">
             <div class="side-icon" onclick="processUrl('https://youtube.com')">▶️</div>
@@ -125,7 +115,7 @@
 
     <div id="intro-overlay" style="position:fixed; inset:0; z-index:2000; background:#050505; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: 1s;">
         <div id="name-prompt" class="flex flex-col items-center gap-6">
-            <h2 class="text-xl font-black uppercase tracking-[0.4em] text-blue-500">Identity Login</h2>
+            <h2 class="text-xl font-black uppercase tracking-[0.4em] text-blue-500">Identity</h2>
             <input type="text" id="nameInput" autofocus class="bg-transparent border-b-2 border-white/10 text-4xl text-center outline-none w-72 focus:border-blue-500 transition-all" placeholder="...">
         </div>
         <h2 id="welcome-text" class="outlined-blue">WELCOME,<br><span id="display-name" style="color:white; -webkit-text-stroke: 0px;"></span></h2>
@@ -138,46 +128,33 @@
             <div class="text-[9px] font-black px-4 py-1 border border-white/10 rounded-full cursor-pointer hover:bg-white hover:text-black transition-all" onclick="resetIdentity()">RESET IDENTITY</div>
         </nav>
         <h1 class="text-9xl font-black italic tracking-tighter uppercase mega-glow">USERIDK</h1>
-        <p class="mt-4 text-gray-500 font-bold uppercase tracking-[0.5em] text-[10px]">Connected as: <span id="nav-name" class="text-white">...</span></p>
+        <p class="mt-4 text-gray-500 font-bold uppercase tracking-[0.5em] text-[10px]">Node Active: <span id="nav-name" class="text-white">...</span></p>
     </div>
 
     <div id="settings-screen" class="overlay-screen" onclick="hideScreens()">
         <div class="card-ui" onclick="event.stopPropagation()">
-            <h3 class="font-black uppercase italic text-xl text-blue-500">System Settings</h3>
-            
+            <h3 class="font-black uppercase italic text-xl text-blue-500">Settings</h3>
             <div class="space-y-2">
-                <label class="text-[9px] font-black uppercase text-gray-500">Cloaking Engine</label>
-                <input type="text" id="cloak-title" class="search-input" placeholder="Custom Tab Title">
+                <label class="text-[9px] font-black uppercase text-gray-500">Cloaking</label>
+                <input type="text" id="cloak-title" class="search-input" placeholder="Tab Title">
                 <input type="text" id="cloak-icon" class="search-input" placeholder="Favicon URL">
             </div>
-
             <div>
-                <label class="text-[9px] font-black uppercase text-gray-500">Theme Select</label>
+                <label class="text-[9px] font-black uppercase text-gray-500">Themes</label>
                 <div class="grid grid-cols-2 gap-2 mt-2">
-                    <button class="theme-btn active-opt" onclick="setTheme('#3b82f6', '#050a15', '#ffffff', this)">COSMIC</button>
-                    <button class="theme-btn" onclick="setTheme('#10b981', '#05150a', '#a7ffd6', this)">EMERALD</button>
-                    <button class="theme-btn" onclick="setTheme('#ef4444', '#150505', '#ff9494', this)">ALERT</button>
-                    <button class="theme-btn" onclick="setTheme('#a855f7', '#0e0515', '#e9d5ff', this)">NEBULA</button>
+                    <button class="active-opt text-[9px] font-black p-2 border border-white/10 rounded-lg" onclick="setTheme('#3b82f6', '#050a15', '#ffffff', this)">COSMIC</button>
+                    <button class="text-[9px] font-black p-2 border border-white/10 rounded-lg" onclick="setTheme('#10b981', '#05150a', '#a7ffd6', this)">EMERALD</button>
                 </div>
             </div>
-
-            <div>
-                <label class="text-[9px] font-black uppercase text-gray-500">Refresh Rate</label>
-                <div class="flex gap-2 mt-2">
-                    <button id="opt-30" class="opt-btn flex-1" onclick="setFPS(30, this)">30 FPS</button>
-                    <button id="opt-60" class="opt-btn flex-1 active-opt" onclick="setFPS(60, this)">60 FPS</button>
-                </div>
-            </div>
-
-            <button class="py-4 bg-white text-black font-black rounded-2xl text-[10px] uppercase mt-4 hover:bg-blue-500 hover:text-white transition-all" onclick="applySettings()">Save Node Data</button>
+            <button class="py-4 bg-white text-black font-black rounded-2xl text-[10px] uppercase mt-4" onclick="applySettings()">Save Changes</button>
         </div>
     </div>
 
     <div id="tos-screen" class="overlay-screen" onclick="hideScreens()">
         <div class="card-ui text-center" onclick="event.stopPropagation()">
             <h3 class="font-black uppercase italic text-3xl">Terms</h3>
-            <p class="text-gray-500 text-xs py-4 leading-relaxed">By accessing this node, you acknowledge that all frame data is processed locally. We do not store your navigation history.</p>
-            <button class="py-4 border-2 border-white rounded-2xl text-[10px] font-black uppercase hover:bg-white hover:text-black transition" onclick="hideScreens()">Confirm Protocol</button>
+            <p class="text-gray-500 text-xs py-4">Data processed is transient.</p>
+            <button class="py-4 border-2 border-white rounded-2xl text-[10px] font-black uppercase" onclick="hideScreens()">Confirm</button>
         </div>
     </div>
 
@@ -188,7 +165,6 @@
     <script>
         let currentFPS = 60;
 
-        // --- FIXED SEARCH BUTTON LOGIC ---
         function toggleSearchHub(e) {
             if(e) e.stopPropagation();
             const hub = document.getElementById('search-hub');
@@ -210,8 +186,7 @@
             if(!val) return;
             let url = (val.includes('.') && !val.includes(' ')) ? (val.startsWith('http') ? val : 'https://' + val) : 'https://duckduckgo.com/?q=' + encodeURIComponent(val);
             processUrl(url);
-            document.getElementById('search-hub').classList.remove('show');
-            setTimeout(() => document.getElementById('search-hub').style.display = 'none', 500);
+            toggleSearchHub(null);
         }
 
         function processUrl(url) {
@@ -268,31 +243,6 @@
             document.documentElement.style.setProperty('--theme-glow', main + '66');
             document.documentElement.style.setProperty('--bg-color', bg);
             document.documentElement.style.setProperty('--star-color', stars);
-            document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active-opt'));
-            btn.classList.add('active-opt');
-        }
-
-        function setFPS(val, btn) {
-            currentFPS = val;
-            document.getElementById('fps-display').innerText = val + " FPS";
-            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active-opt'));
-            btn.classList.add('active-opt');
-        }
-
-        function resetIdentity() {
-            document.getElementById('main-content').classList.remove('active');
-            const intro = document.getElementById('intro-overlay');
-            const prompt = document.getElementById('name-prompt');
-            const welcome = document.getElementById('welcome-text');
-            intro.style.display = 'flex';
-            setTimeout(() => {
-                intro.style.opacity = '1';
-                prompt.style.display = 'flex';
-                prompt.style.opacity = '1';
-                welcome.classList.remove('visible');
-                welcome.style.display = 'none';
-                document.getElementById('nameInput').focus();
-            }, 100);
         }
 
         document.getElementById('nameInput').addEventListener('keypress', (e) => {
@@ -301,7 +251,6 @@
                 const prompt = document.getElementById('name-prompt');
                 const welcome = document.getElementById('welcome-text');
                 prompt.style.opacity = "0";
-                prompt.style.transform = "translateY(-20px)";
                 setTimeout(() => {
                     prompt.style.display = "none";
                     document.getElementById('display-name').innerText = name;
@@ -319,7 +268,17 @@
             }
         });
 
-        // --- Starfield Background ---
+        // ONLY close things when clicking away, don't open them
+        window.onclick = function(e) {
+            if (!e.target.closest('#search-hub') && !e.target.closest('#search-btn')) {
+                const hub = document.getElementById('search-hub');
+                if(hub.classList.contains('show')) toggleSearchHub(null);
+            }
+            if (!e.target.closest('#drop-menu') && !e.target.closest('#menu-btn')) {
+                toggleMenu(null, true);
+            }
+        };
+
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
         let starList = [];
@@ -338,7 +297,6 @@
             setTimeout(() => requestAnimationFrame(drawStars), 1000 / currentFPS);
         }
         initStars(); drawStars();
-        window.onclick = (e) => { if(!e.target.closest('#search-hub') && !e.target.closest('#search-btn')) toggleSearchHub(null, true); };
     </script>
 </body>
 </html>
