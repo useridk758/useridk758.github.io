@@ -8,310 +8,132 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* SYSTEM CONFIGURATION v5.0.0
-           ARCH: X86_64 QUANTUM
-           DESIGN: MINIMALIST FUTURISM
+        /* CORE SYSTEM v6.1.0 
+           STABILIZED UI ARCHITECTURE
         */
 
         :root { 
             --theme-main: #3b82f6; 
-            --theme-glow: rgba(59, 130, 246, 0.4); 
+            --theme-glow: rgba(59, 130, 246, 0.6); 
             --bg-color: #050505;
             --star-color: #ffffff;
             --panel-bg: rgba(10, 10, 10, 0.85);
-            --smooth: cubic-bezier(0.16, 1, 0.3, 1);
-            --accent-crit: #ef4444;
-            --accent-succ: #10b981;
+            --smooth: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            -webkit-font-smoothing: antialiased;
-            cursor: none !important; /* Custom Cursor Logic */
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
 
         body { 
             font-family: 'Inter', sans-serif; 
             background-color: var(--bg-color); 
             color: white; 
             overflow: hidden; 
-            transition: background 1.5s var(--smooth);
+            transition: background 0.8s var(--smooth);
             user-select: none;
             height: 100vh;
-            width: 100vw;
         }
 
-        /* --- Custom Cursor --- */
-        #cursor-dot {
-            position: fixed;
-            width: 8px;
-            height: 8px;
-            background: white;
-            border-radius: 50%;
-            z-index: 10000;
-            pointer-events: none;
-            transition: transform 0.1s;
-        }
-        #cursor-ring {
-            position: fixed;
-            width: 30px;
-            height: 30px;
-            border: 1px solid var(--theme-main);
-            border-radius: 50%;
-            z-index: 9999;
-            pointer-events: none;
-            transition: transform 0.15s var(--smooth), border-color 0.3s;
-        }
+        /* --- Cursor --- */
+        #cursor-dot { position: fixed; width: 6px; height: 6px; background: white; border-radius: 50%; z-index: 10000; pointer-events: none; }
+        #cursor-ring { position: fixed; width: 25px; height: 25px; border: 1px solid var(--theme-main); border-radius: 50%; z-index: 9999; pointer-events: none; transition: transform 0.2s var(--smooth); }
 
         #starCanvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
 
-        /* --- Navigation Components --- */
+        /* --- UI Elements --- */
         #home-btn, .side-icon, #menu-btn { 
-            background: #111; 
-            border: 1px solid #222; 
-            border-radius: 16px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            cursor: pointer; 
-            transition: all 0.6s var(--smooth); 
-            font-size: 1.3rem;
-            backdrop-blur: 15px;
+            background: #111; border: 1px solid #333; border-radius: 12px; 
+            display: flex; align-items: center; justify-content: center; cursor: pointer; 
+            transition: 0.4s var(--smooth); font-size: 1.2rem;
         }
-
         #home-btn:hover, .side-icon:hover, #menu-btn:hover { 
-            border-color: var(--theme-main); 
-            transform: translateY(-5px) scale(1.1); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.7), 0 0 25px var(--theme-glow); 
+            border-color: var(--theme-main); transform: translateY(-5px) scale(1.1); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5), 0 0 15px var(--theme-glow); 
         }
 
-        #home-btn { position: fixed; top: 35px; left: 35px; width: 60px; height: 60px; z-index: 500; }
-        #side-nav { position: fixed; left: 35px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 20px; z-index: 100; }
-        .side-icon { width: 60px; height: 60px; }
-        #menu-btn { position: fixed; bottom: 35px; right: 35px; width: 60px; height: 60px; z-index: 200; font-weight: 900; letter-spacing: 3px; }
+        #home-btn { position: fixed; top: 30px; left: 30px; width: 50px; height: 50px; z-index: 500; }
+        #side-nav { position: fixed; left: 30px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
+        .side-icon { width: 50px; height: 50px; }
+        #menu-btn { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; z-index: 200; font-weight: 900; letter-spacing: 2px; }
 
-        /* --- Advanced Search Hub --- */
+        /* --- Search Hub --- */
         #search-hub {
-            position: fixed; 
-            left: 120px; 
-            top: 50%; 
-            transform: translateY(-50%) scale(0.7);
-            background: var(--panel-bg); 
-            border: 1px solid #333; 
-            border-radius: 32px;
-            padding: 40px; 
-            display: none; 
-            opacity: 0; 
-            flex-direction: column; 
-            gap: 25px;
-            width: 400px; 
-            backdrop-blur: 50px; 
-            transition: 0.7s var(--smooth); 
-            z-index: 90;
-            box-shadow: 0 50px 100px rgba(0,0,0,0.95);
+            position: fixed; left: 100px; top: 50%; transform: translateY(-50%) scale(0.9);
+            background: rgba(10, 10, 10, 0.85); border: 1px solid #333; border-radius: 24px;
+            padding: 25px; display: none; opacity: 0; flex-direction: column; gap: 15px;
+            width: 320px; backdrop-blur: 30px; transition: 0.5s var(--smooth); z-index: 90;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.8);
         }
         #search-hub.show { display: flex; opacity: 1; transform: translateY(-50%) scale(1); }
-        
-        .search-input { 
-            background: #000; 
-            border: 1px solid #333; 
-            border-radius: 18px; 
-            padding: 20px; 
-            width: 100%; 
-            color: white; 
-            outline: none; 
-            font-family: 'JetBrains Mono', monospace; 
-            font-size: 14px; 
-            transition: 0.5s var(--smooth); 
-        }
-        .search-input:focus { 
-            border-color: var(--theme-main); 
-            box-shadow: 0 0 30px var(--theme-glow); 
-            transform: scale(1.02);
-        }
+        .search-input { background: #000; border: 1px solid #333; border-radius: 12px; padding: 12px; width: 100%; color: white; outline: none; font-size: 12px; transition: 0.3s; }
+        .search-input:focus { border-color: var(--theme-main); box-shadow: 0 0 10px var(--theme-glow); }
 
-        /* --- The Drop Menu --- */
+        /* --- Drop Menu --- */
         #drop-menu { 
-            position: fixed; bottom: 110px; right: 35px; width: 260px; 
-            background: var(--panel-bg); border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 28px; display: none; flex-direction: column; z-index: 200; 
-            overflow: hidden; opacity: 0; transform: translateY(40px); 
-            backdrop-blur: 40px; transition: 0.6s var(--smooth);
+            position: fixed; bottom: 95px; right: 30px; width: 220px; 
+            background: rgba(15, 15, 15, 0.8); border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 20px; display: none; flex-direction: column; z-index: 200; 
+            overflow: hidden; opacity: 0; transform: translateY(20px); 
+            backdrop-blur: 25px; transition: 0.4s var(--smooth);
         }
         #drop-menu.show { display: flex; opacity: 1; transform: translateY(0); }
         .menu-item { 
-            padding: 22px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 16px;
-            font-size: 11px; font-weight: 900; text-transform: uppercase; color: #777; transition: 0.4s;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+            padding: 18px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px;
+            font-size: 10px; font-weight: 900; text-transform: uppercase; color: #aaa; transition: 0.3s;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .menu-item:hover { background: rgba(255,255,255,0.06); color: white; padding-left: 32px; }
+        .menu-item:hover { background: rgba(255,255,255,0.05); color: white; padding-left: 25px; }
 
-        /* --- Global Screens --- */
-        .overlay-screen { 
-            position: fixed; inset: 0; 
-            background: rgba(0,0,0,0.96); 
-            z-index: 1000; 
-            display: none; 
-            align-items: center; 
-            justify-content: center; 
-            opacity: 0; 
-            backdrop-blur: 35px; 
-            transition: 1s var(--smooth); 
-        }
+        /* --- Overlays & Transitions --- */
+        .overlay-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; backdrop-blur: 20px; transition: 0.6s var(--smooth); }
         .overlay-screen.active { display: flex; opacity: 1; }
-        
-        .card-ui { 
-            background: #080808; 
-            border: 1px solid #1a1a1a; 
-            border-radius: 40px; 
-            padding: 50px; 
-            width: 520px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 25px; 
-            position: relative; 
-            overflow: hidden; 
-            box-shadow: 0 0 80px rgba(0,0,0,1);
-        }
+        .card-ui { background: #0f0f0f; border: 1px solid #222; border-radius: 30px; padding: 35px; width: 420px; display: flex; flex-direction: column; gap: 15px; }
 
-        .theme-btn, .opt-btn { 
-            padding: 14px; 
-            border-radius: 14px; 
-            font-size: 11px; 
-            font-weight: 900; 
-            border: 1px solid #222; 
-            background: #111; 
-            transition: 0.3s; 
-            color: #555; 
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .active-opt { 
-            border-color: var(--theme-main) !important; 
-            color: white !important; 
-            box-shadow: 0 0 25px var(--theme-glow); 
-            background: rgba(255,255,255,0.04); 
-        }
+        .active-opt { border-color: var(--theme-main) !important; color: white !important; box-shadow: 0 0 15px var(--theme-glow); transform: scale(1.05); }
 
-        /* --- Dashboard Center --- */
+        /* --- OG Identity Styles --- */
+        #welcome-text { opacity: 0; transform: scale(0.9); filter: blur(10px); transition: 1.2s var(--smooth); display: none; font-size: 6rem; font-weight: 900; text-transform: uppercase; text-align: center; }
+        #welcome-text.visible { opacity: 1; transform: scale(1); filter: blur(0px); display: block; }
+        .outlined-blue { color: transparent; -webkit-text-stroke: 2px var(--theme-main); text-shadow: 0 0 30px var(--theme-glow); }
+
+        /* --- Main Content Layout --- */
         #main-content { 
-            opacity: 0; 
-            transform: translateY(80px) scale(0.92); 
-            transition: 1.8s var(--smooth); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; 
-            pointer-events: none; 
+            opacity: 0; transform: translateY(40px); transition: 1.2s var(--smooth); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            height: 85vh; pointer-events: none; margin-top: -8vh; 
         }
-        #main-content.active { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+        #main-content.active { opacity: 1; transform: translateY(0); pointer-events: all; }
         
-        .mega-glow { 
-            font-size: 14rem;
-            line-height: 0.8;
-            letter-spacing: -8px;
-            text-shadow: 0 0 60px var(--theme-glow); 
-            animation: breathe 5s ease-in-out infinite; 
+        .mega-glow-text { 
+            font-size: 9xl; /* Reverted to OG size */
+            font-weight: 900;
+            font-style: italic;
+            letter-spacing: tighter;
+            text-transform: uppercase;
+            animation: pulseGlow 2s infinite alternate; 
         }
-        
-        @keyframes breathe { 
-            0%, 100% { transform: scale(1); opacity: 0.85; filter: blur(0); } 
-            50% { transform: scale(1.03); opacity: 1; filter: blur(1px); } 
-        }
+        @keyframes pulseGlow { from { opacity: 0.8; } to { opacity: 1; } }
 
         /* --- System Log --- */
         #system-log {
-            position: fixed;
-            bottom: 35px;
-            left: 35px;
-            width: 300px;
-            height: 150px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 9px;
-            color: #444;
-            pointer-events: none;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column-reverse;
-            gap: 4px;
-            z-index: 5;
+            position: fixed; bottom: 20px; left: 100px; width: 250px;
+            font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #444;
+            pointer-events: none; display: flex; flex-direction: column-reverse; gap: 2px;
         }
-        .log-entry { animation: logFade 2s forwards; }
-        @keyframes logFade { from { opacity: 1; transform: translateX(-10px); } to { opacity: 0.4; transform: translateX(0); } }
 
-        /* --- Browser Architecture --- */
-        #browser-view { 
-            position: fixed; 
-            inset: 35px 35px 35px 125px; 
-            background: #000; 
-            border: 1px solid #222; 
-            border-radius: 36px; 
-            z-index: 50; 
-            display: none; 
-            overflow: hidden; 
-            opacity: 0; 
-            transform: scale(0.97); 
-            transition: 0.9s var(--smooth); 
-        }
-        #browser-view.active { display: flex; opacity: 1; transform: scale(1); }
+        /* --- Browser View --- */
+        #browser-view { position: fixed; inset: 20px 20px 20px 100px; background: #000; border: 1px solid #333; border-radius: 24px; z-index: 50; display: none; overflow: hidden; opacity: 0; transition: 0.6s var(--smooth); }
+        #browser-view.active { display: flex; opacity: 1; }
 
-        /* --- Partner Grid --- */
         .partner-card {
-            background: #0f0f0f; 
-            border: 1px solid #1a1a1a; 
-            border-radius: 24px;
-            padding: 28px; 
-            display: flex; 
-            align-items: center; 
-            gap: 24px;
-            transition: 0.6s var(--smooth);
+            background: #111; border: 1px solid #333; border-radius: 20px;
+            padding: 20px; display: flex; align-items: center; gap: 15px;
+            cursor: pointer; transition: 0.4s var(--smooth);
         }
-        .partner-card:hover { 
-            border-color: var(--theme-main); 
-            background: #141414; 
-            transform: scale(1.03) translateX(12px); 
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
-        }
+        .partner-card:hover { border-color: var(--theme-main); background: #1a1a1a; transform: scale(1.05); }
 
-        /* --- Intro Sequence --- */
-        #intro-overlay { 
-            position: fixed; 
-            inset: 0; 
-            z-index: 2000; 
-            background: #050505; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            transition: 2s var(--smooth); 
-        }
-        
-        #welcome-text { 
-            display: none; 
-            font-size: 8rem; 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            text-align: center; 
-            line-height: 0.85; 
-            letter-spacing: -6px; 
-        }
-        
-        .outlined-text { color: transparent; -webkit-text-stroke: 3px var(--theme-main); }
-        
-        @keyframes slideUpFade { 
-            from { opacity: 0; transform: translateY(60px); filter: blur(15px); } 
-            to { opacity: 1; transform: translateY(0); filter: blur(0); } 
-        }
-        .animate-in { animation: slideUpFade 1.5s var(--smooth) forwards; }
-
-        /* Scrollbar Overrides */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; transition: 0.3s; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--theme-main); }
+        /* Scroller */
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-thumb { background: var(--theme-main); }
     </style>
 </head>
 <body>
@@ -320,36 +142,28 @@
     <div id="cursor-dot"></div>
     <div id="cursor-ring"></div>
     <div id="system-log"></div>
-    
+
     <div id="home-btn" onclick="goHome()">🏠</div>
 
     <div id="side-nav">
         <div class="side-icon" id="search-btn" onclick="toggleSearchHub(event)">🔍</div>
         <div class="side-icon" onclick="processUrl('https://cineby.gd')">🎬</div>
-        <div class="side-icon" onclick="openScreen('partners-screen', event)">🤝</div>
-    </div>
+        </div>
 
     <div id="menu-btn" onclick="toggleMenu(event)">...</div>
-    
     <div id="drop-menu">
-        <div class="menu-item" onclick="openScreen('settings-screen', event)">⚙️ System Node</div>
-        <div class="menu-item" onclick="openScreen('partners-screen', event)">🤝 Network Mesh</div>
-        <div class="menu-item" onclick="openScreen('tos-screen', event)">📋 Safety Protocol</div>
-        <div class="menu-item" onclick="goHome(event)">🏠 Return Home</div>
+        <div class="menu-item" onclick="openScreen('settings-screen', event)">⚙️ Settings</div>
+        <div class="menu-item" onclick="openScreen('partners-screen', event)">🤝 Partners</div>
+        <div class="menu-item" onclick="openScreen('tos-screen', event)">📋 Terms</div>
+        <div class="menu-item" onclick="goHome(event)">🏠 Dashboard</div>
     </div>
 
     <div id="search-hub" onclick="event.stopPropagation()">
-        <div class="flex justify-between items-end border-b border-white/5 pb-4">
-            <div>
-                <h3 class="text-[11px] font-black uppercase text-blue-500 tracking-[0.4em]">Grid Search</h3>
-                <p class="text-[8px] text-gray-600 font-mono mt-1">ENCRYPTED_TUNNEL::ACTIVE</p>
-            </div>
-            <span class="text-[10px] opacity-20 font-black">V5.0</span>
-        </div>
+        <h3 class="text-[10px] font-black uppercase text-blue-500 tracking-[0.2em]">Global Search</h3>
         <form onsubmit="handleSearch(event)">
-            <input type="text" id="urlInput" class="search-input" placeholder="Query or URL..." autocomplete="off">
+            <input type="text" id="urlInput" class="search-input" placeholder="Enter URL..." autocomplete="off">
         </form>
-        <div class="grid grid-cols-4 gap-4">
+        <div class="grid grid-cols-4 gap-2">
             <div class="side-icon" onclick="processUrl('https://youtube.com')">▶️</div>
             <div class="side-icon" onclick="processUrl('https://discord.com')">💬</div>
             <div class="side-icon" onclick="processUrl('https://tiktok.com')">📱</div>
@@ -357,116 +171,88 @@
         </div>
     </div>
 
-    <div id="partners-screen" class="overlay-screen" onclick="hideScreens()">
-        <div class="card-ui" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-start">
-                <h3 class="font-black uppercase italic text-3xl text-blue-500">Allies</h3>
-                <div class="h-2 w-2 rounded-full bg-blue-500 animate-pulse"></div>
-            </div>
-            <div class="space-y-4 max-h-[450px] overflow-y-auto pr-3">
-                <div class="partner-card" onclick="window.open('https://www.tiktok.com', '_blank')">
-                    <div class="w-14 h-14 rounded-2xl bg-black border border-white/5 flex items-center justify-center text-2xl">📱</div>
-                    <div>
-                        <p class="font-black text-[13px] uppercase tracking-widest">TikTok Stream</p>
-                        <p class="text-[10px] text-gray-600 font-bold mt-1 uppercase">Media Node Partner</p>
-                    </div>
-                </div>
-                <div class="partner-card" onclick="window.open('https://www.github.com', '_blank')">
-                    <div class="w-14 h-14 rounded-2xl bg-black border border-white/5 flex items-center justify-center text-2xl">🐙</div>
-                    <div>
-                        <p class="font-black text-[13px] uppercase tracking-widest">GitHub Logic</p>
-                        <p class="text-[10px] text-gray-600 font-bold mt-1 uppercase">Dev Environment Node</p>
-                    </div>
-                </div>
-            </div>
-            <button class="py-6 border border-white/10 rounded-3xl text-[11px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all" onclick="hideScreens()">DISMISS</button>
+    <div id="intro-overlay" style="position:fixed; inset:0; z-index:2000; background:#050505; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: 1s;">
+        <div id="name-prompt" class="flex flex-col items-center gap-6">
+            <h2 class="text-xl font-black uppercase tracking-[0.4em] text-blue-500">Identity</h2>
+            <input type="text" id="nameInput" autofocus class="bg-transparent border-b-2 border-white/10 text-4xl text-center outline-none w-72 focus:border-blue-500 transition-all" placeholder="...">
+        </div>
+        <h2 id="welcome-text" class="outlined-blue">WELCOME,<br><span id="display-name" style="color:white; -webkit-text-stroke: 0px;"></span></h2>
+    </div>
+
+    <div id="main-content">
+        <nav class="bg-[#0f0f0f]/95 border border-[#222] rounded-full px-8 py-3 flex items-center gap-6 backdrop-blur-xl mb-16">
+            <div class="font-black uppercase text-lg text-blue-500">USERIDK758</div>
+            <div id="fps-display" class="text-[10px] font-black text-gray-500">60 FPS</div>
+            <div class="text-[9px] font-black px-4 py-1 border border-white/10 rounded-full cursor-pointer hover:bg-white hover:text-black transition-all" onclick="resetIdentity()">RESET IDENTITY</div>
+        </nav>
+        <h1 class="text-9xl font-black italic tracking-tighter uppercase mega-glow-text">USERIDK</h1>
+        <p class="mt-4 text-gray-500 font-bold uppercase tracking-[0.5em] text-[10px]">Node Active: <span id="nav-name" class="text-white">...</span></p>
+        
+        <div class="mt-12 flex gap-8 opacity-20 text-[8px] font-black uppercase tracking-widest">
+            <div>SECURE_TUNNEL: ON</div>
+            <div>STABILITY: 99%</div>
+            <div>KERNEL: V6.1</div>
         </div>
     </div>
 
     <div id="settings-screen" class="overlay-screen" onclick="hideScreens()">
         <div class="card-ui" onclick="event.stopPropagation()">
-            <div class="flex flex-col gap-2 border-b border-white/5 pb-6">
-                <h3 class="font-black uppercase italic text-3xl text-blue-500">System</h3>
-                <p class="text-[10px] text-gray-600 font-mono tracking-tighter">HEX_CODE: 0x4F92B - SESSION_STABLE</p>
-            </div>
-            
+            <h3 class="font-black uppercase italic text-xl text-blue-500">Settings</h3>
             <div class="space-y-4">
-                <label class="text-[10px] font-black uppercase text-gray-500 tracking-[0.2em]">Cloak Masking</label>
-                <div class="grid grid-cols-1 gap-3">
-                    <input type="text" id="cloak-title" class="search-input" placeholder="Custom Page Title">
-                    <input type="text" id="cloak-icon" class="search-input" placeholder="Favicon URL">
+                <div>
+                    <label class="text-[9px] font-black uppercase text-gray-500">Cloaking</label>
+                    <input type="text" id="cloak-title" class="search-input mt-1" placeholder="Tab Title">
+                    <input type="text" id="cloak-icon" class="search-input mt-1" placeholder="Favicon URL">
+                </div>
+                <div>
+                    <label class="text-[9px] font-black uppercase text-gray-500">Theme Select</label>
+                    <div class="grid grid-cols-2 gap-2 mt-1">
+                        <button class="theme-btn text-[10px] font-bold p-2 border border-white/10 rounded-lg active-opt" onclick="setTheme('#3b82f6', '#050a15', '#ffffff', this)">COSMIC</button>
+                        <button class="theme-btn text-[10px] font-bold p-2 border border-white/10 rounded-lg" onclick="setTheme('#10b981', '#05150a', '#a7ffd6', this)">EMERALD</button>
+                        <button class="theme-btn text-[10px] font-bold p-2 border border-white/10 rounded-lg" onclick="setTheme('#ef4444', '#150505', '#ff9494', this)">ALERT</button>
+                        <button class="theme-btn text-[10px] font-bold p-2 border border-white/10 rounded-lg" onclick="setTheme('#a855f7', '#0e0515', '#e9d5ff', this)">NEBULA</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[9px] font-black uppercase text-gray-500">Optimization</label>
+                    <div class="flex gap-2 mt-1">
+                        <button class="opt-btn flex-1 p-2 border border-white/10 rounded-lg" onclick="setFPS(30, this)">30 FPS</button>
+                        <button class="opt-btn flex-1 p-2 border border-white/10 rounded-lg active-opt" onclick="setFPS(60, this)">60 FPS</button>
+                    </div>
                 </div>
             </div>
+            <button class="py-4 bg-white text-black font-black rounded-2xl text-[10px] uppercase mt-4" onclick="applySettings()">Save Node</button>
+        </div>
+    </div>
 
-            <div>
-                <label class="text-[10px] font-black uppercase text-gray-500 tracking-[0.2em] mb-4 block">Visual Spectrum</label>
-                <div class="grid grid-cols-4 gap-3">
-                    <button class="theme-btn active-opt" onclick="setTheme('#3b82f6', '#050a15', '#ffffff', this)">COSMIC</button>
-                    <button class="theme-btn" onclick="setTheme('#10b981', '#05150a', '#a7ffd6', this)">EMERALD</button>
-                    <button class="theme-btn" onclick="setTheme('#ef4444', '#150505', '#ff9494', this)">ALERT</button>
-                    <button class="theme-btn" onclick="setTheme('#a855f7', '#0e0515', '#e9d5ff', this)">NEBULA</button>
+    <div id="partners-screen" class="overlay-screen" onclick="hideScreens()">
+        <div class="card-ui" onclick="event.stopPropagation()">
+            <h3 class="font-black uppercase italic text-xl text-blue-500">Official Partners</h3>
+            <div class="space-y-4">
+                <div class="partner-card" onclick="window.open('https://www.tiktok.com', '_blank')">
+                    <span class="text-2xl">📱</span>
+                    <div>
+                        <p class="font-black text-[11px] uppercase">TikTok</p>
+                        <p class="text-[9px] text-gray-500">Short-form entertainment partner.</p>
+                    </div>
+                </div>
+                <div class="partner-card" onclick="window.open('https://www.github.com', '_blank')">
+                    <span class="text-2xl">🐙</span>
+                    <div>
+                        <p class="font-black text-[11px] uppercase">GitHub</p>
+                        <p class="text-[9px] text-gray-500">Open-source development partner.</p>
+                    </div>
                 </div>
             </div>
-
-            <div class="flex gap-4 items-center justify-between p-5 bg-white/5 rounded-3xl border border-white/5">
-                <span class="text-[11px] font-black uppercase tracking-wider">Physics Accuracy</span>
-                <div class="flex gap-3">
-                    <button class="opt-btn px-6" onclick="setFPS(30, this)">30</button>
-                    <button class="opt-btn px-6 active-opt" onclick="setFPS(60, this)">60</button>
-                </div>
-            </div>
-
-            <button class="py-6 bg-white text-black font-black rounded-3xl text-[12px] uppercase mt-4 hover:scale-[0.98] transition-all" onclick="applySettings()">COMMIT REWRITE</button>
+            <button class="py-4 border-2 border-white/10 rounded-2xl text-[10px] font-black uppercase mt-4 hover:bg-white hover:text-black transition" onclick="hideScreens()">Back</button>
         </div>
     </div>
 
     <div id="tos-screen" class="overlay-screen" onclick="hideScreens()">
         <div class="card-ui text-center" onclick="event.stopPropagation()">
-            <div class="py-10">
-                <h3 class="font-black uppercase italic text-5xl mb-4 tracking-tighter">Safety</h3>
-                <div class="w-16 h-1 bg-blue-500 mx-auto mb-6"></div>
-                <p class="text-gray-400 text-[12px] leading-relaxed uppercase font-bold tracking-widest opacity-60">
-                    Encryption is forced. <br>
-                    Data logs are purged on exit. <br>
-                    Identity is local-only.
-                </p>
-            </div>
-            <button class="py-6 border-2 border-white rounded-full text-[12px] font-black uppercase tracking-[0.4em] hover:bg-white hover:text-black transition-all" onclick="hideScreens()">AUTHORIZE</button>
-        </div>
-    </div>
-
-    <div id="intro-overlay">
-        <div id="name-prompt" class="flex flex-col items-center gap-10">
-            <div class="text-center">
-                <h2 class="text-4xl font-black uppercase tracking-[0.8em] text-blue-500 mb-4 animate-pulse">USER_AUTH</h2>
-                <p class="text-[11px] text-gray-600 font-bold uppercase tracking-[0.4em]">Credentials Required</p>
-            </div>
-            <input type="text" id="nameInput" autofocus class="bg-transparent border-b-4 border-white/10 text-6xl text-center outline-none w-[500px] focus:border-blue-500 transition-all font-black pb-6 uppercase tracking-widest" placeholder="---">
-        </div>
-        <h2 id="welcome-text" class="outlined-text">ACCESS GRANTED,<br><span id="display-name" style="color:white; -webkit-text-stroke: 0px;"></span></h2>
-    </div>
-
-    <div id="main-content">
-        <nav class="bg-black/60 border border-white/5 rounded-full px-12 py-5 flex items-center gap-12 backdrop-blur-3xl mb-24 shadow-2xl">
-            <div class="font-black uppercase text-2xl text-blue-500 tracking-tighter">IDK<span class="text-white opacity-20">.QUANTUM</span></div>
-            <div id="fps-display" class="text-[11px] font-black text-blue-500 bg-blue-500/10 px-4 py-1.5 rounded-lg border border-blue-500/20">60 FPS</div>
-            <div class="h-6 w-[1px] bg-white/10"></div>
-            <div class="text-[11px] font-black px-8 py-2.5 border border-blue-500/40 rounded-full cursor-pointer hover:bg-blue-500 hover:text-white transition-all uppercase tracking-widest" onclick="resetIdentity()">WIPE IDENTITY</div>
-        </nav>
-        
-        <div class="relative group">
-            <h1 class="font-black italic uppercase mega-glow select-none">USERIDK</h1>
-            <div class="absolute -bottom-10 right-0 px-5 py-2 bg-blue-500/10 border border-blue-500/20 rounded-xl backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-700">
-                <span class="text-[11px] font-black text-blue-400 uppercase tracking-widest">Level 758 Override</span>
-            </div>
-        </div>
-        
-        <p class="mt-12 text-gray-500 font-bold uppercase tracking-[1em] text-[13px] opacity-50">Current Host: <span id="nav-name" class="text-white opacity-100">---</span></p>
-        
-        <div class="mt-24 grid grid-cols-3 gap-16">
-            <div class="text-center group"><p class="text-[28px] font-black group-hover:text-blue-500 transition-colors">0.8ms</p><p class="text-[9px] uppercase tracking-[0.3em] opacity-30 mt-2">Latency</p></div>
-            <div class="text-center group"><p class="text-[28px] font-black group-hover:text-blue-500 transition-colors">99.9%</p><p class="text-[9px] uppercase tracking-[0.3em] opacity-30 mt-2">Stability</p></div>
-            <div class="text-center group"><p class="text-[28px] font-black group-hover:text-blue-500 transition-colors">AES</p><p class="text-[9px] uppercase tracking-[0.3em] opacity-30 mt-2">Crypt</p></div>
+            <h3 class="font-black uppercase italic text-3xl">Terms</h3>
+            <p class="text-gray-500 text-xs py-4">Data processed is transient.</p>
+            <button class="py-4 border-2 border-white rounded-2xl text-[10px] font-black uppercase" onclick="hideScreens()">Confirm</button>
         </div>
     </div>
 
@@ -476,66 +262,34 @@
 
     <script>
         /**
-         * OS CORE SYSTEM v5
-         * HANDLES: UI, PHYSICS, AUTH, STATE
+         * OS CORE LOGIC
          */
 
-        const STATE = {
-            user: "---",
-            fps: 60,
-            theme: "#3b82f6",
-            log: []
-        };
+        const STATE = { fps: 60, theme: '#3b82f6' };
 
-        // --- Logger ---
         function sysLog(msg) {
             const logBox = document.getElementById('system-log');
             const entry = document.createElement('div');
-            entry.className = 'log-entry';
-            entry.innerText = `[${new Date().toLocaleTimeString()}] > ${msg}`;
+            entry.innerText = `> ${msg}`;
             logBox.prepend(entry);
-            if(logBox.children.length > 8) logBox.lastChild.remove();
+            if(logBox.children.length > 5) logBox.lastChild.remove();
         }
 
-        // --- Cursor Logic ---
-        const cursorDot = document.getElementById('cursor-dot');
-        const cursorRing = document.getElementById('cursor-ring');
+        // Custom Cursor
+        const dot = document.getElementById('cursor-dot');
+        const ring = document.getElementById('cursor-ring');
+        window.onmousemove = (e) => {
+            dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px';
+            ring.animate({ left: (e.clientX-12)+'px', top: (e.clientY-12)+'px' }, {duration:400, fill:'forwards'});
+        };
 
-        window.addEventListener('mousemove', (e) => {
-            cursorDot.style.left = e.clientX + 'px';
-            cursorDot.style.top = e.clientY + 'px';
-            
-            cursorRing.animate({
-                left: (e.clientX - 15) + 'px',
-                top: (e.clientY - 15) + 'px'
-            }, { duration: 500, fill: 'forwards' });
-        });
-
-        document.addEventListener('mousedown', () => {
-            cursorRing.style.transform = 'scale(0.8)';
-            cursorRing.style.borderColor = 'white';
-        });
-
-        document.addEventListener('mouseup', () => {
-            cursorRing.style.transform = 'scale(1)';
-            cursorRing.style.borderColor = STATE.theme;
-        });
-
-        // --- Core Functions ---
         function toggleSearchHub(e) {
             if(e) e.stopPropagation();
             const hub = document.getElementById('search-hub');
             const isShowing = hub.classList.contains('show');
-            if (isShowing) { 
-                sysLog("HUB_CLOSED");
-                hub.classList.remove('show'); 
-                setTimeout(() => hub.style.display = 'none', 700); 
-            } else { 
-                sysLog("HUB_OPENED");
-                hub.style.display = 'flex'; 
-                setTimeout(() => hub.classList.add('show'), 10); 
-                document.getElementById('urlInput').focus(); 
-            }
+            if (isShowing) { hub.classList.remove('show'); setTimeout(() => hub.style.display = 'none', 500); }
+            else { hub.style.display = 'flex'; setTimeout(() => hub.classList.add('show'), 10); document.getElementById('urlInput').focus(); }
+            sysLog(isShowing ? "SEARCH_HIDDEN" : "SEARCH_ACTIVE");
         }
 
         function handleSearch(e) {
@@ -543,31 +297,26 @@
             let val = document.getElementById('urlInput').value.trim();
             if(!val) return;
             let url = (val.includes('.') && !val.includes(' ')) ? (val.startsWith('http') ? val : 'https://' + val) : 'https://duckduckgo.com/?q=' + encodeURIComponent(val);
-            sysLog(`DESTINATION_SET: ${url}`);
             processUrl(url);
             toggleSearchHub(null);
         }
 
         function processUrl(url) {
-            const frame = document.getElementById('proxyFrame');
-            frame.src = url;
+            sysLog(`ROUTING: ${url}`);
+            document.getElementById('proxyFrame').src = url;
             document.getElementById('main-content').classList.remove('active');
             const bv = document.getElementById('browser-view');
             bv.style.display = 'flex';
-            setTimeout(() => bv.classList.add('active'), 100);
+            setTimeout(() => bv.classList.add('active'), 50);
             toggleMenu(null, true);
-            sysLog(`SUBPROCESS_INIT: ${url}`);
         }
 
         function goHome(e) {
             if(e) e.stopPropagation();
-            sysLog("ROUTING_TO_CORE");
+            sysLog("ROUTING_DASHBOARD");
             const bv = document.getElementById('browser-view');
             bv.classList.remove('active');
-            setTimeout(() => { 
-                bv.style.display = 'none'; 
-                document.getElementById('main-content').classList.add('active'); 
-            }, 900);
+            setTimeout(() => { bv.style.display = 'none'; document.getElementById('main-content').classList.add('active'); }, 600);
             toggleMenu(null, true);
             hideScreens();
         }
@@ -575,23 +324,14 @@
         function toggleMenu(e, forceClose = false) {
             if(e) e.stopPropagation();
             const m = document.getElementById('drop-menu');
-            if(forceClose) { 
-                m.classList.remove('show'); 
-                setTimeout(() => m.style.display = 'none', 600); 
-                return; 
-            }
-            if(m.classList.contains('show')) { 
-                m.classList.remove('show'); 
-                setTimeout(() => m.style.display = 'none', 600); 
-            } else { 
-                m.style.display = 'flex'; 
-                setTimeout(() => m.classList.add('show'), 10); 
-            }
+            if(forceClose) { m.classList.remove('show'); setTimeout(() => m.style.display = 'none', 400); return; }
+            if(m.classList.contains('show')) { m.classList.remove('show'); setTimeout(() => m.style.display = 'none', 400); }
+            else { m.style.display = 'flex'; setTimeout(() => m.classList.add('show'), 10); }
         }
 
         function openScreen(id, e) {
             if(e) e.stopPropagation();
-            sysLog(`OVERLAY_ACTIVE: ${id}`);
+            sysLog(`OVERLAY: ${id.toUpperCase()}`);
             toggleMenu(null, true);
             const s = document.getElementById(id);
             s.style.display = 'flex';
@@ -601,28 +341,28 @@
         function hideScreens() {
             document.querySelectorAll('.overlay-screen').forEach(s => {
                 s.classList.remove('active');
-                setTimeout(() => s.style.display = 'none', 1000);
+                setTimeout(() => s.style.display = 'none', 600);
             });
         }
 
         function applySettings() {
             const title = document.getElementById('cloak-title').value;
             const icon = document.getElementById('cloak-icon').value;
-            if(title) { document.title = title; sysLog("TITLE_REWRITE_SUCCESS"); }
-            if(icon) { document.getElementById('tab-icon').href = icon; sysLog("ICON_REWRITE_SUCCESS"); }
+            if(title) document.title = title;
+            if(icon) document.getElementById('tab-icon').href = icon;
+            sysLog("SETTINGS_COMMITTED");
             hideScreens();
         }
 
         function setTheme(main, bg, stars, btn) {
-            STATE.theme = main;
             document.documentElement.style.setProperty('--theme-main', main);
-            document.documentElement.style.setProperty('--theme-glow', main + '55');
+            document.documentElement.style.setProperty('--theme-glow', main + '66');
             document.documentElement.style.setProperty('--bg-color', bg);
             document.documentElement.style.setProperty('--star-color', stars);
             document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active-opt'));
             btn.classList.add('active-opt');
-            cursorRing.style.borderColor = main;
-            sysLog(`SPECTRUM_SHIFT: ${main}`);
+            ring.style.borderColor = main;
+            sysLog(`THEME_SHIFT: ${main}`);
         }
 
         function setFPS(val, btn) {
@@ -630,11 +370,12 @@
             document.getElementById('fps-display').innerText = val + " FPS";
             document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active-opt'));
             btn.classList.add('active-opt');
-            sysLog(`REFRESH_RATE: ${val}`);
+            sysLog(`SPEED_SET: ${val}FPS`);
         }
 
+        // --- Identity Reset Engine ---
         function resetIdentity() {
-            sysLog("KILL_IDENTITY_CONFIRMED");
+            sysLog("KILLING_IDENTITY");
             document.getElementById('main-content').classList.remove('active');
             const intro = document.getElementById('intro-overlay');
             const prompt = document.getElementById('name-prompt');
@@ -646,42 +387,38 @@
                 intro.style.opacity = '1';
                 prompt.style.display = 'flex';
                 prompt.style.opacity = '1';
-                welcome.classList.remove('animate-in');
+                welcome.classList.remove('visible');
                 welcome.style.display = 'none';
                 nameInput.value = '';
                 nameInput.focus();
-            }, 100);
+            }, 50);
         }
 
-        // --- Identity Engine ---
         document.getElementById('nameInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && e.target.value.trim() !== "") {
                 const name = e.target.value.trim();
                 const prompt = document.getElementById('name-prompt');
                 const welcome = document.getElementById('welcome-text');
                 
-                sysLog(`AUTH_PROCESS: ${name}`);
+                sysLog(`AUTH_USER: ${name.toUpperCase()}`);
                 prompt.style.opacity = "0";
                 setTimeout(() => {
                     prompt.style.display = "none";
                     document.getElementById('display-name').innerText = name;
                     document.getElementById('nav-name').innerText = name;
                     welcome.style.display = "block";
-                    setTimeout(() => welcome.classList.add('animate-in'), 100);
-                    
+                    setTimeout(() => welcome.classList.add('visible'), 100);
                     setTimeout(() => {
                         document.getElementById('intro-overlay').style.opacity = "0";
                         setTimeout(() => { 
                             document.getElementById('intro-overlay').style.display="none"; 
                             document.getElementById('main-content').classList.add('active'); 
-                            sysLog("KERNEL_BOOT_COMPLETE");
-                        }, 1500);
-                    }, 3500);
-                }, 1000);
+                        }, 1000);
+                    }, 2800);
+                }, 800);
             }
         });
 
-        // Click-Away State
         window.onclick = function(e) {
             if (!e.target.closest('#search-hub') && !e.target.closest('#search-btn')) {
                 const hub = document.getElementById('search-hub');
@@ -692,55 +429,38 @@
             }
         };
 
-        // --- Physics Engine (Advanced Starfield) ---
+        // Advanced Particle Physics
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
         let starList = [];
-
         function initStars() {
-            canvas.width = window.innerWidth; 
-            canvas.height = window.innerHeight;
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
             starList = [];
-            const count = 250;
-            for(let i=0; i<count; i++) {
+            for(let i=0; i<200; i++) {
                 starList.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * 2.2,
-                    speed: Math.random() * 0.9 + 0.3,
-                    opacity: Math.random(),
-                    drift: (Math.random() - 0.5) * 0.25
+                    x: Math.random()*canvas.width, 
+                    y: Math.random()*canvas.height, 
+                    size: Math.random()*1.8, 
+                    speed: Math.random()*0.6+0.1,
+                    alpha: Math.random()
                 });
             }
         }
-
         function drawStars() {
             ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-color');
             ctx.fillRect(0,0,canvas.width,canvas.height);
-            
             starList.forEach(s => {
                 ctx.beginPath();
                 ctx.arc(s.x, s.y, s.size, 0, Math.PI*2);
-                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star-color');
-                ctx.globalAlpha = s.opacity;
+                ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
                 ctx.fill();
-                
                 s.y += s.speed;
-                s.x += s.drift;
-                
-                if(s.y > canvas.height) { s.y = -10; s.x = Math.random() * canvas.width; }
-                if(s.x > canvas.width) s.x = 0;
-                if(s.x < 0) s.x = canvas.width;
+                if(s.y > canvas.height) s.y = 0;
             });
-            ctx.globalAlpha = 1.0;
-            
             setTimeout(() => requestAnimationFrame(drawStars), 1000 / STATE.fps);
         }
-
-        window.onresize = initStars;
-        initStars(); 
-        drawStars();
-        sysLog("PHYSICS_ENGINE_READY");
+        initStars(); drawStars();
+        sysLog("KERNEL_BOOT_SUCCESS");
     </script>
 </body>
 </html>
