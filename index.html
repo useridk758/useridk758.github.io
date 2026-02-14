@@ -18,43 +18,66 @@
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: white; margin: 0; overflow: hidden; transition: background 0.8s var(--smooth); }
         #starCanvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
 
-        /* --- UI Positioning --- */
-        #home-btn { position: fixed; top: 30px; left: 30px; width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 500; transition: 0.4s var(--smooth); }
-        #home-btn:hover { border-color: var(--theme-main); transform: scale(1.1); box-shadow: 0 0 20px var(--theme-glow); }
-
-        #side-nav { position: fixed; left: 30px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
-        .side-icon { width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.4s var(--smooth); font-size: 1.2rem; }
-        .side-icon:hover { border-color: var(--theme-main); transform: scale(1.1); }
-
-        /* --- Menu & Overlays --- */
-        #menu-btn { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 200; transition: 0.3s; }
-        #drop-menu { position: fixed; bottom: 95px; right: 30px; width: 200px; background: #0f0f0f; border: 1px solid #333; border-radius: 15px; display: none; flex-direction: column; z-index: 200; overflow: hidden; opacity: 0; transform: translateY(20px); transition: 0.4s var(--smooth); }
-        #drop-menu.show { display: flex; opacity: 1; transform: translateY(0); }
-        
-        .overlay-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; backdrop-blur: 20px; transition: 0.6s var(--smooth); }
-        .overlay-screen.active { display: flex; opacity: 1; }
-        .card-ui { background: #0f0f0f; border: 1px solid #222; border-radius: 30px; padding: 35px; width: 420px; display: flex; flex-direction: column; gap: 15px; }
-
-        /* --- Settings Interactivity --- */
-        .setting-input { background: #000; border: 1px solid #333; border-radius: 10px; padding: 12px; width: 100%; color: white; outline: none; font-size: 11px; transition: 0.3s; }
-        .setting-input:focus { border-color: var(--theme-main); }
-        .theme-btn, .opt-btn { padding: 10px; border-radius: 8px; font-size: 9px; font-weight: 900; border: 1px solid #333; background: #151515; transition: 0.2s; color: #555; }
-        .theme-btn:active, .opt-btn:active { transform: scale(0.92); border-color: var(--theme-main); color: white; }
-        .active-opt { border-color: var(--theme-main) !important; color: white !important; box-shadow: 0 0 10px var(--theme-glow); }
-
-        /* --- Intro Transitions --- */
-        #welcome-text { opacity: 0; transform: scale(0.9); filter: blur(10px); transition: 1.2s var(--smooth); display: none; font-size: 6rem; font-weight: 900; text-transform: uppercase; text-align: center; }
-        #welcome-text.visible { opacity: 1; transform: scale(1); filter: blur(0px); display: block; }
-        
-        /* The Outlined Text */
-        .outlined-blue {
-            color: transparent;
-            -webkit-text-stroke: 2px var(--theme-main);
-            text-shadow: 0 0 30px var(--theme-glow);
+        /* --- UI Elements --- */
+        #home-btn, .side-icon, #menu-btn { 
+            background: #111; border: 1px solid #333; border-radius: 12px; 
+            display: flex; align-items: center; justify-content: center; cursor: pointer; 
+            transition: 0.4s var(--smooth); font-size: 1.2rem;
+        }
+        #home-btn:hover, .side-icon:hover, #menu-btn:hover { 
+            border-color: var(--theme-main); transform: translateY(-5px) scale(1.1); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5), 0 0 15px var(--theme-glow); 
         }
 
-        /* --- Main Layout --- */
-        #main-content { opacity: 0; transform: translateY(40px); transition: 1.2s var(--smooth); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 85vh; pointer-events: none; margin-top: -5vh; }
+        #home-btn { position: fixed; top: 30px; left: 30px; width: 50px; height: 50px; z-index: 500; }
+        #side-nav { position: fixed; left: 30px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
+        .side-icon { width: 50px; height: 50px; }
+        #menu-btn { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; z-index: 200; font-weight: 900; letter-spacing: 2px; }
+
+        /* --- Search Hub --- */
+        #search-hub {
+            position: fixed; left: 100px; top: 50%; transform: translateY(-50%) scale(0.9);
+            background: rgba(10, 10, 10, 0.8); border: 1px solid #333; border-radius: 24px;
+            padding: 25px; display: none; opacity: 0; flex-direction: column; gap: 15px;
+            width: 320px; backdrop-blur: 20px; transition: 0.5s var(--smooth); z-index: 90;
+        }
+        #search-hub.show { display: flex; opacity: 1; transform: translateY(-50%) scale(1); }
+        .search-input { background: #000; border: 1px solid #333; border-radius: 12px; padding: 12px; width: 100%; color: white; outline: none; font-size: 12px; transition: 0.3s; }
+        .search-input:focus { border-color: var(--theme-main); box-shadow: 0 0 10px var(--theme-glow); }
+
+        /* --- Premium Drop Menu --- */
+        #drop-menu { 
+            position: fixed; bottom: 95px; right: 30px; width: 220px; 
+            background: rgba(15, 15, 15, 0.7); border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 20px; display: none; flex-direction: column; z-index: 200; 
+            overflow: hidden; opacity: 0; transform: translateY(20px); 
+            backdrop-blur: 25px; transition: 0.4s var(--smooth);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+        #drop-menu.show { display: flex; opacity: 1; transform: translateY(0); }
+        .menu-item { 
+            padding: 18px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px;
+            font-size: 10px; font-weight: 900; text-transform: uppercase; color: #aaa; transition: 0.3s;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .menu-item:hover { background: rgba(255,255,255,0.05); color: white; padding-left: 25px; }
+        .menu-item:last-child { border: none; }
+
+        /* --- Overlays & Cards --- */
+        .overlay-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; backdrop-blur: 20px; transition: 0.6s var(--smooth); }
+        .overlay-screen.active { display: flex; opacity: 1; }
+        .card-ui { background: #0f0f0f; border: 1px solid #222; border-radius: 30px; padding: 35px; width: 420px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
+
+        .theme-btn, .opt-btn { padding: 10px; border-radius: 8px; font-size: 9px; font-weight: 900; border: 1px solid #333; background: #151515; transition: 0.2s; color: #555; cursor: pointer; }
+        .theme-btn:hover, .opt-btn:hover { border-color: #555; color: #eee; }
+        .active-opt { border-color: var(--theme-main) !important; color: white !important; box-shadow: 0 0 15px var(--theme-glow); transform: scale(1.05); }
+
+        /* --- Transitions --- */
+        #welcome-text { opacity: 0; transform: scale(0.9); filter: blur(10px); transition: 1.2s var(--smooth); display: none; font-size: 6rem; font-weight: 900; text-transform: uppercase; text-align: center; }
+        #welcome-text.visible { opacity: 1; transform: scale(1); filter: blur(0px); display: block; }
+        .outlined-blue { color: transparent; -webkit-text-stroke: 2px var(--theme-main); text-shadow: 0 0 30px var(--theme-glow); }
+
+        #main-content { opacity: 0; transform: translateY(40px); transition: 1.2s var(--smooth); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 85vh; pointer-events: none; margin-top: -8vh; }
         #main-content.active { opacity: 1; transform: translateY(0); pointer-events: all; }
 
         #browser-view { position: fixed; inset: 20px 20px 20px 100px; background: #000; border: 1px solid #333; border-radius: 24px; z-index: 50; display: none; overflow: hidden; opacity: 0; transition: 0.6s var(--smooth); }
@@ -70,20 +93,39 @@
     <div id="home-btn" onclick="goHome()">🏠</div>
 
     <div id="side-nav">
-        <div class="side-icon" onclick="toggleSearchHub(event)">🔍</div>
+        <div class="side-icon" id="search-btn" onclick="toggleSearchHub(event)">🔍</div>
         <div class="side-icon" onclick="processUrl('https://cineby.gd')">🎬</div>
     </div>
 
     <div id="menu-btn" onclick="toggleMenu(event)">...</div>
     <div id="drop-menu">
-        <div class="menu-item" onclick="openScreen('settings-screen', event)">Settings</div>
-        <div class="menu-item" onclick="openScreen('tos-screen', event)">Terms</div>
-        <div class="menu-item" onclick="goHome(event)">Dashboard</div>
+        <div class="menu-item" onclick="openScreen('settings-screen', event)">
+            <span>⚙️</span> Settings
+        </div>
+        <div class="menu-item" onclick="openScreen('tos-screen', event)">
+            <span>📋</span> Terms
+        </div>
+        <div class="menu-item" onclick="goHome(event)">
+            <span>🏠</span> Dashboard
+        </div>
+    </div>
+
+    <div id="search-hub">
+        <h3 class="text-[10px] font-black uppercase text-blue-500 tracking-[0.2em]">Global Search</h3>
+        <form onsubmit="handleSearch(event)">
+            <input type="text" id="urlInput" class="search-input" placeholder="Enter URL or query..." autocomplete="off">
+        </form>
+        <div class="grid grid-cols-4 gap-2">
+            <div class="side-icon" onclick="processUrl('https://youtube.com')">▶️</div>
+            <div class="side-icon" onclick="processUrl('https://discord.com')">💬</div>
+            <div class="side-icon" onclick="processUrl('https://tiktok.com')">📱</div>
+            <div class="side-icon" onclick="processUrl('https://poki.com')">🎮</div>
+        </div>
     </div>
 
     <div id="intro-overlay" style="position:fixed; inset:0; z-index:2000; background:#050505; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: 1s;">
         <div id="name-prompt" class="flex flex-col items-center gap-6">
-            <h2 class="text-xl font-black uppercase tracking-[0.4em] text-blue-500">Identity</h2>
+            <h2 class="text-xl font-black uppercase tracking-[0.4em] text-blue-500">Identity Login</h2>
             <input type="text" id="nameInput" autofocus class="bg-transparent border-b-2 border-white/10 text-4xl text-center outline-none w-72 focus:border-blue-500 transition-all" placeholder="...">
         </div>
         <h2 id="welcome-text" class="outlined-blue">WELCOME,<br><span id="display-name" style="color:white; -webkit-text-stroke: 0px;"></span></h2>
@@ -93,26 +135,26 @@
         <nav class="bg-[#0f0f0f]/95 border border-[#222] rounded-full px-8 py-3 flex items-center gap-6 backdrop-blur-xl mb-16">
             <div class="font-black uppercase text-lg text-blue-500">USERIDK758</div>
             <div id="fps-display" class="text-[10px] font-black text-gray-500">60 FPS</div>
-            <div class="text-[9px] font-black px-3 py-1 border border-white/10 rounded-full cursor-pointer hover:bg-white hover:text-black transition" onclick="resetIdentity()">RESET NODE</div>
+            <div class="text-[9px] font-black px-4 py-1 border border-white/10 rounded-full cursor-pointer hover:bg-white hover:text-black transition-all" onclick="resetIdentity()">RESET IDENTITY</div>
         </nav>
         <h1 class="text-9xl font-black italic tracking-tighter uppercase mega-glow">USERIDK</h1>
-        <p class="mt-4 text-gray-500 font-bold uppercase tracking-[0.5em] text-[10px]">Active Node: <span id="nav-name" class="text-white">...</span></p>
+        <p class="mt-4 text-gray-500 font-bold uppercase tracking-[0.5em] text-[10px]">Connected as: <span id="nav-name" class="text-white">...</span></p>
     </div>
 
     <div id="settings-screen" class="overlay-screen" onclick="hideScreens()">
         <div class="card-ui" onclick="event.stopPropagation()">
-            <h3 class="font-black uppercase italic text-xl text-blue-500">Node Configuration</h3>
+            <h3 class="font-black uppercase italic text-xl text-blue-500">System Settings</h3>
             
             <div class="space-y-2">
-                <label class="text-[9px] font-black uppercase text-gray-500">Tab Cloaking</label>
-                <input type="text" id="cloak-title" class="setting-input" placeholder="Custom Tab Title">
-                <input type="text" id="cloak-icon" class="setting-input" placeholder="Favicon URL">
+                <label class="text-[9px] font-black uppercase text-gray-500">Cloaking Engine</label>
+                <input type="text" id="cloak-title" class="search-input" placeholder="Custom Tab Title">
+                <input type="text" id="cloak-icon" class="search-input" placeholder="Favicon URL">
             </div>
 
             <div>
-                <label class="text-[9px] font-black uppercase text-gray-500">Visual Themes</label>
+                <label class="text-[9px] font-black uppercase text-gray-500">Theme Select</label>
                 <div class="grid grid-cols-2 gap-2 mt-2">
-                    <button class="theme-btn" onclick="setTheme('#3b82f6', '#050a15', '#ffffff', this)">COSMIC</button>
+                    <button class="theme-btn active-opt" onclick="setTheme('#3b82f6', '#050a15', '#ffffff', this)">COSMIC</button>
                     <button class="theme-btn" onclick="setTheme('#10b981', '#05150a', '#a7ffd6', this)">EMERALD</button>
                     <button class="theme-btn" onclick="setTheme('#ef4444', '#150505', '#ff9494', this)">ALERT</button>
                     <button class="theme-btn" onclick="setTheme('#a855f7', '#0e0515', '#e9d5ff', this)">NEBULA</button>
@@ -120,31 +162,57 @@
             </div>
 
             <div>
-                <label class="text-[9px] font-black uppercase text-gray-500">Performance</label>
+                <label class="text-[9px] font-black uppercase text-gray-500">Refresh Rate</label>
                 <div class="flex gap-2 mt-2">
-                    <button id="opt-30" class="opt-btn flex-1" onclick="setFPS(30, this)">Power Save</button>
-                    <button id="opt-60" class="opt-btn flex-1 active-opt" onclick="setFPS(60, this)">Performance</button>
+                    <button id="opt-30" class="opt-btn flex-1" onclick="setFPS(30, this)">30 FPS</button>
+                    <button id="opt-60" class="opt-btn flex-1 active-opt" onclick="setFPS(60, this)">60 FPS</button>
                 </div>
             </div>
 
-            <button class="py-4 bg-white text-black font-black rounded-2xl text-[10px] uppercase mt-4" onclick="applySettings()">Save & Close</button>
+            <button class="py-4 bg-white text-black font-black rounded-2xl text-[10px] uppercase mt-4 hover:bg-blue-500 hover:text-white transition-all" onclick="applySettings()">Save Node Data</button>
         </div>
     </div>
 
     <div id="tos-screen" class="overlay-screen" onclick="hideScreens()">
         <div class="card-ui text-center" onclick="event.stopPropagation()">
             <h3 class="font-black uppercase italic text-3xl">Terms</h3>
-            <p class="text-gray-500 text-xs">Node Access granted. Session data is transient.</p>
-            <button class="py-4 border-2 border-white rounded-2xl text-[10px] font-black uppercase hover:bg-white hover:text-black transition" onclick="hideScreens()">Acknowledge</button>
+            <p class="text-gray-500 text-xs py-4 leading-relaxed">By accessing this node, you acknowledge that all frame data is processed locally. We do not store your navigation history.</p>
+            <button class="py-4 border-2 border-white rounded-2xl text-[10px] font-black uppercase hover:bg-white hover:text-black transition" onclick="hideScreens()">Confirm Protocol</button>
         </div>
     </div>
 
     <div id="browser-view">
-        <iframe id="proxyFrame" class="w-full h-full bg-white"></iframe>
+        <iframe id="proxyFrame" class="w-full h-full bg-white border-none"></iframe>
     </div>
 
     <script>
         let currentFPS = 60;
+
+        // --- FIXED SEARCH BUTTON LOGIC ---
+        function toggleSearchHub(e) {
+            if(e) e.stopPropagation();
+            const hub = document.getElementById('search-hub');
+            const isShowing = hub.classList.contains('show');
+            
+            if (isShowing) {
+                hub.classList.remove('show');
+                setTimeout(() => hub.style.display = 'none', 500);
+            } else {
+                hub.style.display = 'flex';
+                setTimeout(() => hub.classList.add('show'), 10);
+                document.getElementById('urlInput').focus();
+            }
+        }
+
+        function handleSearch(e) {
+            e.preventDefault();
+            let val = document.getElementById('urlInput').value.trim();
+            if(!val) return;
+            let url = (val.includes('.') && !val.includes(' ')) ? (val.startsWith('http') ? val : 'https://' + val) : 'https://duckduckgo.com/?q=' + encodeURIComponent(val);
+            processUrl(url);
+            document.getElementById('search-hub').classList.remove('show');
+            setTimeout(() => document.getElementById('search-hub').style.display = 'none', 500);
+        }
 
         function processUrl(url) {
             document.getElementById('proxyFrame').src = url;
@@ -152,13 +220,16 @@
             const bv = document.getElementById('browser-view');
             bv.style.display = 'flex';
             setTimeout(() => bv.classList.add('active'), 50);
+            toggleMenu(null, true);
         }
 
-        function goHome() {
+        function goHome(e) {
+            if(e) e.stopPropagation();
             const bv = document.getElementById('browser-view');
             bv.classList.remove('active');
             setTimeout(() => { bv.style.display = 'none'; document.getElementById('main-content').classList.add('active'); }, 600);
             toggleMenu(null, true);
+            hideScreens();
         }
 
         function toggleMenu(e, forceClose = false) {
@@ -208,35 +279,47 @@
             btn.classList.add('active-opt');
         }
 
+        function resetIdentity() {
+            document.getElementById('main-content').classList.remove('active');
+            const intro = document.getElementById('intro-overlay');
+            const prompt = document.getElementById('name-prompt');
+            const welcome = document.getElementById('welcome-text');
+            intro.style.display = 'flex';
+            setTimeout(() => {
+                intro.style.opacity = '1';
+                prompt.style.display = 'flex';
+                prompt.style.opacity = '1';
+                welcome.classList.remove('visible');
+                welcome.style.display = 'none';
+                document.getElementById('nameInput').focus();
+            }, 100);
+        }
+
         document.getElementById('nameInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && e.target.value.trim() !== "") {
                 const name = e.target.value.trim();
                 const prompt = document.getElementById('name-prompt');
                 const welcome = document.getElementById('welcome-text');
-                
                 prompt.style.opacity = "0";
                 prompt.style.transform = "translateY(-20px)";
-                
                 setTimeout(() => {
                     prompt.style.display = "none";
                     document.getElementById('display-name').innerText = name;
                     document.getElementById('nav-name').innerText = name;
-                    
                     welcome.style.display = "block";
-                    // Smoother Reveal
                     setTimeout(() => welcome.classList.add('visible'), 100);
-                    
                     setTimeout(() => {
                         document.getElementById('intro-overlay').style.opacity = "0";
                         setTimeout(() => { 
                             document.getElementById('intro-overlay').style.display="none"; 
                             document.getElementById('main-content').classList.add('active'); 
                         }, 1000);
-                    }, 2800); // Cinematic pause
+                    }, 2800);
                 }, 800);
             }
         });
 
+        // --- Starfield Background ---
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
         let starList = [];
@@ -255,6 +338,7 @@
             setTimeout(() => requestAnimationFrame(drawStars), 1000 / currentFPS);
         }
         initStars(); drawStars();
+        window.onclick = (e) => { if(!e.target.closest('#search-hub') && !e.target.closest('#search-btn')) toggleSearchHub(null, true); };
     </script>
 </body>
 </html>
