@@ -18,61 +18,50 @@
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: white; margin: 0; overflow: hidden; transition: background 0.8s var(--smooth); }
         #starCanvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
 
-        /* --- Home & Sidebar --- */
-        #home-btn { 
-            position: fixed; top: 30px; left: 30px; 
-            width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; 
-            display: flex; align-items: center; justify-content: center; cursor: pointer; 
-            z-index: 500; transition: 0.4s var(--smooth);
-        }
+        /* --- UI Positioning --- */
+        #home-btn { position: fixed; top: 30px; left: 30px; width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 500; transition: 0.4s var(--smooth); }
         #home-btn:hover { border-color: var(--theme-main); transform: scale(1.1); box-shadow: 0 0 20px var(--theme-glow); }
 
         #side-nav { position: fixed; left: 30px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
-        .side-icon { 
-            width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; 
-            display: flex; align-items: center; justify-content: center; cursor: pointer; 
-            transition: 0.4s var(--smooth); font-size: 1.2rem; 
-        }
+        .side-icon { width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.4s var(--smooth); font-size: 1.2rem; }
         .side-icon:hover { border-color: var(--theme-main); transform: scale(1.1); }
 
-        /* --- Search Hub --- */
-        #search-hub {
-            position: fixed; left: 95px; top: 50%; transform: translateY(-50%) translateX(-20px);
-            background: rgba(10, 10, 10, 0.98); border: 1px solid #333; border-radius: 24px;
-            padding: 25px; display: none; opacity: 0; flex-direction: column; gap: 15px;
-            width: 320px; backdrop-blur: 20px; transition: 0.5s var(--smooth); z-index: 90;
-        }
-        #search-hub.show { display: flex; opacity: 1; transform: translateY(-50%) translateX(0); }
-        .search-input { background: #000; border: 1px solid #333; border-radius: 12px; padding: 12px; width: 100%; color: white; outline: none; font-size: 12px; }
-        .search-input:focus { border-color: var(--theme-main); }
-
-        /* --- 3-Dot Menu & Overlays --- */
+        /* --- Menu & Overlays --- */
         #menu-btn { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: #111; border: 1px solid #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 200; transition: 0.3s; }
-        #drop-menu { 
-            position: fixed; bottom: 95px; right: 30px; width: 200px; background: #0f0f0f; border: 1px solid #333; border-radius: 15px; 
-            display: none; flex-direction: column; z-index: 200; overflow: hidden; opacity: 0; transform: translateY(20px); transition: 0.4s var(--smooth); 
-        }
+        #drop-menu { position: fixed; bottom: 95px; right: 30px; width: 200px; background: #0f0f0f; border: 1px solid #333; border-radius: 15px; display: none; flex-direction: column; z-index: 200; overflow: hidden; opacity: 0; transform: translateY(20px); transition: 0.4s var(--smooth); }
         #drop-menu.show { display: flex; opacity: 1; transform: translateY(0); }
-        .menu-item { padding: 18px; text-align: center; cursor: pointer; border-bottom: 1px solid #222; font-size: 10px; font-weight: 900; text-transform: uppercase; color: #555; transition: 0.3s; }
-        .menu-item:hover { background: #1a1a1a; color: white; border-left: 4px solid var(--theme-main); }
-
-        .overlay-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; backdrop-blur: 15px; transition: 0.6s var(--smooth); }
-        .overlay-screen.active { display: flex; opacity: 1; }
-        .card-ui { background: #0f0f0f; border: 1px solid #333; border-radius: 30px; padding: 40px; width: 400px; display: flex; flex-direction: column; gap: 20px; }
-
-        /* --- Transitions --- */
-        #welcome-text { opacity: 0; transform: scale(0.8); transition: 1s var(--smooth); display: none; font-size: 5rem; font-weight: 900; text-transform: uppercase; text-align: center; }
-        #welcome-text.visible { opacity: 1; transform: scale(1); display: block; }
         
-        #main-content { opacity: 0; transform: translateY(20px); transition: 1s var(--smooth); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; pointer-events: none; }
+        .overlay-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; backdrop-blur: 20px; transition: 0.6s var(--smooth); }
+        .overlay-screen.active { display: flex; opacity: 1; }
+        .card-ui { background: #0f0f0f; border: 1px solid #222; border-radius: 30px; padding: 35px; width: 420px; display: flex; flex-direction: column; gap: 15px; }
+
+        /* --- Settings Interactivity --- */
+        .setting-input { background: #000; border: 1px solid #333; border-radius: 10px; padding: 12px; width: 100%; color: white; outline: none; font-size: 11px; transition: 0.3s; }
+        .setting-input:focus { border-color: var(--theme-main); }
+        .theme-btn, .opt-btn { padding: 10px; border-radius: 8px; font-size: 9px; font-weight: 900; border: 1px solid #333; background: #151515; transition: 0.2s; color: #555; }
+        .theme-btn:active, .opt-btn:active { transform: scale(0.92); border-color: var(--theme-main); color: white; }
+        .active-opt { border-color: var(--theme-main) !important; color: white !important; box-shadow: 0 0 10px var(--theme-glow); }
+
+        /* --- Intro Transitions --- */
+        #welcome-text { opacity: 0; transform: scale(0.9); filter: blur(10px); transition: 1.2s var(--smooth); display: none; font-size: 6rem; font-weight: 900; text-transform: uppercase; text-align: center; }
+        #welcome-text.visible { opacity: 1; transform: scale(1); filter: blur(0px); display: block; }
+        
+        /* The Outlined Text */
+        .outlined-blue {
+            color: transparent;
+            -webkit-text-stroke: 2px var(--theme-main);
+            text-shadow: 0 0 30px var(--theme-glow);
+        }
+
+        /* --- Main Layout --- */
+        #main-content { opacity: 0; transform: translateY(40px); transition: 1.2s var(--smooth); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 85vh; pointer-events: none; margin-top: -5vh; }
         #main-content.active { opacity: 1; transform: translateY(0); pointer-events: all; }
 
         #browser-view { position: fixed; inset: 20px 20px 20px 100px; background: #000; border: 1px solid #333; border-radius: 24px; z-index: 50; display: none; overflow: hidden; opacity: 0; transition: 0.6s var(--smooth); }
         #browser-view.active { display: flex; opacity: 1; }
 
-        .theme-btn { padding: 8px; border-radius: 8px; font-size: 9px; font-weight: 900; border: 1px solid #333; transition: 0.2s; }
-        .mega-glow { animation: pulseGlow 2s infinite alternate; text-shadow: 0 0 20px var(--theme-glow); }
-        @keyframes pulseGlow { from { opacity: 0.7; } to { opacity: 1; } }
+        .mega-glow { animation: pulseGlow 2s infinite alternate; }
+        @keyframes pulseGlow { from { opacity: 0.8; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -81,7 +70,7 @@
     <div id="home-btn" onclick="goHome()">🏠</div>
 
     <div id="side-nav">
-        <div class="side-icon" id="search-trigger" onclick="toggleSearchHub(event)">🔍</div>
+        <div class="side-icon" onclick="toggleSearchHub(event)">🔍</div>
         <div class="side-icon" onclick="processUrl('https://cineby.gd')">🎬</div>
     </div>
 
@@ -92,92 +81,70 @@
         <div class="menu-item" onclick="goHome(event)">Dashboard</div>
     </div>
 
-    <div id="search-hub">
-        <h3 class="text-[10px] font-black uppercase text-gray-400">Search Engine</h3>
-        <form onsubmit="handleSearch(event)">
-            <input type="text" id="urlInput" class="search-input" placeholder="Enter URL..." autocomplete="off">
-        </form>
-        <div class="grid grid-cols-4 gap-2">
-            <div class="side-icon" onclick="processUrl('https://youtube.com')">▶️</div>
-            <div class="side-icon" onclick="processUrl('https://discord.com')">💬</div>
-            <div class="side-icon" onclick="processUrl('https://tiktok.com')">📱</div>
-            <div class="side-icon" onclick="processUrl('https://poki.com')">🎮</div>
-        </div>
-    </div>
-
-    <div id="intro-overlay" style="position:fixed; inset:0; z-index:2000; background:#050505; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: 0.8s;">
-        <div id="name-prompt" class="flex flex-col items-center gap-6 transition-all duration-500">
-            <h2 class="text-xl font-black uppercase tracking-[0.4em]" style="color: var(--theme-main)">Access Protocol</h2>
+    <div id="intro-overlay" style="position:fixed; inset:0; z-index:2000; background:#050505; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: 1s;">
+        <div id="name-prompt" class="flex flex-col items-center gap-6">
+            <h2 class="text-xl font-black uppercase tracking-[0.4em] text-blue-500">Identity</h2>
             <input type="text" id="nameInput" autofocus class="bg-transparent border-b-2 border-white/10 text-4xl text-center outline-none w-72 focus:border-blue-500 transition-all" placeholder="...">
         </div>
-        <h2 id="welcome-text" class="mega-glow">WELCOME,<br><span id="display-name" style="color:var(--theme-main)"></span></h2>
+        <h2 id="welcome-text" class="outlined-blue">WELCOME,<br><span id="display-name" style="color:white; -webkit-text-stroke: 0px;"></span></h2>
     </div>
 
     <div id="main-content">
-        <nav class="bg-[#0f0f0f]/90 border border-[#222] rounded-full px-8 py-3 flex items-center gap-6 backdrop-blur-xl mb-12">
-            <div class="font-black uppercase text-lg" style="color: var(--theme-main)">USERIDK758</div>
-            <div class="h-4 w-[1px] bg-white/10"></div>
+        <nav class="bg-[#0f0f0f]/95 border border-[#222] rounded-full px-8 py-3 flex items-center gap-6 backdrop-blur-xl mb-16">
+            <div class="font-black uppercase text-lg text-blue-500">USERIDK758</div>
             <div id="fps-display" class="text-[10px] font-black text-gray-500">60 FPS</div>
-            <div class="text-[9px] font-black px-3 py-1 border border-white/10 rounded-full cursor-pointer hover:bg-white hover:text-black transition" onclick="resetIdentity()">CHANGE NAME</div>
+            <div class="text-[9px] font-black px-3 py-1 border border-white/10 rounded-full cursor-pointer hover:bg-white hover:text-black transition" onclick="resetIdentity()">RESET NODE</div>
         </nav>
         <h1 class="text-9xl font-black italic tracking-tighter uppercase mega-glow">USERIDK</h1>
         <p class="mt-4 text-gray-500 font-bold uppercase tracking-[0.5em] text-[10px]">Active Node: <span id="nav-name" class="text-white">...</span></p>
     </div>
 
-    <div id="browser-view">
-        <iframe id="proxyFrame" class="w-full h-full bg-white"></iframe>
-    </div>
-
     <div id="settings-screen" class="overlay-screen" onclick="hideScreens()">
         <div class="card-ui" onclick="event.stopPropagation()">
-            <h3 class="font-black uppercase italic text-xl text-blue-500">Settings</h3>
+            <h3 class="font-black uppercase italic text-xl text-blue-500">Node Configuration</h3>
+            
+            <div class="space-y-2">
+                <label class="text-[9px] font-black uppercase text-gray-500">Tab Cloaking</label>
+                <input type="text" id="cloak-title" class="setting-input" placeholder="Custom Tab Title">
+                <input type="text" id="cloak-icon" class="setting-input" placeholder="Favicon URL">
+            </div>
+
             <div>
-                <label class="text-[9px] font-black uppercase text-gray-500">Theme Engine</label>
+                <label class="text-[9px] font-black uppercase text-gray-500">Visual Themes</label>
                 <div class="grid grid-cols-2 gap-2 mt-2">
-                    <button class="theme-btn text-blue-500" onclick="setTheme('#3b82f6', '#050a15', '#ffffff')">COSMIC</button>
-                    <button class="theme-btn text-emerald-500" onclick="setTheme('#10b981', '#05150a', '#a7ffd6')">EMERALD</button>
-                    <button class="theme-btn text-red-500" onclick="setTheme('#ef4444', '#150505', '#ff9494')">ALERT</button>
-                    <button class="theme-btn text-purple-500" onclick="setTheme('#a855f7', '#0e0515', '#e9d5ff')">NEBULA</button>
+                    <button class="theme-btn" onclick="setTheme('#3b82f6', '#050a15', '#ffffff', this)">COSMIC</button>
+                    <button class="theme-btn" onclick="setTheme('#10b981', '#05150a', '#a7ffd6', this)">EMERALD</button>
+                    <button class="theme-btn" onclick="setTheme('#ef4444', '#150505', '#ff9494', this)">ALERT</button>
+                    <button class="theme-btn" onclick="setTheme('#a855f7', '#0e0515', '#e9d5ff', this)">NEBULA</button>
                 </div>
             </div>
+
             <div>
-                <label class="text-[9px] font-black uppercase text-gray-500">Optimization</label>
+                <label class="text-[9px] font-black uppercase text-gray-500">Performance</label>
                 <div class="flex gap-2 mt-2">
-                    <button class="flex-1 py-2 bg-white/5 border border-white/10 rounded-lg text-[9px] font-black uppercase" onclick="setFPS(30)">Power Save</button>
-                    <button class="flex-1 py-2 bg-white/5 border border-blue-500 rounded-lg text-[9px] font-black uppercase text-blue-500" onclick="setFPS(60)">Performance</button>
+                    <button id="opt-30" class="opt-btn flex-1" onclick="setFPS(30, this)">Power Save</button>
+                    <button id="opt-60" class="opt-btn flex-1 active-opt" onclick="setFPS(60, this)">Performance</button>
                 </div>
             </div>
-            <button class="py-4 bg-white text-black font-black rounded-2xl text-[10px] uppercase mt-4" onclick="hideScreens()">Apply Changes</button>
+
+            <button class="py-4 bg-white text-black font-black rounded-2xl text-[10px] uppercase mt-4" onclick="applySettings()">Save & Close</button>
         </div>
     </div>
 
     <div id="tos-screen" class="overlay-screen" onclick="hideScreens()">
         <div class="card-ui text-center" onclick="event.stopPropagation()">
             <h3 class="font-black uppercase italic text-3xl">Terms</h3>
-            <p class="text-gray-500 text-xs leading-relaxed">This node is provided for educational interface testing. Data processed remains local to your session.</p>
-            <button class="py-4 border-2 border-white rounded-2xl text-[10px] font-black uppercase hover:bg-white hover:text-black transition" onclick="hideScreens()">I Understand</button>
+            <p class="text-gray-500 text-xs">Node Access granted. Session data is transient.</p>
+            <button class="py-4 border-2 border-white rounded-2xl text-[10px] font-black uppercase hover:bg-white hover:text-black transition" onclick="hideScreens()">Acknowledge</button>
         </div>
+    </div>
+
+    <div id="browser-view">
+        <iframe id="proxyFrame" class="w-full h-full bg-white"></iframe>
     </div>
 
     <script>
         let currentFPS = 60;
-
-        function toggleSearchHub(e) {
-            e.stopPropagation();
-            const hub = document.getElementById('search-hub');
-            hub.style.display = 'flex';
-            setTimeout(() => hub.classList.toggle('show'), 10);
-            document.getElementById('urlInput').focus();
-        }
-
-        function handleSearch(e) {
-            e.preventDefault();
-            let val = document.getElementById('urlInput').value.trim();
-            if(!val) return;
-            let url = (val.includes('.') && !val.includes(' ')) ? (val.startsWith('http') ? val : 'https://' + val) : 'https://duckduckgo.com/?q=' + encodeURIComponent(val);
-            processUrl(url);
-            document.getElementById('search-hub').classList.remove('show');
-        }
 
         function processUrl(url) {
             document.getElementById('proxyFrame').src = url;
@@ -187,13 +154,11 @@
             setTimeout(() => bv.classList.add('active'), 50);
         }
 
-        function goHome(e) {
-            if(e) e.stopPropagation();
+        function goHome() {
             const bv = document.getElementById('browser-view');
             bv.classList.remove('active');
             setTimeout(() => { bv.style.display = 'none'; document.getElementById('main-content').classList.add('active'); }, 600);
             toggleMenu(null, true);
-            hideScreens();
         }
 
         function toggleMenu(e, forceClose = false) {
@@ -206,10 +171,18 @@
 
         function openScreen(id, e) {
             if(e) e.stopPropagation();
-            toggleMenu(null, true); // Auto close menu when picking a screen
+            toggleMenu(null, true);
             const s = document.getElementById(id);
             s.style.display = 'flex';
             setTimeout(() => s.classList.add('active'), 50);
+        }
+
+        function applySettings() {
+            const title = document.getElementById('cloak-title').value;
+            const icon = document.getElementById('cloak-icon').value;
+            if(title) document.title = title;
+            if(icon) document.getElementById('tab-icon').href = icon;
+            hideScreens();
         }
 
         function hideScreens() {
@@ -219,29 +192,20 @@
             });
         }
 
-        function setTheme(main, bg, stars) {
+        function setTheme(main, bg, stars, btn) {
             document.documentElement.style.setProperty('--theme-main', main);
             document.documentElement.style.setProperty('--theme-glow', main + '66');
             document.documentElement.style.setProperty('--bg-color', bg);
             document.documentElement.style.setProperty('--star-color', stars);
+            document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active-opt'));
+            btn.classList.add('active-opt');
         }
 
-        function setFPS(val) { currentFPS = val; document.getElementById('fps-display').innerText = val + " FPS"; }
-
-        function resetIdentity() {
-            document.getElementById('main-content').classList.remove('active');
-            const intro = document.getElementById('intro-overlay');
-            const prompt = document.getElementById('name-prompt');
-            const welcome = document.getElementById('welcome-text');
-            intro.style.display = 'flex';
-            setTimeout(() => {
-                intro.style.opacity = '1';
-                prompt.style.display = 'flex';
-                prompt.style.opacity = '1';
-                welcome.classList.remove('visible');
-                welcome.style.display = 'none';
-                document.getElementById('nameInput').focus();
-            }, 100);
+        function setFPS(val, btn) {
+            currentFPS = val;
+            document.getElementById('fps-display').innerText = val + " FPS";
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active-opt'));
+            btn.classList.add('active-opt');
         }
 
         document.getElementById('nameInput').addEventListener('keypress', (e) => {
@@ -249,29 +213,29 @@
                 const name = e.target.value.trim();
                 const prompt = document.getElementById('name-prompt');
                 const welcome = document.getElementById('welcome-text');
+                
                 prompt.style.opacity = "0";
                 prompt.style.transform = "translateY(-20px)";
+                
                 setTimeout(() => {
                     prompt.style.display = "none";
                     document.getElementById('display-name').innerText = name;
                     document.getElementById('nav-name').innerText = name;
+                    
                     welcome.style.display = "block";
-                    setTimeout(() => welcome.classList.add('visible'), 50);
+                    // Smoother Reveal
+                    setTimeout(() => welcome.classList.add('visible'), 100);
+                    
                     setTimeout(() => {
                         document.getElementById('intro-overlay').style.opacity = "0";
                         setTimeout(() => { 
                             document.getElementById('intro-overlay').style.display="none"; 
                             document.getElementById('main-content').classList.add('active'); 
-                        }, 800);
-                    }, 2000);
-                }, 600);
+                        }, 1000);
+                    }, 2800); // Cinematic pause
+                }, 800);
             }
         });
-
-        window.onclick = () => {
-            document.getElementById('search-hub').classList.remove('show');
-            toggleMenu(null, true);
-        };
 
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
