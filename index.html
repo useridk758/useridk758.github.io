@@ -8,11 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* SYSTEM OS v7.7.0 - HOTFIX 
-           - RESTORED SEARCH HUB
-           - FIXED SETTINGS & PARTNERS
-           - RE-LINKED IDENTITY RESET
-        */
+        /* SYSTEM OS v7.8.0 - TRANSITION RECONSTRUCTION */
 
         :root { 
             --theme-main: #3b82f6; 
@@ -39,45 +35,57 @@
 
         #starCanvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
 
-        /* --- UI Components --- */
+        /* --- Navigation & Icons --- */
         #home-btn, .side-icon, #menu-btn { 
             background: #111; border: 1px solid #333; border-radius: 12px; 
             display: flex; align-items: center; justify-content: center; cursor: pointer; 
             transition: 0.4s var(--smooth);
         }
         #home-btn:hover, .side-icon:hover, #menu-btn:hover { border-color: var(--theme-main); transform: scale(1.1); }
-
         #home-btn { position: fixed; top: 30px; left: 30px; width: 50px; height: 50px; z-index: 500; }
         #side-nav { position: fixed; left: 30px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
         .side-icon { width: 50px; height: 50px; font-size: 1.2rem; }
         #menu-btn { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; z-index: 200; font-weight: 900; }
 
-        /* --- Search Hub (OG Version) --- */
+        /* --- Search Hub --- */
         #search-hub {
             position: fixed; left: 100px; top: 50%; transform: translateY(-50%) scale(0.9);
             background: var(--panel-bg); border: 1px solid #333; border-radius: 24px;
             padding: 25px; display: none; opacity: 0; flex-direction: column; gap: 15px;
-            width: 320px; backdrop-blur: 30px; transition: 0.5s var(--smooth); z-index: 90;
+            width: 320px; backdrop-filter: blur(30px); transition: 0.5s var(--smooth); z-index: 90;
         }
         #search-hub.show { display: flex; opacity: 1; transform: translateY(-50%) scale(1); }
         .search-input { background: #000; border: 1px solid #333; border-radius: 12px; padding: 12px; width: 100%; color: white; outline: none; font-size: 12px; }
 
         /* --- Overlays --- */
-        .overlay-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; backdrop-blur: 20px; transition: 0.6s var(--smooth); }
+        .overlay-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; backdrop-filter: blur(20px); transition: 0.8s var(--smooth); }
         .overlay-screen.active { display: flex; opacity: 1; }
         .card-ui { background: #0f0f0f; border: 1px solid #222; border-radius: 30px; padding: 35px; width: 420px; display: flex; flex-direction: column; gap: 15px; }
 
-        /* --- OG Welcome & Content --- */
-        #welcome-text { opacity: 0; transform: scale(0.9); filter: blur(10px); transition: 1.2s var(--smooth); display: none; font-size: 6rem; font-weight: 900; text-transform: uppercase; text-align: center; }
+        /* --- Identity Sequence --- */
+        #intro-overlay { position: fixed; inset: 0; z-index: 2000; background: #050505; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 1s var(--smooth); }
+        #name-prompt { transition: opacity 0.8s var(--smooth), transform 0.8s var(--smooth); }
+        
+        #welcome-text { 
+            opacity: 0; transform: scale(0.8); filter: blur(20px); 
+            transition: opacity 1.2s var(--smooth), transform 1.2s var(--smooth), filter 1.2s var(--smooth); 
+            display: none; font-size: 6rem; font-weight: 900; text-transform: uppercase; text-align: center; 
+        }
         #welcome-text.visible { opacity: 1; transform: scale(1); filter: blur(0px); display: block; }
         .outlined-blue { color: transparent; -webkit-text-stroke: 2px var(--theme-main); text-shadow: 0 0 30px var(--theme-glow); }
 
-        #main-content { opacity: 0; transform: translateY(40px); transition: 1.2s var(--smooth); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 85vh; pointer-events: none; margin-top: -8vh; }
+        /* --- Main Dashboard --- */
+        #main-content { 
+            opacity: 0; transform: translateY(40px); 
+            transition: opacity 1.2s var(--smooth), transform 1.2s var(--smooth); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            height: 85vh; pointer-events: none; margin-top: -8vh; 
+        }
         #main-content.active { opacity: 1; transform: translateY(0); pointer-events: all; }
         .mega-glow-text { font-size: 8rem; font-weight: 900; font-style: italic; text-transform: uppercase; }
 
         /* --- Context Menu --- */
-        #context-menu { position: fixed; width: 180px; background: var(--panel-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: none; flex-direction: column; z-index: 5000; backdrop-blur: 20px; padding: 8px; }
+        #context-menu { position: fixed; width: 180px; background: var(--panel-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: none; flex-direction: column; z-index: 5000; backdrop-filter: blur(20px); padding: 8px; }
         .ctx-item { padding: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; color: #888; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; }
         .ctx-item:hover { background: rgba(255,255,255,0.05); color: white; }
 
@@ -111,12 +119,6 @@
         <form onsubmit="handleSearch(event)">
             <input type="text" id="urlInput" class="search-input" placeholder="Enter URL or Search..." autocomplete="off">
         </form>
-        <div class="grid grid-cols-4 gap-2">
-            <div class="side-icon" onclick="processUrl('https://youtube.com')">▶️</div>
-            <div class="side-icon" onclick="processUrl('https://discord.com')">💬</div>
-            <div class="side-icon" onclick="processUrl('https://tiktok.com')">📱</div>
-            <div class="side-icon" onclick="processUrl('https://poki.com')">🎮</div>
-        </div>
     </div>
 
     <div id="menu-btn" onclick="toggleMenu(event)">...</div>
@@ -126,10 +128,10 @@
         <div class="p-4 text-[10px] font-black uppercase cursor-pointer hover:bg-white/5 border-t border-white/5" onclick="openScreen('tos-screen')">📋 Terms</div>
     </div>
 
-    <div id="intro-overlay" style="position:fixed; inset:0; z-index:2000; background:#050505; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: 1s;">
+    <div id="intro-overlay">
         <div id="name-prompt" class="flex flex-col items-center gap-6">
-            <h2 class="text-xl font-black uppercase text-blue-500">Identity</h2>
-            <input type="text" id="nameInput" autofocus class="bg-transparent border-b-2 border-white/10 text-4xl text-center outline-none w-72" placeholder="...">
+            <h2 class="text-xl font-black uppercase text-blue-500 tracking-widest">Identity</h2>
+            <input type="text" id="nameInput" autofocus class="bg-transparent border-b-2 border-white/10 text-4xl text-center outline-none w-72 focus:border-blue-500 transition-all" placeholder="...">
         </div>
         <h2 id="welcome-text" class="outlined-blue">WELCOME,<br><span id="display-name" style="color:white; -webkit-text-stroke: 0px;"></span></h2>
     </div>
@@ -138,7 +140,7 @@
         <nav class="bg-[#0f0f0f]/95 border border-[#222] rounded-full px-8 py-3 flex items-center gap-6 mb-16">
             <div class="font-black uppercase text-lg text-blue-500">USERIDK758</div>
             <div class="text-[10px] font-black text-gray-500">60 FPS</div>
-            <div class="text-[9px] font-black px-4 py-1 border border-white/10 rounded-full cursor-pointer hover:bg-white hover:text-black" onclick="resetIdentity()">RESET IDENTITY</div>
+            <div class="text-[9px] font-black px-4 py-1 border border-white/10 rounded-full cursor-pointer hover:bg-white hover:text-black transition-all" onclick="resetIdentity()">RESET IDENTITY</div>
         </nav>
         <h1 class="mega-glow-text">USERIDK</h1>
         <div class="mt-12 flex gap-12 opacity-60">
@@ -167,19 +169,12 @@
         </div>
     </div>
 
-    <div id="tos-screen" class="overlay-screen" onclick="hideScreens()">
-        <div class="card-ui" onclick="event.stopPropagation()">
-            <h3 class="font-black italic text-xl text-blue-500">TERMS</h3>
-            <p class="text-[10px] text-gray-400">Zero-retention policy. All session data is transient.</p>
-            <button class="py-4 bg-white text-black font-black rounded-xl text-[10px] uppercase" onclick="hideScreens()">Accept</button>
-        </div>
-    </div>
-
     <div id="browser-view">
         <iframe id="proxyFrame" class="w-full h-full bg-white border-none"></iframe>
     </div>
 
     <script>
+        // --- Core UI Logic ---
         function handleContextMenu(e) {
             e.preventDefault();
             const m = document.getElementById('context-menu');
@@ -245,30 +240,53 @@
             hideScreens();
         }
 
+        // --- FIXED IDENTITY TRANSITIONS ---
         function resetIdentity() {
-            document.getElementById('main-content').classList.remove('active');
+            const main = document.getElementById('main-content');
             const intro = document.getElementById('intro-overlay');
-            intro.style.display = 'flex'; intro.style.opacity = '1';
-            document.getElementById('name-prompt').style.display = 'flex';
-            document.getElementById('name-prompt').style.opacity = '1';
-            document.getElementById('welcome-text').style.display = 'none';
-            document.getElementById('nameInput').value = '';
-            document.getElementById('nameInput').focus();
+            const prompt = document.getElementById('name-prompt');
+            const welcome = document.getElementById('welcome-text');
+            const input = document.getElementById('nameInput');
+
+            main.classList.remove('active'); // Fade out dashboard
+            
+            setTimeout(() => {
+                intro.style.display = 'flex';
+                setTimeout(() => intro.style.opacity = '1', 10);
+                prompt.style.display = 'flex';
+                prompt.style.opacity = '1';
+                prompt.style.transform = 'translateY(0)';
+                welcome.classList.remove('visible');
+                welcome.style.display = 'none';
+                input.value = '';
+                input.focus();
+            }, 600);
         }
 
         document.getElementById('nameInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && e.target.value.trim() !== "") {
                 const name = e.target.value.trim();
-                document.getElementById('name-prompt').style.opacity = "0";
+                const prompt = document.getElementById('name-prompt');
+                const welcome = document.getElementById('welcome-text');
+                const intro = document.getElementById('intro-overlay');
+
+                // 1. Transition prompt out
+                prompt.style.opacity = "0";
+                prompt.style.transform = "translateY(-20px)";
+                
                 setTimeout(() => {
-                    document.getElementById('name-prompt').style.display = "none";
+                    prompt.style.display = "none";
                     document.getElementById('display-name').innerText = name;
-                    const welcome = document.getElementById('welcome-text');
-                    welcome.style.display = "block"; setTimeout(() => welcome.classList.add('visible'), 100);
+                    
+                    // 2. Transition Welcome in
+                    welcome.style.display = "block";
+                    setTimeout(() => welcome.classList.add('visible'), 50);
+                    
                     setTimeout(() => {
-                        document.getElementById('intro-overlay').style.opacity = "0";
+                        // 3. Fade entire overlay out
+                        intro.style.opacity = "0";
                         setTimeout(() => { 
-                            document.getElementById('intro-overlay').style.display="none"; 
+                            intro.style.display = "none"; 
                             document.getElementById('main-content').classList.add('active'); 
                         }, 1000);
                     }, 2500);
@@ -276,6 +294,7 @@
             }
         });
 
+        // --- Background Stars ---
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
         let stars = [];
@@ -294,6 +313,7 @@
         }
         window.onresize = init; init(); draw();
 
+        // --- Global Helpers ---
         const dot = document.getElementById('cursor-dot');
         const ring = document.getElementById('cursor-ring');
         window.onmousemove = (e) => {
