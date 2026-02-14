@@ -62,6 +62,14 @@
         }
         .menu-item:hover { background: rgba(255,255,255,0.05); color: white; padding-left: 25px; }
 
+        /* --- Partners UI --- */
+        .partner-card {
+            background: #111; border: 1px solid #333; border-radius: 20px;
+            padding: 20px; display: flex; align-items: center; gap: 15px;
+            cursor: pointer; transition: 0.4s var(--smooth);
+        }
+        .partner-card:hover { border-color: var(--theme-main); background: #1a1a1a; transform: scale(1.05); }
+
         /* --- Overlays & Transitions --- */
         .overlay-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; backdrop-blur: 20px; transition: 0.6s var(--smooth); }
         .overlay-screen.active { display: flex; opacity: 1; }
@@ -96,6 +104,7 @@
     <div id="menu-btn" onclick="toggleMenu(event)">...</div>
     <div id="drop-menu">
         <div class="menu-item" onclick="openScreen('settings-screen', event)">⚙️ Settings</div>
+        <div class="menu-item" onclick="openScreen('partners-screen', event)">🤝 Partners</div>
         <div class="menu-item" onclick="openScreen('tos-screen', event)">📋 Terms</div>
         <div class="menu-item" onclick="goHome(event)">🏠 Dashboard</div>
     </div>
@@ -105,11 +114,28 @@
         <form onsubmit="handleSearch(event)">
             <input type="text" id="urlInput" class="search-input" placeholder="Enter URL..." autocomplete="off">
         </form>
-        <div class="grid grid-cols-4 gap-2">
-            <div class="side-icon" onclick="processUrl('https://youtube.com')">▶️</div>
-            <div class="side-icon" onclick="processUrl('https://discord.com')">💬</div>
-            <div class="side-icon" onclick="processUrl('https://tiktok.com')">📱</div>
-            <div class="side-icon" onclick="processUrl('https://poki.com')">🎮</div>
+    </div>
+
+    <div id="partners-screen" class="overlay-screen" onclick="hideScreens()">
+        <div class="card-ui" onclick="event.stopPropagation()">
+            <h3 class="font-black uppercase italic text-xl text-blue-500">Official Partners</h3>
+            <div class="space-y-4">
+                <div class="partner-card" onclick="window.open('https://www.tiktok.com', '_blank')">
+                    <span class="text-2xl">📱</span>
+                    <div>
+                        <p class="font-black text-[11px] uppercase">TikTok</p>
+                        <p class="text-[9px] text-gray-500">Short-form entertainment partner.</p>
+                    </div>
+                </div>
+                <div class="partner-card" onclick="window.open('https://www.github.com', '_blank')">
+                    <span class="text-2xl">🐙</span>
+                    <div>
+                        <p class="font-black text-[11px] uppercase">GitHub</p>
+                        <p class="text-[9px] text-gray-500">Open-source development partner.</p>
+                    </div>
+                </div>
+            </div>
+            <button class="py-4 border-2 border-white/10 rounded-2xl text-[10px] font-black uppercase mt-4 hover:bg-white hover:text-black transition" onclick="hideScreens()">Back to Terminal</button>
         </div>
     </div>
 
@@ -139,13 +165,6 @@
                 <input type="text" id="cloak-title" class="search-input" placeholder="Tab Title">
                 <input type="text" id="cloak-icon" class="search-input" placeholder="Favicon URL">
             </div>
-            <div>
-                <label class="text-[9px] font-black uppercase text-gray-500">Themes</label>
-                <div class="grid grid-cols-2 gap-2 mt-2">
-                    <button class="active-opt text-[9px] font-black p-2 border border-white/10 rounded-lg" onclick="setTheme('#3b82f6', '#050a15', '#ffffff', this)">COSMIC</button>
-                    <button class="text-[9px] font-black p-2 border border-white/10 rounded-lg" onclick="setTheme('#10b981', '#05150a', '#a7ffd6', this)">EMERALD</button>
-                </div>
-            </div>
             <button class="py-4 bg-white text-black font-black rounded-2xl text-[10px] uppercase mt-4" onclick="applySettings()">Save Changes</button>
         </div>
     </div>
@@ -169,15 +188,8 @@
             if(e) e.stopPropagation();
             const hub = document.getElementById('search-hub');
             const isShowing = hub.classList.contains('show');
-            
-            if (isShowing) {
-                hub.classList.remove('show');
-                setTimeout(() => hub.style.display = 'none', 500);
-            } else {
-                hub.style.display = 'flex';
-                setTimeout(() => hub.classList.add('show'), 10);
-                document.getElementById('urlInput').focus();
-            }
+            if (isShowing) { hub.classList.remove('show'); setTimeout(() => hub.style.display = 'none', 500); }
+            else { hub.style.display = 'flex'; setTimeout(() => hub.classList.add('show'), 10); document.getElementById('urlInput').focus(); }
         }
 
         function handleSearch(e) {
@@ -238,13 +250,6 @@
             });
         }
 
-        function setTheme(main, bg, stars, btn) {
-            document.documentElement.style.setProperty('--theme-main', main);
-            document.documentElement.style.setProperty('--theme-glow', main + '66');
-            document.documentElement.style.setProperty('--bg-color', bg);
-            document.documentElement.style.setProperty('--star-color', stars);
-        }
-
         document.getElementById('nameInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && e.target.value.trim() !== "") {
                 const name = e.target.value.trim();
@@ -268,7 +273,6 @@
             }
         });
 
-        // ONLY close things when clicking away, don't open them
         window.onclick = function(e) {
             if (!e.target.closest('#search-hub') && !e.target.closest('#search-btn')) {
                 const hub = document.getElementById('search-hub');
