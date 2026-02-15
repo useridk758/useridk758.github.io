@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA OS | V9.4 BROADCAST</title>
+    <title>NEBULA OS | V9.5 CONSOLE-LINK</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
@@ -26,26 +26,24 @@
         }
         .hover-state #c-ring { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-color: #fff; }
 
-        /* --- ANNOUNCEMENT SYSTEM --- */
+        /* --- ANNOUNCEMENT --- */
         #announcement-bar {
             position: fixed; top: -100px; left: 0; width: 100%; background: var(--theme-main); color: #fff; 
             padding: 12px; z-index: 9000; transition: 0.8s var(--bezier); text-align: center; font-weight: 900; 
-            text-transform: uppercase; letter-spacing: 2px; font-size: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-transform: uppercase; letter-spacing: 2px; font-size: 11px;
         }
         #announcement-bar.active { top: 0; }
 
-        /* --- LOGIN GATE --- */
+        /* --- LOGIN STAGE --- */
         #gate { position: fixed; inset: 0; background: #010101; z-index: 8000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .gate-card { width: 500px; text-align: center; }
-        .input-wrap { position: relative; margin-top: 40px; }
-        .gate-in { background: transparent; border: none; border-bottom: 2px solid #222; width: 100%; padding: 10px; font-size: 2rem; font-weight: 900; color: #fff; text-align: center; outline: none; transition: 0.5s; }
+        .gate-in { background: transparent; border: none; border-bottom: 2px solid #111; width: 400px; padding: 10px; font-size: 2.5rem; font-weight: 900; color: #fff; text-align: center; outline: none; transition: 0.5s; }
         .gate-in:focus { border-color: var(--theme-main); }
 
-        /* --- SMOOTH MODULES --- */
+        /* --- SMOOTH SEARCH --- */
         .win-overlay { 
             position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; 
-            display: none; align-items: center; justify-content: center; backdrop-filter: blur(0px);
-            opacity: 0; transform: scale(1.1); transition: 0.6s var(--bezier);
+            display: none; align-items: center; justify-content: center;
+            opacity: 0; transform: scale(1.05); transition: 0.5s var(--bezier);
         }
         .win-overlay.active { display: flex; opacity: 1; transform: scale(1); backdrop-filter: blur(40px); }
 
@@ -55,18 +53,20 @@
         .btn { width: 50px; height: 50px; background: #111; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; border: 1px solid #222; transition: 0.4s var(--bezier); }
         .btn:hover { transform: translateY(-10px) scale(1.1); border-color: var(--theme-main); }
 
-        /* --- PROXY / MOVIE MODULE --- */
+        /* --- PROXY RADIAL WIPE --- */
         #proxy-wrap { 
             position: fixed; inset: 0; background: #000; z-index: 7000; 
-            clip-path: circle(0% at 50% 50%); transition: 0.8s cubic-bezier(0.86, 0, 0.07, 1);
+            clip-path: circle(0% at 50% 50%); transition: 1s cubic-bezier(0.85, 0, 0.15, 1);
         }
         #proxy-wrap.open { clip-path: circle(150% at 50% 50%); }
 
-        /* --- TERMINAL --- */
-        #term-ui { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 6000; display: none; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; }
-        .term-box { width: 600px; background: #080808; border: 1px solid #222; border-radius: 20px; overflow: hidden; }
+        /* --- TERMINAL (ALT + T) --- */
+        #term-ui { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 6000; display: none; align-items: center; justify-content: center; opacity: 0; transition: 0.4s var(--bezier); }
+        .term-box { width: 650px; background: #080808; border: 1px solid #222; border-radius: 20px; overflow: hidden; transform: translateY(20px); transition: 0.4s var(--bezier); }
+        #term-ui.active .term-box { transform: translateY(0); }
 
-        #desktop { height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 1.5s; }
+        #desktop { height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 2s; }
+        .hero { font-size: 12vw; font-weight: 950; font-style: italic; background: linear-gradient(to bottom, #fff, #333); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.05em; }
     </style>
 </head>
 <body>
@@ -75,52 +75,44 @@
     <div id="c-dot"></div>
     <div id="c-ring"></div>
 
-    <div id="announcement-bar">
-        <span id="announcement-text">Global Sync Active</span>
-    </div>
+    <div id="announcement-bar"><span id="announcement-text"></span></div>
 
     <div id="gate">
-        <div class="gate-card">
-            <p class="text-[9px] font-black tracking-[12px] text-gray-600 uppercase">Aether Identification</p>
-            <div class="input-wrap">
-                <input type="text" id="user-id" class="gate-in hoverable" placeholder="NAME" onkeypress="if(event.key==='Enter')OS.validate()">
-            </div>
-            <p id="gate-status" class="mt-8 text-[10px] font-mono text-blue-500 opacity-0">SECURE TUNNEL ESTABLISHED</p>
-        </div>
+        <p class="text-[9px] font-black tracking-[12px] text-gray-600 uppercase mb-4">Aether System v9.5</p>
+        <input type="text" id="user-id" class="gate-in hoverable" placeholder="NAME" autocomplete="off" onkeypress="if(event.key==='Enter')OS.validate()">
+        <p id="gate-status" class="mt-8 text-[10px] font-mono text-blue-500 opacity-0 uppercase tracking-widest">Awaiting Input...</p>
     </div>
 
     <div id="win-search" class="win-overlay">
-        <button class="absolute top-10 right-10 hoverable font-black" onclick="OS.closeSearch()">✕ CLOSE</button>
+        <button class="absolute top-10 right-10 hoverable font-black text-xs tracking-widest" onclick="OS.closeSearch()">✕ CLOSE</button>
         <div class="text-center w-full">
-            <p class="text-blue-500 font-black tracking-[2em] mb-10 ml-[2em]">NEBULA SEARCH</p>
+            <p class="text-blue-500 font-black tracking-[2em] mb-10 ml-[2em] text-[10px]">NEBULA CORE SEARCH</p>
             <input type="text" id="search-in" class="bg-transparent border-b-4 border-white/10 text-7xl font-black text-center text-white outline-none w-[80%] hoverable focus:border-blue-500 transition-all" placeholder="..." onkeypress="if(event.key==='Enter')OS.runSearch()">
         </div>
     </div>
 
     <div id="proxy-wrap">
-        <button class="absolute top-8 left-1/2 -translate-x-1/2 px-10 py-3 bg-white text-black font-black rounded-full z-[8000] hoverable" onclick="OS.closeProxy()">EXIT PORTAL</button>
+        <button class="absolute top-8 left-1/2 -translate-x-1/2 px-10 py-3 bg-white text-black font-black rounded-full z-[8000] hoverable text-xs tracking-widest" onclick="OS.closeProxy()">EXIT PORTAL</button>
         <iframe id="proxy-frame" class="w-full h-full bg-white border-none"></iframe>
     </div>
 
     <div id="term-ui">
         <div class="term-box">
             <div class="p-4 bg-[#111] border-b border-[#222] flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-500">
-                <span>System Console</span>
-                <span>Alt+T</span>
+                <span>Kernel Terminal / System Settings</span>
+                <button class="hoverable" onclick="OS.toggleTerm()">✕</button>
             </div>
-            <div id="term-log" class="p-6 h-[300px] overflow-y-auto font-mono text-green-500 text-xs leading-relaxed">
-                NEBULA KERNEL v9.4.0 <br> Identity confirmed. Type 'help' for commands.
+            <div id="term-log" class="p-6 h-[320px] overflow-y-auto font-mono text-green-500 text-xs leading-relaxed">
+                Nebula Kernel [Build 9.5.0]<br>System link established via Settings Module.<br>Type 'help' for core commands.
             </div>
             <div class="p-4 bg-[#050505] border-t border-[#222] flex gap-3 items-center">
                 <span class="text-blue-500 font-bold">$</span>
-                <input type="text" id="term-field" class="bg-transparent border-none outline-none text-white font-mono w-full" onkeypress="OS.handleTerm(event)">
+                <input type="text" id="term-field" class="bg-transparent border-none outline-none text-white font-mono w-full" autocomplete="off" onkeypress="OS.handleTerm(event)">
             </div>
         </div>
     </div>
 
-    <main id="desktop">
-        <h1 class="text-[12vw] font-black italic text-white/10">USERIDK</h1>
-    </main>
+    <main id="desktop"><h1 class="hero" id="hero-name">USERIDK</h1></main>
 
     <div id="dock-wrap" class="dock-wrap">
         <div class="dock">
@@ -132,7 +124,7 @@
     </div>
 
     <script>
-        class NebulaBroadcast {
+        class NebulaV95 {
             constructor() {
                 this.m = { x: 0, y: 0, rx: 0, ry: 0 };
                 this.init();
@@ -141,7 +133,7 @@
             init() {
                 this.setupMouse();
                 this.setupStars();
-                this.bindKeys();
+                window.onkeydown = (e) => { if(e.altKey && e.key === 't') this.toggleTerm(); };
             }
 
             setupMouse() {
@@ -159,53 +151,48 @@
                     requestAnimationFrame(sync);
                 };
                 sync();
-
                 document.onmouseover = (e) => {
                     if(e.target.classList.contains('hoverable')) document.body.classList.add('hover-state');
                     else document.body.classList.remove('hover-state');
                 };
             }
 
-            bindKeys() {
-                window.onkeydown = (e) => {
-                    if(e.altKey && e.key === 't') this.toggleTerm();
-                };
-            }
-
             validate() {
-                const user = document.getElementById('user-id').value;
-                if(!user) return;
+                const val = document.getElementById('user-id').value;
+                if(!val) return;
                 const status = document.getElementById('gate-status');
                 status.style.opacity = '1';
-                status.innerText = `INITIALIZING SESSION FOR ${user.toUpperCase()}...`;
+                document.getElementById('hero-name').innerText = val.toUpperCase();
                 
-                setTimeout(() => {
-                    document.getElementById('gate').style.opacity = '0';
-                    setTimeout(() => {
-                        document.getElementById('gate').style.display = 'none';
-                        this.reveal();
-                    }, 800);
-                }, 1500);
+                // Advanced scramble effect
+                let count = 0;
+                const scramble = setInterval(() => {
+                    status.innerText = Math.random().toString(36).substring(7).toUpperCase() + "_VALIDATING";
+                    count++;
+                    if(count > 10) {
+                        clearInterval(scramble);
+                        status.innerText = "ACCESS GRANTED. WELCOME.";
+                        setTimeout(() => {
+                            document.getElementById('gate').style.opacity = '0';
+                            setTimeout(() => {
+                                document.getElementById('gate').style.display = 'none';
+                                this.reveal();
+                            }, 800);
+                        }, 1000);
+                    }
+                }, 80);
             }
 
             reveal() {
-                const d = document.getElementById('desktop');
-                const dw = document.getElementById('dock-wrap');
-                d.style.display = 'flex';
-                dw.style.display = 'block';
-                setTimeout(() => {
-                    d.style.opacity = '1';
-                    dw.style.opacity = '1';
-                }, 100);
+                const d = document.getElementById('desktop'), dw = document.getElementById('dock-wrap');
+                d.style.display = 'flex'; dw.style.display = 'block';
+                setTimeout(() => { d.style.opacity = '1'; dw.style.opacity = '1'; }, 100);
             }
 
             openSearch() {
                 const s = document.getElementById('win-search');
                 s.style.display = 'flex';
-                setTimeout(() => {
-                    s.classList.add('active');
-                    document.getElementById('search-in').focus();
-                }, 10);
+                setTimeout(() => { s.classList.add('active'); document.getElementById('search-in').focus(); }, 10);
             }
 
             closeSearch() {
@@ -230,20 +217,18 @@
 
             closeProxy() {
                 document.getElementById('proxy-wrap').classList.remove('open');
-                setTimeout(() => document.getElementById('proxy-frame').src = '', 800);
+                setTimeout(() => document.getElementById('proxy-frame').src = '', 1000);
             }
 
             toggleTerm() {
                 const t = document.getElementById('term-ui');
                 if(t.style.display === 'flex') {
+                    t.classList.remove('active');
                     t.style.opacity = '0';
-                    setTimeout(() => t.style.display = 'none', 300);
+                    setTimeout(() => t.style.display = 'none', 400);
                 } else {
                     t.style.display = 'flex';
-                    setTimeout(() => {
-                        t.style.opacity = '1';
-                        document.getElementById('term-field').focus();
-                    }, 10);
+                    setTimeout(() => { t.style.opacity = '1'; t.classList.add('active'); document.getElementById('term-field').focus(); }, 10);
                 }
             }
 
@@ -254,14 +239,18 @@
                     let res = "";
 
                     if(cmd === 'help') {
-                        res = "COMMANDS: <br> - help: List commands <br> - global [msg]: Broadcast message <br> - clear: Clear logs <br> - exit: Close terminal";
+                        res = "COMMANDS: <br> - help: Core list <br> - global [msg]: Broadcast <br> - global clear: Kill broadcast <br> - clear: Wipe logs";
                     } else if(cmd.startsWith('global ')) {
                         const msg = cmd.replace('global ', '');
-                        this.announce(msg);
-                        res = "Global Announcement Dispatched.";
+                        if(msg === 'clear') {
+                            document.getElementById('announcement-bar').classList.remove('active');
+                            res = "Broadcast terminated.";
+                        } else {
+                            this.announce(msg);
+                            res = "Broadcast live.";
+                        }
                     } else if(cmd === 'clear') {
-                        log.innerHTML = "Logs Cleared.";
-                        e.target.value = ""; return;
+                        log.innerHTML = "Logs Cleared."; e.target.value = ""; return;
                     } else {
                         res = "Command Error: Unknown String.";
                     }
@@ -276,20 +265,19 @@
                 const bar = document.getElementById('announcement-bar');
                 document.getElementById('announcement-text').innerText = msg;
                 bar.classList.add('active');
-                setTimeout(() => bar.classList.remove('active'), 5000);
             }
 
             setupStars() {
                 const c = document.getElementById('stars');
                 const ctx = c.getContext('2d');
-                let parts = [];
-                const resize = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
-                window.onresize = resize; resize();
-                for(let i=0; i<150; i++) parts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*2});
+                let pts = [];
+                const res = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
+                window.onresize = res; res();
+                for(let i=0; i<150; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*2});
                 const draw = () => {
                     ctx.fillStyle = '#010101'; ctx.fillRect(0,0,c.width,c.height);
                     ctx.fillStyle = '#fff';
-                    parts.forEach(p => {
+                    pts.forEach(p => {
                         ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill();
                         p.y += 0.3; if(p.y > c.height) p.y = 0;
                     });
@@ -299,7 +287,7 @@
             }
         }
 
-        const OS = new NebulaBroadcast();
+        const OS = new NebulaV95();
     </script>
 </body>
 </html>
