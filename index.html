@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA OS | V9.8 HORIZON</title>
+    <title id="os-title">NEBULA OS | V9.9</title>
+    <link id="os-favicon" rel="icon" href="https://cdn-icons-png.flaticon.com/512/606/606547.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
@@ -14,56 +15,56 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; user-select: none; }
-        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
+        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; width: 100vw; transition: filter 0.5s ease; }
+        
+        body.cloaked { filter: brightness(0.6) contrast(1.2); }
 
-        /* --- MOUSE KERNEL --- */
+        /* --- CURSOR --- */
         #c-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10000; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); }
         #c-ring { 
             position: fixed; top: 0; left: 0; width: 35px; height: 35px; border: 1.5px solid var(--theme-main); border-radius: 50%; z-index: 9999; pointer-events: none; 
             transform: translate3d(calc(var(--r-x) - 15px), calc(var(--r-y) - 15px), 0);
             mix-blend-mode: difference; transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .hover-state #c-ring { width: 65px; height: 65px; background: rgba(255,255,255,0.1); border-color: #fff; }
+        .hover-state #c-ring { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-color: #fff; }
 
-        /* --- UI OVERLAYS (SEARCH & TERM) --- */
-        .layer {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; 
-            display: none; align-items: center; justify-content: center; backdrop-filter: blur(40px);
-            opacity: 0; transition: opacity 0.5s ease;
+        /* --- GLOBAL ANNOUNCEMENT --- */
+        #announcement-bar {
+            position: fixed; top: -100px; left: 0; width: 100%; background: var(--theme-main); color: #fff; 
+            padding: 12px; z-index: 9000; transition: 0.7s cubic-bezier(0.16, 1, 0.3, 1); text-align: center; 
+            font-weight: 900; text-transform: uppercase; letter-spacing: 2px; font-size: 11px;
         }
+        #announcement-bar.active { top: 0; }
+
+        /* --- SETTINGS SIDEBAR --- */
+        #settings-panel {
+            position: fixed; right: -400px; top: 0; width: 350px; height: 100vh; 
+            background: rgba(10,10,10,0.95); backdrop-filter: blur(30px); z-index: 6000;
+            border-left: 1px solid rgba(255,255,255,0.05); transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 60px 30px;
+        }
+        #settings-panel.active { right: 0; }
+
+        /* --- MODALS --- */
+        .layer { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 5000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(20px); opacity: 0; transition: 0.4s; }
         .layer.active { display: flex; opacity: 1; }
-        .modal { transform: scale(0.95) translateY(20px); transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); width: 100%; max-width: 800px; padding: 20px; }
-        .layer.active .modal { transform: scale(1) translateY(0); }
 
-        /* --- DOCK (FIXED CUT-OFF) --- */
-        .dock-container {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            z-index: 1000; display: none; opacity: 0; transition: 1s ease;
-            padding: 10px; /* Space to prevent clipping during hover scale */
-        }
-        .dock {
-            display: flex; gap: 12px; background: rgba(20,20,20,0.6); 
-            padding: 12px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08);
-            backdrop-filter: blur(20px); box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-        }
-        .dock-btn {
-            width: 52px; height: 52px; background: #1a1a1a; border-radius: 16px; 
-            display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
-            border: 1px solid #333; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .dock-btn:hover { transform: translateY(-12px) scale(1.15); border-color: var(--theme-main); background: #222; }
+        /* --- DOCK --- */
+        .dock-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1000; display: none; opacity: 0; transition: 1s; padding: 10px; }
+        .dock { display: flex; gap: 12px; background: rgba(20,20,20,0.7); padding: 12px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); }
+        .dock-btn { width: 50px; height: 50px; background: #1a1a1a; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; border: 1px solid #333; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .dock-btn:hover { transform: translateY(-10px) scale(1.1); border-color: var(--theme-main); }
 
-        /* --- HERO --- */
-        #desktop { height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 2s ease; }
-        .hero-text { font-size: 14vw; font-weight: 900; italic; letter-spacing: -0.05em; background: linear-gradient(180deg, #fff 30%, #444 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        /* --- TOGGLE SWITCH --- */
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: none; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--theme-main); }
+        input:checked + .slider:before { transform: translateX(20px); }
 
-        /* --- LOGIN --- */
-        #gate { position: fixed; inset: 0; background: #000; z-index: 8000; display: flex; align-items: center; justify-content: center; }
-        .gate-input { background: transparent; border: none; border-bottom: 2px solid #222; text-6xl font-black text-center text-white outline-none w-full max-w-2xl focus:border-blue-500 transition-all; }
-
-        /* --- PROXY --- */
-        #proxy-layer { position: fixed; inset: 0; background: #000; z-index: 9000; transform: translateY(100%); transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
-        #proxy-layer.active { transform: translateY(0); }
+        #desktop { height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 1.5s; }
+        .hero-text { font-size: 14vw; font-weight: 900; italic; background: linear-gradient(180deg, #fff 40%, #333 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     </style>
 </head>
 <body>
@@ -72,37 +73,65 @@
     <div id="c-dot"></div>
     <div id="c-ring"></div>
 
-    <div id="gate">
-        <input type="text" id="user-in" class="gate-input hoverable" placeholder="IDENTIFY" autocomplete="off" onkeypress="if(event.key==='Enter')OS.validate()">
+    <div id="announcement-bar"><span id="announcement-text"></span></div>
+
+    <div id="gate" class="fixed inset-0 bg-black z-[8000] flex items-center justify-center">
+        <input type="text" id="user-in" class="bg-transparent border-b-2 border-white/10 text-6xl font-black text-center outline-none w-full max-w-xl hoverable focus:border-blue-500 transition-all" placeholder="IDENTIFY" onkeypress="if(event.key==='Enter')OS.validate()">
     </div>
 
-    <div id="search-layer" class="layer">
-        <div class="modal text-center">
-            <p class="text-blue-500 font-black tracking-[1.5em] mb-10 text-xs">CORE SEARCH</p>
-            <input type="text" id="search-field" class="bg-transparent border-b-4 border-white/10 text-7xl font-black text-center text-white outline-none w-full hoverable focus:border-blue-500 transition-all" placeholder="..." onkeypress="if(event.key==='Enter')OS.runSearch()">
-            <p class="mt-10 text-gray-600 text-[10px] tracking-widest uppercase">Press ESC to return</p>
+    <aside id="settings-panel">
+        <div class="flex justify-between items-center mb-10">
+            <h2 class="text-xl font-black italic">TACTICAL SETTINGS</h2>
+            <button class="hoverable text-[10px] font-bold opacity-50" onclick="OS.toggleSettings()">CLOSE</button>
         </div>
-    </div>
+
+        <div class="space-y-8">
+            <div>
+                <p class="text-[9px] font-black tracking-widest text-gray-500 uppercase mb-4">Theme Optimization</p>
+                <div class="flex gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500 hoverable" onclick="OS.setTheme('#3b82f6')"></div>
+                    <div class="w-8 h-8 rounded-lg bg-rose-500 hoverable" onclick="OS.setTheme('#f43f5e')"></div>
+                    <div class="w-8 h-8 rounded-lg bg-amber-500 hoverable" onclick="OS.setTheme('#f59e0b')"></div>
+                    <div class="w-8 h-8 rounded-lg bg-emerald-500 hoverable" onclick="OS.setTheme('#10b981')"></div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] font-bold">Cloaking Mode</p>
+                        <p class="text-[8px] text-gray-500 uppercase tracking-tighter">Mask Tab & Favicon</p>
+                    </div>
+                    <label class="switch hoverable">
+                        <input type="checkbox" onchange="OS.toggleCloak(this)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </aside>
 
     <div id="term-layer" class="layer">
-        <div class="modal max-w-2xl bg-[#0a0a0a] border border-white/5 rounded-3xl overflow-hidden">
-            <div class="p-4 bg-[#111] border-b border-white/5 flex justify-between text-[10px] font-black uppercase text-gray-500">
+        <div class="w-full max-w-2xl bg-[#0a0a0a] border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+            <div class="p-4 bg-[#111] flex justify-between text-[10px] font-black uppercase text-gray-500">
                 <span>Nebula Terminal</span>
                 <span>Alt + T</span>
             </div>
-            <div id="term-out" class="p-6 h-64 overflow-y-auto font-mono text-green-500 text-xs">
-                Welcome to Nebula Kernel v9.8.0...<br>Type 'help' for instructions.
+            <div id="term-out" class="p-6 h-64 overflow-y-auto font-mono text-blue-500 text-xs">
+                Kernel initialized. Use 'global [msg]' to broadcast.
             </div>
-            <div class="p-4 bg-[#050505] flex gap-3 border-t border-white/5">
+            <div class="p-4 bg-[#050505] flex gap-3">
                 <span class="text-blue-500 font-bold">$</span>
                 <input type="text" id="term-in" class="bg-transparent border-none outline-none text-white font-mono w-full" autocomplete="off" onkeypress="OS.handleTerm(event)">
             </div>
         </div>
     </div>
 
-    <div id="proxy-layer">
-        <button class="absolute top-8 left-1/2 -translate-x-1/2 px-10 py-3 bg-white text-black font-black rounded-full z-[10000] hoverable text-xs" onclick="OS.closeProxy()">CLOSE PORTAL</button>
-        <iframe id="proxy-frame" class="w-full h-full border-none bg-white"></iframe>
+    <div id="search-layer" class="layer">
+        <div class="text-center w-full max-w-4xl">
+            <p class="text-blue-500 font-black tracking-[1em] mb-8 text-xs">NEURAL SEARCH</p>
+            <input type="text" id="search-field" class="bg-transparent border-b-4 border-white/10 text-8xl font-black text-center text-white outline-none w-full hoverable focus:border-blue-500 transition-all" placeholder="..." onkeypress="if(event.key==='Enter')OS.runSearch()">
+        </div>
     </div>
 
     <main id="desktop">
@@ -113,15 +142,22 @@
         <div class="dock">
             <div class="dock-btn hoverable" onclick="location.reload()">🏠</div>
             <div class="dock-btn hoverable" onclick="OS.toggle('search-layer')">🔍</div>
+            <div class="dock-btn hoverable" onclick="OS.toggleSettings()">⚙️</div>
             <div class="dock-btn hoverable" onclick="OS.openProxy('https://cineby.gd')">🎬</div>
-            <div class="dock-btn hoverable" onclick="OS.toggle('term-layer')">⚙️</div>
         </div>
     </div>
 
+    <div id="proxy-layer" class="fixed inset-0 z-[9000] hidden bg-black">
+        <button class="absolute top-8 left-1/2 -translate-x-1/2 px-10 py-3 bg-white text-black font-black rounded-full z-[10000] hoverable text-xs" onclick="OS.closeProxy()">CLOSE</button>
+        <iframe id="proxy-frame" class="w-full h-full border-none"></iframe>
+    </div>
+
     <script>
-        class NebulaHorizon {
+        class NebulaSpecter {
             constructor() {
                 this.m = { x: 0, y: 0, rx: 0, ry: 0 };
+                this.originalTitle = "NEBULA OS | V9.9";
+                this.originalFavicon = "https://cdn-icons-png.flaticon.com/512/606/606547.png";
                 this.init();
             }
 
@@ -162,7 +198,7 @@
                 setTimeout(() => {
                     document.getElementById('gate').style.display = 'none';
                     this.reveal();
-                }, 800);
+                }, 600);
             }
 
             reveal() {
@@ -175,7 +211,7 @@
                 const el = document.getElementById(id);
                 if(el.classList.contains('active')) {
                     el.classList.remove('active');
-                    setTimeout(() => el.style.display = 'none', 500);
+                    setTimeout(() => el.style.display = 'none', 400);
                 } else {
                     el.style.display = 'flex';
                     setTimeout(() => {
@@ -186,10 +222,56 @@
                 }
             }
 
-            closeAll() {
-                document.querySelectorAll('.layer').forEach(l => {
-                    if(l.classList.contains('active')) this.toggle(l.id);
-                });
+            toggleSettings() {
+                document.getElementById('settings-panel').classList.toggle('active');
+            }
+
+            setTheme(c) {
+                document.documentElement.style.setProperty('--theme-main', c);
+                document.getElementById('announcement-bar').style.background = c;
+            }
+
+            toggleCloak(el) {
+                const titleEl = document.getElementById('os-title');
+                const faviconEl = document.getElementById('os-favicon');
+                
+                if(el.checked) {
+                    document.body.classList.add('cloaked');
+                    titleEl.innerText = "My Drive - Google Drive";
+                    faviconEl.href = "https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png";
+                } else {
+                    document.body.classList.remove('cloaked');
+                    titleEl.innerText = this.originalTitle;
+                    faviconEl.href = this.originalFavicon;
+                }
+            }
+
+            handleTerm(e) {
+                if(e.key === 'Enter') {
+                    const cmd = e.target.value.trim();
+                    const out = document.getElementById('term-out');
+                    let res = "";
+
+                    if(cmd.startsWith('global ')) {
+                        const msg = cmd.replace('global ', '');
+                        if(msg === 'clear') {
+                            document.getElementById('announcement-bar').classList.remove('active');
+                            res = "Announcement cleared.";
+                        } else {
+                            document.getElementById('announcement-text').innerText = msg;
+                            document.getElementById('announcement-bar').classList.add('active');
+                            res = "Global broadcast live.";
+                        }
+                    } else if(cmd === 'clear') {
+                        out.innerHTML = "Console wiped."; e.target.value = ""; return;
+                    } else {
+                        res = "Command unrecognized.";
+                    }
+
+                    out.innerHTML += `<br><span class="text-white">> ${cmd}</span><br>${res}`;
+                    e.target.value = "";
+                    out.scrollTop = out.scrollHeight;
+                }
             }
 
             runSearch() {
@@ -203,33 +285,18 @@
 
             openProxy(url) {
                 document.getElementById('proxy-frame').src = url;
-                document.getElementById('proxy-layer').classList.add('active');
+                document.getElementById('proxy-layer').classList.remove('hidden');
             }
 
             closeProxy() {
-                document.getElementById('proxy-layer').classList.remove('active');
-                setTimeout(() => document.getElementById('proxy-frame').src = '', 800);
+                document.getElementById('proxy-layer').classList.add('hidden');
             }
 
-            handleTerm(e) {
-                if(e.key === 'Enter') {
-                    const cmd = e.target.value.trim().toLowerCase();
-                    const out = document.getElementById('term-out');
-                    let res = "";
-
-                    if(cmd === 'help') res = "AVAILABLE: help, clear, exit, theme [color]";
-                    else if(cmd === 'clear') { out.innerHTML = "Console cleared."; e.target.value = ""; return; }
-                    else if(cmd === 'exit') { this.toggle('term-layer'); e.target.value = ""; return; }
-                    else if(cmd.startsWith('theme ')) {
-                        const c = cmd.split(' ')[1];
-                        document.documentElement.style.setProperty('--theme-main', c);
-                        res = "Theme color updated.";
-                    } else res = "Error: Unknown Command.";
-
-                    out.innerHTML += `<br><span class="text-white">> ${cmd}</span><br>${res}`;
-                    e.target.value = "";
-                    out.scrollTop = out.scrollHeight;
-                }
+            closeAll() {
+                document.querySelectorAll('.layer').forEach(l => {
+                    if(l.classList.contains('active')) this.toggle(l.id);
+                });
+                document.getElementById('settings-panel').classList.remove('active');
             }
 
             setupStars() {
@@ -238,7 +305,7 @@
                 let pts = [];
                 const res = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
                 window.onresize = res; res();
-                for(let i=0; i<150; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*1.5});
+                for(let i=0; i<150; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*1.2});
                 const draw = () => {
                     ctx.fillStyle = '#000'; ctx.fillRect(0,0,c.width,c.height);
                     ctx.fillStyle = '#fff';
@@ -252,7 +319,7 @@
             }
         }
 
-        const OS = new NebulaHorizon();
+        const OS = new NebulaSpecter();
     </script>
 </body>
 </html>
