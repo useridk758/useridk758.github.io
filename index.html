@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA OS | V9.5 CONSOLE-LINK</title>
+    <title>NEBULA OS | V9.6 TACTICAL</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
@@ -15,58 +15,50 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; user-select: none; }
-        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
+        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; transition: filter 0.5s; }
+        
+        /* CLOAKING STYLE */
+        body.cloaked { filter: grayscale(1) brightness(0.5); }
+        body.cloaked #hero-name { opacity: 0.1; }
 
         /* --- HARDWARE CURSOR --- */
         #c-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10000; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); }
         #c-ring { 
             position: fixed; top: 0; left: 0; width: 35px; height: 35px; border: 1.5px solid var(--theme-main); border-radius: 50%; z-index: 9999; pointer-events: none; 
             transform: translate3d(calc(var(--r-x) - 15px), calc(var(--r-y) - 15px), 0);
-            mix-blend-mode: difference; transition: width 0.4s var(--bezier), height 0.4s var(--bezier), background 0.3s;
+            mix-blend-mode: difference; transition: width 0.4s var(--bezier), height 0.4s var(--bezier), border-color 0.3s;
         }
         .hover-state #c-ring { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-color: #fff; }
 
-        /* --- ANNOUNCEMENT --- */
-        #announcement-bar {
-            position: fixed; top: -100px; left: 0; width: 100%; background: var(--theme-main); color: #fff; 
-            padding: 12px; z-index: 9000; transition: 0.8s var(--bezier); text-align: center; font-weight: 900; 
-            text-transform: uppercase; letter-spacing: 2px; font-size: 11px;
+        /* --- SETTINGS PANEL --- */
+        #settings-ui { 
+            position: fixed; right: -450px; top: 0; width: 400px; height: 100vh; background: rgba(8,8,8,0.95); 
+            border-left: 1px solid rgba(255,255,255,0.05); z-index: 6000; backdrop-filter: blur(30px);
+            transition: 0.6s var(--bezier); padding: 60px 40px;
         }
-        #announcement-bar.active { top: 0; }
+        #settings-ui.active { right: 0; }
+        .setting-group { margin-bottom: 40px; }
+        .setting-label { font-[900] text-[10px] uppercase tracking-[3px] text-gray-500 mb-4 block; }
+        
+        /* TOGGLE SWITCH */
+        .switch { position: relative; display: inline-block; width: 45px; height: 22px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: none; top: 0; left: 0; right: 0; bottom: 0; background-color: #222; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--theme-main); }
+        input:checked + .slider:before { transform: translateX(23px); }
 
-        /* --- LOGIN STAGE --- */
-        #gate { position: fixed; inset: 0; background: #010101; z-index: 8000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .gate-in { background: transparent; border: none; border-bottom: 2px solid #111; width: 400px; padding: 10px; font-size: 2.5rem; font-weight: 900; color: #fff; text-align: center; outline: none; transition: 0.5s; }
-        .gate-in:focus { border-color: var(--theme-main); }
-
-        /* --- SMOOTH SEARCH --- */
-        .win-overlay { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; 
-            display: none; align-items: center; justify-content: center;
-            opacity: 0; transform: scale(1.05); transition: 0.5s var(--bezier);
-        }
-        .win-overlay.active { display: flex; opacity: 1; transform: scale(1); backdrop-filter: blur(40px); }
-
-        /* --- DOCK --- */
+        /* --- DOCK & UI --- */
         .dock-wrap { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1000; display: none; opacity: 0; transition: 1s; }
         .dock { display: flex; gap: 15px; background: rgba(15,15,15,0.7); padding: 12px 20px; border-radius: 28px; border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(20px); }
         .btn { width: 50px; height: 50px; background: #111; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; border: 1px solid #222; transition: 0.4s var(--bezier); }
         .btn:hover { transform: translateY(-10px) scale(1.1); border-color: var(--theme-main); }
 
-        /* --- PROXY RADIAL WIPE --- */
-        #proxy-wrap { 
-            position: fixed; inset: 0; background: #000; z-index: 7000; 
-            clip-path: circle(0% at 50% 50%); transition: 1s cubic-bezier(0.85, 0, 0.15, 1);
-        }
-        #proxy-wrap.open { clip-path: circle(150% at 50% 50%); }
-
-        /* --- TERMINAL (ALT + T) --- */
-        #term-ui { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 6000; display: none; align-items: center; justify-content: center; opacity: 0; transition: 0.4s var(--bezier); }
-        .term-box { width: 650px; background: #080808; border: 1px solid #222; border-radius: 20px; overflow: hidden; transform: translateY(20px); transition: 0.4s var(--bezier); }
-        #term-ui.active .term-box { transform: translateY(0); }
-
         #desktop { height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 2s; }
-        .hero { font-size: 12vw; font-weight: 950; font-style: italic; background: linear-gradient(to bottom, #fff, #333); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.05em; }
+        .hero { font-size: 12vw; font-weight: 950; font-style: italic; background: linear-gradient(to bottom, #fff, #333); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        #gate { position: fixed; inset: 0; background: #010101; z-index: 8000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .gate-in { background: transparent; border: none; border-bottom: 2px solid #111; width: 400px; padding: 10px; font-size: 2.5rem; font-weight: 900; color: #fff; text-align: center; outline: none; transition: 0.5s; }
     </style>
 </head>
 <body>
@@ -75,65 +67,83 @@
     <div id="c-dot"></div>
     <div id="c-ring"></div>
 
-    <div id="announcement-bar"><span id="announcement-text"></span></div>
-
     <div id="gate">
-        <p class="text-[9px] font-black tracking-[12px] text-gray-600 uppercase mb-4">Aether System v9.5</p>
         <input type="text" id="user-id" class="gate-in hoverable" placeholder="NAME" autocomplete="off" onkeypress="if(event.key==='Enter')OS.validate()">
-        <p id="gate-status" class="mt-8 text-[10px] font-mono text-blue-500 opacity-0 uppercase tracking-widest">Awaiting Input...</p>
     </div>
 
-    <div id="win-search" class="win-overlay">
-        <button class="absolute top-10 right-10 hoverable font-black text-xs tracking-widest" onclick="OS.closeSearch()">✕ CLOSE</button>
-        <div class="text-center w-full">
-            <p class="text-blue-500 font-black tracking-[2em] mb-10 ml-[2em] text-[10px]">NEBULA CORE SEARCH</p>
-            <input type="text" id="search-in" class="bg-transparent border-b-4 border-white/10 text-7xl font-black text-center text-white outline-none w-[80%] hoverable focus:border-blue-500 transition-all" placeholder="..." onkeypress="if(event.key==='Enter')OS.runSearch()">
+    <aside id="settings-ui">
+        <div class="flex justify-between items-center mb-12">
+            <h2 class="text-2xl font-[900] italic uppercase tracking-tighter">System Config</h2>
+            <button class="hoverable text-xs font-bold opacity-40" onclick="OS.toggleSettings()">CLOSE</button>
         </div>
-    </div>
 
-    <div id="proxy-wrap">
-        <button class="absolute top-8 left-1/2 -translate-x-1/2 px-10 py-3 bg-white text-black font-black rounded-full z-[8000] hoverable text-xs tracking-widest" onclick="OS.closeProxy()">EXIT PORTAL</button>
-        <iframe id="proxy-frame" class="w-full h-full bg-white border-none"></iframe>
-    </div>
-
-    <div id="term-ui">
-        <div class="term-box">
-            <div class="p-4 bg-[#111] border-b border-[#222] flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-500">
-                <span>Kernel Terminal / System Settings</span>
-                <button class="hoverable" onclick="OS.toggleTerm()">✕</button>
-            </div>
-            <div id="term-log" class="p-6 h-[320px] overflow-y-auto font-mono text-green-500 text-xs leading-relaxed">
-                Nebula Kernel [Build 9.5.0]<br>System link established via Settings Module.<br>Type 'help' for core commands.
-            </div>
-            <div class="p-4 bg-[#050505] border-t border-[#222] flex gap-3 items-center">
-                <span class="text-blue-500 font-bold">$</span>
-                <input type="text" id="term-field" class="bg-transparent border-none outline-none text-white font-mono w-full" autocomplete="off" onkeypress="OS.handleTerm(event)">
+        <div class="setting-group">
+            <span class="setting-label">Theme Optimization</span>
+            <div class="flex gap-4">
+                <div class="w-10 h-10 rounded-xl bg-blue-600 hoverable border-2 border-transparent hover:border-white" onclick="OS.setTheme('#3b82f6')"></div>
+                <div class="w-10 h-10 rounded-xl bg-purple-600 hoverable border-2 border-transparent hover:border-white" onclick="OS.setTheme('#a855f7')"></div>
+                <div class="w-10 h-10 rounded-xl bg-emerald-500 hoverable border-2 border-transparent hover:border-white" onclick="OS.setTheme('#10b981')"></div>
+                <div class="w-10 h-10 rounded-xl bg-rose-500 hoverable border-2 border-transparent hover:border-white" onclick="OS.setTheme('#f43f5e')"></div>
             </div>
         </div>
-    </div>
 
-    <main id="desktop"><h1 class="hero" id="hero-name">USERIDK</h1></main>
+        <div class="setting-group">
+            <span class="setting-label">Cloaking Protocol</span>
+            <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+                <span class="text-xs font-bold text-gray-400">Stealth Mode</span>
+                <label class="switch hoverable">
+                    <input type="checkbox" onchange="OS.toggleCloak(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <span class="setting-label">Optimization</span>
+            <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+                <span class="text-xs font-bold text-gray-400">Turbo Rendering</span>
+                <label class="switch hoverable">
+                    <input type="checkbox" checked onchange="OS.toggleTurbo(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="absolute bottom-10 left-10">
+            <p class="text-[8px] font-mono text-gray-600">NEBULA KERNEL v9.6.0-TACTICAL</p>
+        </div>
+    </aside>
+
+    <main id="desktop">
+        <h1 class="hero" id="hero-name">USERIDK</h1>
+    </main>
 
     <div id="dock-wrap" class="dock-wrap">
         <div class="dock">
             <div class="btn hoverable" onclick="location.reload()">🏠</div>
-            <div class="btn hoverable" onclick="OS.openSearch()">🔍</div>
+            <div class="btn hoverable" onclick="OS.toggleSettings()">⚙️</div>
             <div class="btn hoverable" onclick="OS.openProxy('https://cineby.gd')">🎬</div>
-            <div class="btn hoverable" onclick="OS.toggleTerm()">⚙️</div>
+            <div class="btn hoverable" onclick="OS.openSearch()">🔍</div>
         </div>
     </div>
 
+    <div id="proxy-wrap" class="fixed inset-0 z-[7000] hidden bg-black">
+        <iframe id="proxy-frame" class="w-full h-full border-none bg-white"></iframe>
+        <button class="absolute top-8 left-1/2 -translate-x-1/2 px-8 py-2 bg-white text-black font-black rounded-full hoverable text-[10px]" onclick="OS.closeProxy()">EXIT</button>
+    </div>
+
     <script>
-        class NebulaV95 {
+        class NebulaTactical {
             constructor() {
                 this.m = { x: 0, y: 0, rx: 0, ry: 0 };
+                this.turbo = true;
                 this.init();
             }
 
             init() {
                 this.setupMouse();
                 this.setupStars();
-                window.onkeydown = (e) => { if(e.altKey && e.key === 't') this.toggleTerm(); };
+                window.onkeydown = (e) => { if(e.altKey && e.key === 't') console.log("Terminal remains internal."); };
             }
 
             setupMouse() {
@@ -144,8 +154,9 @@
                     r.style.setProperty('--m-y', `${this.m.y}px`);
                 };
                 const sync = () => {
-                    this.m.rx += (this.m.x - this.m.rx) * 0.12;
-                    this.m.ry += (this.m.y - this.m.ry) * 0.12;
+                    let lerpFactor = this.turbo ? 0.12 : 0.05;
+                    this.m.rx += (this.m.x - this.m.rx) * lerpFactor;
+                    this.m.ry += (this.m.y - this.m.ry) * lerpFactor;
                     r.style.setProperty('--r-x', `${this.m.rx}px`);
                     r.style.setProperty('--r-y', `${this.m.ry}px`);
                     requestAnimationFrame(sync);
@@ -160,27 +171,12 @@
             validate() {
                 const val = document.getElementById('user-id').value;
                 if(!val) return;
-                const status = document.getElementById('gate-status');
-                status.style.opacity = '1';
                 document.getElementById('hero-name').innerText = val.toUpperCase();
-                
-                // Advanced scramble effect
-                let count = 0;
-                const scramble = setInterval(() => {
-                    status.innerText = Math.random().toString(36).substring(7).toUpperCase() + "_VALIDATING";
-                    count++;
-                    if(count > 10) {
-                        clearInterval(scramble);
-                        status.innerText = "ACCESS GRANTED. WELCOME.";
-                        setTimeout(() => {
-                            document.getElementById('gate').style.opacity = '0';
-                            setTimeout(() => {
-                                document.getElementById('gate').style.display = 'none';
-                                this.reveal();
-                            }, 800);
-                        }, 1000);
-                    }
-                }, 80);
+                document.getElementById('gate').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('gate').style.display = 'none';
+                    this.reveal();
+                }, 800);
             }
 
             reveal() {
@@ -189,82 +185,29 @@
                 setTimeout(() => { d.style.opacity = '1'; dw.style.opacity = '1'; }, 100);
             }
 
-            openSearch() {
-                const s = document.getElementById('win-search');
-                s.style.display = 'flex';
-                setTimeout(() => { s.classList.add('active'); document.getElementById('search-in').focus(); }, 10);
+            toggleSettings() {
+                document.getElementById('settings-ui').classList.toggle('active');
             }
 
-            closeSearch() {
-                const s = document.getElementById('win-search');
-                s.classList.remove('active');
-                setTimeout(() => s.style.display = 'none', 600);
+            setTheme(c) {
+                document.documentElement.style.setProperty('--theme-main', c);
             }
 
-            runSearch() {
-                let v = document.getElementById('search-in').value;
-                if(!v.includes('.')) v = 'https://google.com/search?q=' + v;
-                else if(!v.startsWith('http')) v = 'https://' + v;
-                this.openProxy(v);
-                this.closeSearch();
+            toggleCloak(el) {
+                document.body.classList.toggle('cloaked', el.checked);
+            }
+
+            toggleTurbo(el) {
+                this.turbo = el.checked;
             }
 
             openProxy(url) {
-                const p = document.getElementById('proxy-wrap');
                 document.getElementById('proxy-frame').src = url;
-                p.classList.add('open');
+                document.getElementById('proxy-wrap').classList.remove('hidden');
             }
 
             closeProxy() {
-                document.getElementById('proxy-wrap').classList.remove('open');
-                setTimeout(() => document.getElementById('proxy-frame').src = '', 1000);
-            }
-
-            toggleTerm() {
-                const t = document.getElementById('term-ui');
-                if(t.style.display === 'flex') {
-                    t.classList.remove('active');
-                    t.style.opacity = '0';
-                    setTimeout(() => t.style.display = 'none', 400);
-                } else {
-                    t.style.display = 'flex';
-                    setTimeout(() => { t.style.opacity = '1'; t.classList.add('active'); document.getElementById('term-field').focus(); }, 10);
-                }
-            }
-
-            handleTerm(e) {
-                if(e.key === 'Enter') {
-                    const cmd = e.target.value.trim();
-                    const log = document.getElementById('term-log');
-                    let res = "";
-
-                    if(cmd === 'help') {
-                        res = "COMMANDS: <br> - help: Core list <br> - global [msg]: Broadcast <br> - global clear: Kill broadcast <br> - clear: Wipe logs";
-                    } else if(cmd.startsWith('global ')) {
-                        const msg = cmd.replace('global ', '');
-                        if(msg === 'clear') {
-                            document.getElementById('announcement-bar').classList.remove('active');
-                            res = "Broadcast terminated.";
-                        } else {
-                            this.announce(msg);
-                            res = "Broadcast live.";
-                        }
-                    } else if(cmd === 'clear') {
-                        log.innerHTML = "Logs Cleared."; e.target.value = ""; return;
-                    } else {
-                        res = "Command Error: Unknown String.";
-                    }
-
-                    log.innerHTML += `<br><span class="text-white">> ${cmd}</span><br>${res}`;
-                    e.target.value = "";
-                    log.scrollTop = log.scrollHeight;
-                }
-            }
-
-            announce(msg) {
-                const bar = document.getElementById('announcement-bar');
-                document.getElementById('announcement-text').innerText = msg;
-                bar.classList.add('active');
+                document.getElementById('proxy-wrap').classList.add('hidden');
             }
 
             setupStars() {
@@ -279,7 +222,8 @@
                     ctx.fillStyle = '#fff';
                     pts.forEach(p => {
                         ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill();
-                        p.y += 0.3; if(p.y > c.height) p.y = 0;
+                        p.y += this.turbo ? 0.3 : 0.1;
+                        if(p.y > c.height) p.y = 0;
                     });
                     requestAnimationFrame(draw);
                 };
@@ -287,7 +231,7 @@
             }
         }
 
-        const OS = new NebulaV95();
+        const OS = new NebulaTactical();
     </script>
 </body>
 </html>
