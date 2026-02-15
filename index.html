@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA OS | V9.3 AETHER</title>
+    <title>NEBULA OS | V9.4 BROADCAST</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
@@ -11,51 +11,62 @@
             --theme-main: #3b82f6;
             --m-x: 0px; --m-y: 0px; --r-x: 0px; --r-y: 0px;
             --bg: #010101;
+            --bezier: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; user-select: none; }
         body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* --- MOUSE KERNEL --- */
+        /* --- HARDWARE CURSOR --- */
         #c-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10000; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); }
         #c-ring { 
             position: fixed; top: 0; left: 0; width: 35px; height: 35px; border: 1.5px solid var(--theme-main); border-radius: 50%; z-index: 9999; pointer-events: none; 
             transform: translate3d(calc(var(--r-x) - 15px), calc(var(--r-y) - 15px), 0);
-            mix-blend-mode: difference; transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
+            mix-blend-mode: difference; transition: width 0.4s var(--bezier), height 0.4s var(--bezier), background 0.3s;
         }
-        .hover-state #c-ring { width: 65px; height: 65px; background: rgba(255,255,255,0.1); border-color: #fff; }
+        .hover-state #c-ring { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-color: #fff; }
 
-        /* --- LOGIN & WELCOME PHASE --- */
+        /* --- ANNOUNCEMENT SYSTEM --- */
+        #announcement-bar {
+            position: fixed; top: -100px; left: 0; width: 100%; background: var(--theme-main); color: #fff; 
+            padding: 12px; z-index: 9000; transition: 0.8s var(--bezier); text-align: center; font-weight: 900; 
+            text-transform: uppercase; letter-spacing: 2px; font-size: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        #announcement-bar.active { top: 0; }
+
+        /* --- LOGIN GATE --- */
         #gate { position: fixed; inset: 0; background: #010101; z-index: 8000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        #welcome-sequence { position: fixed; inset: 0; background: #010101; z-index: 8500; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 1.5s; }
-        .gate-in { background: transparent; border: none; border-bottom: 4px solid #111; text-6xl font-black text-center text-white outline-none w-[80%] transition: 0.5s; }
+        .gate-card { width: 500px; text-align: center; }
+        .input-wrap { position: relative; margin-top: 40px; }
+        .gate-in { background: transparent; border: none; border-bottom: 2px solid #222; width: 100%; padding: 10px; font-size: 2rem; font-weight: 900; color: #fff; text-align: center; outline: none; transition: 0.5s; }
         .gate-in:focus { border-color: var(--theme-main); }
 
-        /* --- DOCK (BOTTOM CENTER) --- */
-        .dock-wrap { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1000; opacity: 0; transition: 1.5s; display: none; }
-        .dock { display: flex; gap: 20px; background: rgba(15,15,15,0.7); padding: 12px 25px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(30px); }
-        .btn { width: 55px; height: 55px; background: #111; border-radius: 18px; display: flex; align-items: center; justify-content: center; border: 1px solid #222; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-size: 1.4rem; }
-        .btn:hover { transform: translateY(-12px) scale(1.1); border-color: var(--theme-main); }
+        /* --- SMOOTH MODULES --- */
+        .win-overlay { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; 
+            display: none; align-items: center; justify-content: center; backdrop-filter: blur(0px);
+            opacity: 0; transform: scale(1.1); transition: 0.6s var(--bezier);
+        }
+        .win-overlay.active { display: flex; opacity: 1; transform: scale(1); backdrop-filter: blur(40px); }
 
-        /* --- TERMINAL (ALT + T) --- */
-        #term-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); z-index: 5000; display: none; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; }
-        .term-box { width: 600px; background: #080808; border: 1px solid #222; border-radius: 20px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
-        .term-header { padding: 12px 20px; background: #111; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
-        .term-body { padding: 20px; height: 300px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #22c55e; }
-        .term-input-line { display: flex; gap: 10px; padding: 15px 20px; background: #050505; border-top: 1px solid #222; }
-        #term-field { background: transparent; border: none; outline: none; color: #fff; width: 100%; font-family: 'JetBrains Mono'; }
+        /* --- DOCK --- */
+        .dock-wrap { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1000; display: none; opacity: 0; transition: 1s; }
+        .dock { display: flex; gap: 15px; background: rgba(15,15,15,0.7); padding: 12px 20px; border-radius: 28px; border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(20px); }
+        .btn { width: 50px; height: 50px; background: #111; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; border: 1px solid #222; transition: 0.4s var(--bezier); }
+        .btn:hover { transform: translateY(-10px) scale(1.1); border-color: var(--theme-main); }
 
-        /* --- MAIN UI --- */
-        #desktop { height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 2s; }
-        .hero { font-size: 12vw; font-weight: 900; italic; background: linear-gradient(to bottom, #fff, #333); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        /* --- PROXY / MOVIE MODULE --- */
+        #proxy-wrap { 
+            position: fixed; inset: 0; background: #000; z-index: 7000; 
+            clip-path: circle(0% at 50% 50%); transition: 0.8s cubic-bezier(0.86, 0, 0.07, 1);
+        }
+        #proxy-wrap.open { clip-path: circle(150% at 50% 50%); }
 
-        /* --- SEARCH & SETTINGS --- */
-        .win { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 4000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(40px); }
-        .win-active { display: flex; }
-        .search-field { width: 70%; background: transparent; border: none; border-bottom: 3px solid #222; text-6xl font-black text-center text-white outline-none focus:border-blue-500 transition: 0.5s; }
+        /* --- TERMINAL --- */
+        #term-ui { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 6000; display: none; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; }
+        .term-box { width: 600px; background: #080808; border: 1px solid #222; border-radius: 20px; overflow: hidden; }
 
-        .settings-panel { position: fixed; right: -400px; top: 0; width: 350px; height: 100vh; background: #080808; border-left: 1px solid #222; z-index: 3000; transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1); padding: 60px 30px; }
-        .settings-panel.active { right: 0; }
+        #desktop { height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 1.5s; }
     </style>
 </head>
 <body>
@@ -64,246 +75,217 @@
     <div id="c-dot"></div>
     <div id="c-ring"></div>
 
-    <div id="gate">
-        <p class="text-[10px] font-black tracking-[10px] text-gray-600 mb-8 uppercase">Kernel Authentication</p>
-        <input type="text" id="user-input" class="gate-in hoverable" placeholder="..." onkeypress="if(event.key==='Enter')OS.startSequence()">
+    <div id="announcement-bar">
+        <span id="announcement-text">Global Sync Active</span>
     </div>
 
-    <div id="welcome-sequence">
-        <h2 id="welcome-text" class="text-4xl font-black italic mb-4"></h2>
-        <p class="text-[9px] font-mono tracking-[5px] text-blue-500 uppercase" id="load-status">Decrypting Profile...</p>
+    <div id="gate">
+        <div class="gate-card">
+            <p class="text-[9px] font-black tracking-[12px] text-gray-600 uppercase">Aether Identification</p>
+            <div class="input-wrap">
+                <input type="text" id="user-id" class="gate-in hoverable" placeholder="NAME" onkeypress="if(event.key==='Enter')OS.validate()">
+            </div>
+            <p id="gate-status" class="mt-8 text-[10px] font-mono text-blue-500 opacity-0">SECURE TUNNEL ESTABLISHED</p>
+        </div>
+    </div>
+
+    <div id="win-search" class="win-overlay">
+        <button class="absolute top-10 right-10 hoverable font-black" onclick="OS.closeSearch()">✕ CLOSE</button>
+        <div class="text-center w-full">
+            <p class="text-blue-500 font-black tracking-[2em] mb-10 ml-[2em]">NEBULA SEARCH</p>
+            <input type="text" id="search-in" class="bg-transparent border-b-4 border-white/10 text-7xl font-black text-center text-white outline-none w-[80%] hoverable focus:border-blue-500 transition-all" placeholder="..." onkeypress="if(event.key==='Enter')OS.runSearch()">
+        </div>
+    </div>
+
+    <div id="proxy-wrap">
+        <button class="absolute top-8 left-1/2 -translate-x-1/2 px-10 py-3 bg-white text-black font-black rounded-full z-[8000] hoverable" onclick="OS.closeProxy()">EXIT PORTAL</button>
+        <iframe id="proxy-frame" class="w-full h-full bg-white border-none"></iframe>
+    </div>
+
+    <div id="term-ui">
+        <div class="term-box">
+            <div class="p-4 bg-[#111] border-b border-[#222] flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-500">
+                <span>System Console</span>
+                <span>Alt+T</span>
+            </div>
+            <div id="term-log" class="p-6 h-[300px] overflow-y-auto font-mono text-green-500 text-xs leading-relaxed">
+                NEBULA KERNEL v9.4.0 <br> Identity confirmed. Type 'help' for commands.
+            </div>
+            <div class="p-4 bg-[#050505] border-t border-[#222] flex gap-3 items-center">
+                <span class="text-blue-500 font-bold">$</span>
+                <input type="text" id="term-field" class="bg-transparent border-none outline-none text-white font-mono w-full" onkeypress="OS.handleTerm(event)">
+            </div>
+        </div>
     </div>
 
     <main id="desktop">
-        <h1 class="hero">USERIDK</h1>
-        <div class="mt-12 flex gap-20">
-            <div class="text-center"><p class="text-4xl font-black font-mono" id="stat-fps">60</p><p class="text-[8px] font-black uppercase tracking-widest text-blue-500">Stability</p></div>
-            <div class="text-center"><p class="text-4xl font-black font-mono" id="stat-up">0s</p><p class="text-[8px] font-black uppercase tracking-widest text-blue-500">Uptime</p></div>
-        </div>
+        <h1 class="text-[12vw] font-black italic text-white/10">USERIDK</h1>
     </main>
-
-    <div id="term-overlay">
-        <div class="term-box">
-            <div class="term-header">
-                <span class="text-[9px] font-black uppercase tracking-widest">Aether System Console</span>
-                <span class="text-[9px] opacity-40">nebula-v9.3</span>
-            </div>
-            <div class="term-body" id="term-log">
-                Nebula OS [Version 9.3.0]<br>
-                (c) 2026 USERIDK Corp. All rights reserved.<br><br>
-                Type 'help' for available commands.
-            </div>
-            <div class="term-input-line">
-                <span class="text-blue-500 font-bold">$</span>
-                <input type="text" id="term-field" autocomplete="off" spellcheck="false" onkeypress="OS.handleTerm(event)">
-            </div>
-        </div>
-    </div>
-
-    <div id="win-search" class="win">
-        <button class="absolute top-10 right-10 hoverable" onclick="OS.toggle('win-search')">✕ CLOSE</button>
-        <input type="text" id="search-in" class="search-field hoverable" placeholder="URL OR QUERY..." onkeypress="if(event.key==='Enter')OS.runSearch()">
-    </div>
-
-    <div id="win-settings" class="settings-panel">
-        <h2 class="text-2xl font-black italic mb-10">CORE CONFIG</h2>
-        <div class="space-y-6">
-            <div class="p-5 bg-white/5 border border-white/5 rounded-2xl">
-                <p class="text-[9px] font-black uppercase text-gray-500 mb-2">Interface Color</p>
-                <div class="flex gap-4">
-                    <div class="w-8 h-8 rounded-full bg-blue-500 hoverable" onclick="OS.setTheme('#3b82f6')"></div>
-                    <div class="w-8 h-8 rounded-full bg-rose-500 hoverable" onclick="OS.setTheme('#f43f5e')"></div>
-                    <div class="w-8 h-8 rounded-full bg-amber-500 hoverable" onclick="OS.setTheme('#f59e0b')"></div>
-                </div>
-            </div>
-            <button class="w-full py-4 bg-white text-black font-black uppercase text-xs rounded-xl hoverable" onclick="location.reload()">Reset Kernel</button>
-        </div>
-        <button class="absolute bottom-10 left-10 hoverable" onclick="OS.toggleSettings()">✕ BACK</button>
-    </div>
 
     <div id="dock-wrap" class="dock-wrap">
         <div class="dock">
-            <div class="btn hoverable" onclick="OS.home()">🏠</div>
-            <div class="btn hoverable" onclick="OS.toggle('win-search')">🔍</div>
-            <div class="btn hoverable" onclick="OS.proxy('https://cineby.gd')">🎬</div>
-            <div class="btn hoverable" onclick="OS.toggleSettings()">⚙️</div>
+            <div class="btn hoverable" onclick="location.reload()">🏠</div>
+            <div class="btn hoverable" onclick="OS.openSearch()">🔍</div>
+            <div class="btn hoverable" onclick="OS.openProxy('https://cineby.gd')">🎬</div>
+            <div class="btn hoverable" onclick="OS.toggleTerm()">⚙️</div>
         </div>
     </div>
 
-    <div id="proxy-container" class="fixed inset-0 z-[6000] bg-black hidden">
-        <button class="absolute top-6 left-1/2 -translate-x-1/2 px-8 py-3 bg-white text-black font-black rounded-full z-[7000] hoverable" onclick="OS.home()">EXIT PORTAL</button>
-        <iframe id="proxy-frame" class="w-full h-full border-none bg-white"></iframe>
-    </div>
-
     <script>
-        class NebulaAether {
+        class NebulaBroadcast {
             constructor() {
-                this.mouse = { x: 0, y: 0, rx: 0, ry: 0 };
-                this.uptime = 0;
+                this.m = { x: 0, y: 0, rx: 0, ry: 0 };
                 this.init();
             }
 
             init() {
-                this.setupInput();
-                this.setupGraphics();
-                this.handleGlobalKeys();
-                setInterval(() => {
-                    this.uptime++;
-                    document.getElementById('stat-up').innerText = this.uptime + 's';
-                }, 1000);
+                this.setupMouse();
+                this.setupStars();
+                this.bindKeys();
             }
 
-            setupInput() {
+            setupMouse() {
                 const r = document.documentElement;
-                window.addEventListener('mousemove', (e) => {
-                    this.mouse.x = e.clientX; this.mouse.y = e.clientY;
-                    r.style.setProperty('--m-x', `${this.mouse.x}px`);
-                    r.style.setProperty('--m-y', `${this.mouse.y}px`);
-                });
-
-                const lerp = () => {
-                    this.mouse.rx += (this.mouse.x - this.mouse.rx) * 0.12;
-                    this.mouse.ry += (this.mouse.y - this.mouse.ry) * 0.12;
-                    r.style.setProperty('--r-x', `${this.mouse.rx}px`);
-                    r.style.setProperty('--r-y', `${this.mouse.ry}px`);
-                    requestAnimationFrame(lerp);
+                window.onmousemove = (e) => {
+                    this.m.x = e.clientX; this.m.y = e.clientY;
+                    r.style.setProperty('--m-x', `${this.m.x}px`);
+                    r.style.setProperty('--m-y', `${this.m.y}px`);
                 };
-                lerp();
+                const sync = () => {
+                    this.m.rx += (this.m.x - this.m.rx) * 0.12;
+                    this.m.ry += (this.m.y - this.m.ry) * 0.12;
+                    r.style.setProperty('--r-x', `${this.m.rx}px`);
+                    r.style.setProperty('--r-y', `${this.m.ry}px`);
+                    requestAnimationFrame(sync);
+                };
+                sync();
 
-                document.addEventListener('mouseover', (e) => {
+                document.onmouseover = (e) => {
                     if(e.target.classList.contains('hoverable')) document.body.classList.add('hover-state');
-                });
-                document.addEventListener('mouseout', (e) => {
-                    if(e.target.classList.contains('hoverable')) document.body.classList.remove('hover-state');
-                });
+                    else document.body.classList.remove('hover-state');
+                };
             }
 
-            handleGlobalKeys() {
-                window.addEventListener('keydown', (e) => {
-                    if(e.altKey && e.key.toLowerCase() === 't') {
-                        this.toggleTerminal();
-                    }
-                });
+            bindKeys() {
+                window.onkeydown = (e) => {
+                    if(e.altKey && e.key === 't') this.toggleTerm();
+                };
             }
 
-            startSequence() {
-                const name = document.getElementById('user-input').value.trim();
-                if(!name) return;
-
-                // Transition to Welcome
-                document.getElementById('gate').style.display = 'none';
-                const seq = document.getElementById('welcome-sequence');
-                seq.style.display = 'flex';
-                setTimeout(() => seq.style.opacity = '1', 50);
-
-                document.getElementById('welcome-text').innerText = `WELCOME, ${name.toUpperCase()}`;
-
-                // Artificial Delay for "Cinematic" feel
-                const logs = ["Syncing Aether...", "Loading UI Modules...", "Establishing Proxy Handshake...", "Kernel Ready."];
-                let i = 0;
-                const iv = setInterval(() => {
-                    document.getElementById('load-status').innerText = logs[i];
-                    i++;
-                    if(i >= logs.length) {
-                        clearInterval(iv);
-                        setTimeout(() => this.revealDesktop(), 1000);
-                    }
-                }, 800);
-            }
-
-            revealDesktop() {
-                document.getElementById('welcome-sequence').style.opacity = '0';
+            validate() {
+                const user = document.getElementById('user-id').value;
+                if(!user) return;
+                const status = document.getElementById('gate-status');
+                status.style.opacity = '1';
+                status.innerText = `INITIALIZING SESSION FOR ${user.toUpperCase()}...`;
+                
                 setTimeout(() => {
-                    document.getElementById('welcome-sequence').style.display = 'none';
-                    const d = document.getElementById('desktop');
-                    d.style.display = 'flex';
-                    setTimeout(() => d.style.opacity = '1', 50);
-                    const dock = document.getElementById('dock-wrap');
-                    dock.style.display = 'block';
-                    setTimeout(() => dock.style.opacity = '1', 100);
+                    document.getElementById('gate').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('gate').style.display = 'none';
+                        this.reveal();
+                    }, 800);
                 }, 1500);
             }
 
-            toggleTerminal() {
-                const term = document.getElementById('term-overlay');
-                if(term.style.display === 'flex') {
-                    term.style.opacity = '0';
-                    setTimeout(() => term.style.display = 'none', 300);
-                } else {
-                    term.style.display = 'flex';
-                    setTimeout(() => {
-                        term.style.opacity = '1';
-                        document.getElementById('term-field').focus();
-                    }, 50);
-                }
+            reveal() {
+                const d = document.getElementById('desktop');
+                const dw = document.getElementById('dock-wrap');
+                d.style.display = 'flex';
+                dw.style.display = 'block';
+                setTimeout(() => {
+                    d.style.opacity = '1';
+                    dw.style.opacity = '1';
+                }, 100);
             }
 
-            handleTerm(e) {
-                if(e.key === 'Enter') {
-                    const input = e.target.value.toLowerCase().trim();
-                    const log = document.getElementById('term-log');
-                    let output = "";
-
-                    if(input === 'help') {
-                        output = "AVAILABLE COMMANDS:<br> - help: Show this list<br> - clear: Wipe console<br> - proxy [url]: Rapid tunnel<br> - exit: Close terminal";
-                    } else if(input === 'clear') {
-                        log.innerHTML = "Nebula OS Console Cleared.";
-                        e.target.value = ""; return;
-                    } else if(input === 'exit') {
-                        this.toggleTerminal();
-                        e.target.value = ""; return;
-                    } else if(input.startsWith('proxy ')) {
-                        this.proxy(input.split(' ')[1]);
-                        output = "Tunneling to target...";
-                    } else {
-                        output = `Command not recognized: ${input}`;
-                    }
-
-                    log.innerHTML += `<br><span class="text-white">$ ${input}</span><br>${output}`;
-                    e.target.value = "";
-                    log.scrollTop = log.scrollHeight;
-                }
+            openSearch() {
+                const s = document.getElementById('win-search');
+                s.style.display = 'flex';
+                setTimeout(() => {
+                    s.classList.add('active');
+                    document.getElementById('search-in').focus();
+                }, 10);
             }
 
-            toggle(id) {
-                const el = document.getElementById(id);
-                el.classList.toggle('win-active');
-                if(el.classList.contains('win-active')) document.getElementById('search-in').focus();
-            }
-
-            toggleSettings() {
-                document.getElementById('win-settings').classList.toggle('active');
+            closeSearch() {
+                const s = document.getElementById('win-search');
+                s.classList.remove('active');
+                setTimeout(() => s.style.display = 'none', 600);
             }
 
             runSearch() {
                 let v = document.getElementById('search-in').value;
                 if(!v.includes('.')) v = 'https://google.com/search?q=' + v;
                 else if(!v.startsWith('http')) v = 'https://' + v;
-                this.proxy(v);
-                this.toggle('win-search');
+                this.openProxy(v);
+                this.closeSearch();
             }
 
-            proxy(url) {
+            openProxy(url) {
+                const p = document.getElementById('proxy-wrap');
                 document.getElementById('proxy-frame').src = url;
-                document.getElementById('proxy-container').style.display = 'block';
+                p.classList.add('open');
             }
 
-            home() {
-                document.getElementById('proxy-container').style.display = 'none';
-                document.getElementById('proxy-frame').src = '';
+            closeProxy() {
+                document.getElementById('proxy-wrap').classList.remove('open');
+                setTimeout(() => document.getElementById('proxy-frame').src = '', 800);
             }
 
-            setTheme(c) {
-                document.documentElement.style.setProperty('--theme-main', c);
+            toggleTerm() {
+                const t = document.getElementById('term-ui');
+                if(t.style.display === 'flex') {
+                    t.style.opacity = '0';
+                    setTimeout(() => t.style.display = 'none', 300);
+                } else {
+                    t.style.display = 'flex';
+                    setTimeout(() => {
+                        t.style.opacity = '1';
+                        document.getElementById('term-field').focus();
+                    }, 10);
+                }
             }
 
-            setupGraphics() {
+            handleTerm(e) {
+                if(e.key === 'Enter') {
+                    const cmd = e.target.value.trim();
+                    const log = document.getElementById('term-log');
+                    let res = "";
+
+                    if(cmd === 'help') {
+                        res = "COMMANDS: <br> - help: List commands <br> - global [msg]: Broadcast message <br> - clear: Clear logs <br> - exit: Close terminal";
+                    } else if(cmd.startsWith('global ')) {
+                        const msg = cmd.replace('global ', '');
+                        this.announce(msg);
+                        res = "Global Announcement Dispatched.";
+                    } else if(cmd === 'clear') {
+                        log.innerHTML = "Logs Cleared.";
+                        e.target.value = ""; return;
+                    } else {
+                        res = "Command Error: Unknown String.";
+                    }
+
+                    log.innerHTML += `<br><span class="text-white">> ${cmd}</span><br>${res}`;
+                    e.target.value = "";
+                    log.scrollTop = log.scrollHeight;
+                }
+            }
+
+            announce(msg) {
+                const bar = document.getElementById('announcement-bar');
+                document.getElementById('announcement-text').innerText = msg;
+                bar.classList.add('active');
+                setTimeout(() => bar.classList.remove('active'), 5000);
+            }
+
+            setupStars() {
                 const c = document.getElementById('stars');
                 const ctx = c.getContext('2d');
                 let parts = [];
-                const res = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
-                window.onresize = res; res();
-                for(let i=0; i<200; i++) parts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*2});
+                const resize = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
+                window.onresize = resize; resize();
+                for(let i=0; i<150; i++) parts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*2});
                 const draw = () => {
                     ctx.fillStyle = '#010101'; ctx.fillRect(0,0,c.width,c.height);
                     ctx.fillStyle = '#fff';
@@ -317,7 +299,7 @@
             }
         }
 
-        const OS = new NebulaAether();
+        const OS = new NebulaBroadcast();
     </script>
 </body>
 </html>
