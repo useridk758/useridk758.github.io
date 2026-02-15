@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA OS | V9.6 TACTICAL</title>
+    <title>NEBULA OS | V9.7 APEX</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
@@ -11,54 +11,57 @@
             --theme-main: #3b82f6;
             --m-x: 0px; --m-y: 0px; --r-x: 0px; --r-y: 0px;
             --bg: #010101;
-            --bezier: cubic-bezier(0.16, 1, 0.3, 1);
+            --bezier: cubic-bezier(0.2, 0, 0, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; user-select: none; }
-        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; transition: filter 0.5s; }
-        
-        /* CLOAKING STYLE */
-        body.cloaked { filter: grayscale(1) brightness(0.5); }
-        body.cloaked #hero-name { opacity: 0.1; }
+        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* --- HARDWARE CURSOR --- */
-        #c-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10000; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); }
+        /* --- SMOOTH HARDWARE CURSOR --- */
+        #c-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10000; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); will-change: transform; }
         #c-ring { 
             position: fixed; top: 0; left: 0; width: 35px; height: 35px; border: 1.5px solid var(--theme-main); border-radius: 50%; z-index: 9999; pointer-events: none; 
             transform: translate3d(calc(var(--r-x) - 15px), calc(var(--r-y) - 15px), 0);
-            mix-blend-mode: difference; transition: width 0.4s var(--bezier), height 0.4s var(--bezier), border-color 0.3s;
+            mix-blend-mode: difference; transition: width 0.3s var(--bezier), height 0.3s var(--bezier), background 0.3s; will-change: transform;
         }
         .hover-state #c-ring { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-color: #fff; }
 
-        /* --- SETTINGS PANEL --- */
-        #settings-ui { 
-            position: fixed; right: -450px; top: 0; width: 400px; height: 100vh; background: rgba(8,8,8,0.95); 
-            border-left: 1px solid rgba(255,255,255,0.05); z-index: 6000; backdrop-filter: blur(30px);
-            transition: 0.6s var(--bezier); padding: 60px 40px;
+        /* --- UNIFIED TRANSITION OVERLAYS --- */
+        .system-layer {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 5000; 
+            display: none; align-items: center; justify-content: center; backdrop-filter: blur(0px);
+            opacity: 0; transition: opacity 0.4s var(--bezier), backdrop-filter 0.4s var(--bezier);
         }
-        #settings-ui.active { right: 0; }
-        .setting-group { margin-bottom: 40px; }
-        .setting-label { font-[900] text-[10px] uppercase tracking-[3px] text-gray-500 mb-4 block; }
-        
-        /* TOGGLE SWITCH */
-        .switch { position: relative; display: inline-block; width: 45px; height: 22px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: none; top: 0; left: 0; right: 0; bottom: 0; background-color: #222; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--theme-main); }
-        input:checked + .slider:before { transform: translateX(23px); }
+        .system-layer.active { display: flex; opacity: 1; backdrop-filter: blur(30px); }
 
-        /* --- DOCK & UI --- */
-        .dock-wrap { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1000; display: none; opacity: 0; transition: 1s; }
-        .dock { display: flex; gap: 15px; background: rgba(15,15,15,0.7); padding: 12px 20px; border-radius: 28px; border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(20px); }
-        .btn { width: 50px; height: 50px; background: #111; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; border: 1px solid #222; transition: 0.4s var(--bezier); }
-        .btn:hover { transform: translateY(-10px) scale(1.1); border-color: var(--theme-main); }
+        /* Terminal & Search Boxes */
+        .modal-box {
+            width: 700px; transform: scale(0.9) translateY(30px); opacity: 0;
+            transition: transform 0.5s var(--bezier), opacity 0.4s var(--bezier);
+            will-change: transform, opacity;
+        }
+        .system-layer.active .modal-box { transform: scale(1) translateY(0); opacity: 1; }
 
-        #desktop { height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 2s; }
-        .hero { font-size: 12vw; font-weight: 950; font-style: italic; background: linear-gradient(to bottom, #fff, #333); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        /* --- DOCK --- */
+        .dock-wrap { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1000; display: none; opacity: 0; transition: 1s var(--bezier); }
+        .dock { display: flex; gap: 15px; background: rgba(15,15,15,0.7); padding: 12px 20px; border-radius: 28px; border: 1px solid rgba(255,255,255,0.05); }
+        .btn { width: 50px; height: 50px; background: #111; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; border: 1px solid #222; transition: 0.3s var(--bezier); }
+        .btn:hover { transform: translateY(-10px); border-color: var(--theme-main); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+
+        /* --- LOGIN & HERO --- */
+        #gate { position: fixed; inset: 0; background: #010101; z-index: 8000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.8s var(--bezier); }
+        .gate-in { background: transparent; border: none; border-bottom: 2px solid #111; width: 450px; padding: 15px; font-size: 3rem; font-weight: 900; color: #fff; text-align: center; outline: none; transition: 0.5s; }
+        .gate-in:focus { border-color: var(--theme-main); }
         
-        #gate { position: fixed; inset: 0; background: #010101; z-index: 8000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .gate-in { background: transparent; border: none; border-bottom: 2px solid #111; width: 400px; padding: 10px; font-size: 2.5rem; font-weight: 900; color: #fff; text-align: center; outline: none; transition: 0.5s; }
+        #desktop { height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 1.5s var(--bezier); }
+        .hero { font-size: 13vw; font-weight: 950; font-style: italic; background: linear-gradient(to bottom, #fff, #222); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.05em; }
+
+        /* --- PROXY --- */
+        #proxy-wrap { 
+            position: fixed; inset: 0; background: #000; z-index: 7000; 
+            clip-path: circle(0% at 50% 50%); transition: 1s cubic-bezier(0.8, 0, 0.2, 1);
+        }
+        #proxy-wrap.open { clip-path: circle(150% at 50% 50%); }
     </style>
 </head>
 <body>
@@ -68,85 +71,75 @@
     <div id="c-ring"></div>
 
     <div id="gate">
-        <input type="text" id="user-id" class="gate-in hoverable" placeholder="NAME" autocomplete="off" onkeypress="if(event.key==='Enter')OS.validate()">
+        <p class="text-[9px] font-black tracking-[12px] text-gray-600 uppercase mb-4">Apex Kernel Initialized</p>
+        <input type="text" id="user-id" class="gate-in hoverable" placeholder="IDENTIFY" autocomplete="off" onkeypress="if(event.key==='Enter')OS.validate()">
     </div>
 
-    <aside id="settings-ui">
-        <div class="flex justify-between items-center mb-12">
-            <h2 class="text-2xl font-[900] italic uppercase tracking-tighter">System Config</h2>
-            <button class="hoverable text-xs font-bold opacity-40" onclick="OS.toggleSettings()">CLOSE</button>
+    <div id="win-search" class="system-layer">
+        <div class="modal-box text-center">
+            <p class="text-blue-500 font-black tracking-[1.5em] mb-8 text-[10px] uppercase">Neural Search Core</p>
+            <input type="text" id="search-in" class="bg-transparent border-b-4 border-white/10 text-7xl font-black text-center text-white outline-none w-full hoverable focus:border-blue-500 transition-all" placeholder="..." onkeypress="if(event.key==='Enter')OS.runSearch()">
+            <button class="mt-12 text-gray-500 hover:text-white font-bold text-[10px] tracking-widest hoverable" onclick="OS.toggleLayer('win-search')">ESC TO CLOSE</button>
         </div>
+    </div>
 
-        <div class="setting-group">
-            <span class="setting-label">Theme Optimization</span>
-            <div class="flex gap-4">
-                <div class="w-10 h-10 rounded-xl bg-blue-600 hoverable border-2 border-transparent hover:border-white" onclick="OS.setTheme('#3b82f6')"></div>
-                <div class="w-10 h-10 rounded-xl bg-purple-600 hoverable border-2 border-transparent hover:border-white" onclick="OS.setTheme('#a855f7')"></div>
-                <div class="w-10 h-10 rounded-xl bg-emerald-500 hoverable border-2 border-transparent hover:border-white" onclick="OS.setTheme('#10b981')"></div>
-                <div class="w-10 h-10 rounded-xl bg-rose-500 hoverable border-2 border-transparent hover:border-white" onclick="OS.setTheme('#f43f5e')"></div>
+    <div id="win-term" class="system-layer">
+        <div class="modal-box bg-[#080808] border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+            <div class="p-4 bg-[#111] border-b border-white/5 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-500">
+                <span>Apex System Terminal</span>
+                <span class="opacity-50">v9.7.0</span>
+            </div>
+            <div id="term-log" class="p-6 h-[300px] overflow-y-auto font-mono text-blue-400 text-xs leading-relaxed">
+                [SYSTEM]: Kernel Link Active.<br>
+                [SYSTEM]: Performance Optimization... DONE.<br>
+                [SYSTEM]: Type 'help' for global commands.
+            </div>
+            <div class="p-5 bg-[#050505] border-t border-white/5 flex gap-4 items-center">
+                <span class="text-blue-500 font-bold">$</span>
+                <input type="text" id="term-field" class="bg-transparent border-none outline-none text-white font-mono w-full" autocomplete="off" onkeypress="OS.handleTerm(event)">
             </div>
         </div>
-
-        <div class="setting-group">
-            <span class="setting-label">Cloaking Protocol</span>
-            <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
-                <span class="text-xs font-bold text-gray-400">Stealth Mode</span>
-                <label class="switch hoverable">
-                    <input type="checkbox" onchange="OS.toggleCloak(this)">
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-
-        <div class="setting-group">
-            <span class="setting-label">Optimization</span>
-            <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
-                <span class="text-xs font-bold text-gray-400">Turbo Rendering</span>
-                <label class="switch hoverable">
-                    <input type="checkbox" checked onchange="OS.toggleTurbo(this)">
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-
-        <div class="absolute bottom-10 left-10">
-            <p class="text-[8px] font-mono text-gray-600">NEBULA KERNEL v9.6.0-TACTICAL</p>
-        </div>
-    </aside>
+    </div>
 
     <main id="desktop">
         <h1 class="hero" id="hero-name">USERIDK</h1>
     </main>
 
+    <div id="proxy-wrap">
+        <button class="absolute top-8 left-1/2 -translate-x-1/2 px-10 py-3 bg-white text-black font-black rounded-full z-[8000] hoverable text-[10px] tracking-widest" onclick="OS.closeProxy()">EXIT PORTAL</button>
+        <iframe id="proxy-frame" class="w-full h-full bg-white border-none"></iframe>
+    </div>
+
     <div id="dock-wrap" class="dock-wrap">
         <div class="dock">
             <div class="btn hoverable" onclick="location.reload()">🏠</div>
-            <div class="btn hoverable" onclick="OS.toggleSettings()">⚙️</div>
+            <div class="btn hoverable" onclick="OS.toggleLayer('win-search')">🔍</div>
             <div class="btn hoverable" onclick="OS.openProxy('https://cineby.gd')">🎬</div>
-            <div class="btn hoverable" onclick="OS.openSearch()">🔍</div>
+            <div class="btn hoverable" onclick="OS.toggleLayer('win-term')">⚙️</div>
         </div>
     </div>
 
-    <div id="proxy-wrap" class="fixed inset-0 z-[7000] hidden bg-black">
-        <iframe id="proxy-frame" class="w-full h-full border-none bg-white"></iframe>
-        <button class="absolute top-8 left-1/2 -translate-x-1/2 px-8 py-2 bg-white text-black font-black rounded-full hoverable text-[10px]" onclick="OS.closeProxy()">EXIT</button>
-    </div>
-
     <script>
-        class NebulaTactical {
+        class NebulaApex {
             constructor() {
                 this.m = { x: 0, y: 0, rx: 0, ry: 0 };
-                this.turbo = true;
                 this.init();
             }
 
             init() {
-                this.setupMouse();
-                this.setupStars();
-                window.onkeydown = (e) => { if(e.altKey && e.key === 't') console.log("Terminal remains internal."); };
+                this.setupInput();
+                this.setupGraphics();
+                window.onkeydown = (e) => {
+                    if(e.altKey && e.key === 't') this.toggleLayer('win-term');
+                    if(e.key === 'Escape') {
+                        document.querySelectorAll('.system-layer').forEach(l => {
+                            if(l.classList.contains('active')) this.toggleLayer(l.id);
+                        });
+                    }
+                };
             }
 
-            setupMouse() {
+            setupInput() {
                 const r = document.documentElement;
                 window.onmousemove = (e) => {
                     this.m.x = e.clientX; this.m.y = e.clientY;
@@ -154,9 +147,8 @@
                     r.style.setProperty('--m-y', `${this.m.y}px`);
                 };
                 const sync = () => {
-                    let lerpFactor = this.turbo ? 0.12 : 0.05;
-                    this.m.rx += (this.m.x - this.m.rx) * lerpFactor;
-                    this.m.ry += (this.m.y - this.m.ry) * lerpFactor;
+                    this.m.rx += (this.m.x - this.m.rx) * 0.15;
+                    this.m.ry += (this.m.y - this.m.ry) * 0.15;
                     r.style.setProperty('--r-x', `${this.m.rx}px`);
                     r.style.setProperty('--r-y', `${this.m.ry}px`);
                     requestAnimationFrame(sync);
@@ -185,45 +177,79 @@
                 setTimeout(() => { d.style.opacity = '1'; dw.style.opacity = '1'; }, 100);
             }
 
-            toggleSettings() {
-                document.getElementById('settings-ui').classList.toggle('active');
+            toggleLayer(id) {
+                const l = document.getElementById(id);
+                if(l.classList.contains('active')) {
+                    l.classList.remove('active');
+                    setTimeout(() => l.style.display = 'none', 400);
+                } else {
+                    l.style.display = 'flex';
+                    setTimeout(() => {
+                        l.classList.add('active');
+                        const input = l.querySelector('input');
+                        if(input) input.focus();
+                    }, 10);
+                }
             }
 
-            setTheme(c) {
-                document.documentElement.style.setProperty('--theme-main', c);
-            }
-
-            toggleCloak(el) {
-                document.body.classList.toggle('cloaked', el.checked);
-            }
-
-            toggleTurbo(el) {
-                this.turbo = el.checked;
+            runSearch() {
+                let v = document.getElementById('search-in').value;
+                if(!v) return;
+                if(!v.includes('.')) v = 'https://google.com/search?q=' + v;
+                else if(!v.startsWith('http')) v = 'https://' + v;
+                this.openProxy(v);
+                this.toggleLayer('win-search');
             }
 
             openProxy(url) {
+                const p = document.getElementById('proxy-wrap');
                 document.getElementById('proxy-frame').src = url;
-                document.getElementById('proxy-wrap').classList.remove('hidden');
+                p.classList.add('open');
             }
 
             closeProxy() {
-                document.getElementById('proxy-wrap').classList.add('hidden');
+                document.getElementById('proxy-wrap').classList.remove('open');
+                setTimeout(() => document.getElementById('proxy-frame').src = '', 1000);
             }
 
-            setupStars() {
+            handleTerm(e) {
+                if(e.key === 'Enter') {
+                    const cmd = e.target.value.trim().toLowerCase();
+                    const log = document.getElementById('term-log');
+                    let res = "";
+
+                    if(cmd === 'help') res = "COMMANDS: help, clear, theme [color], exit";
+                    else if(cmd.startsWith('theme ')) {
+                        const color = cmd.split(' ')[1];
+                        document.documentElement.style.setProperty('--theme-main', color);
+                        res = `Theme adjusted to ${color}`;
+                    } else if(cmd === 'clear') {
+                        log.innerHTML = "Console cleared."; e.target.value = ""; return;
+                    } else if(cmd === 'exit') {
+                        this.toggleLayer('win-term'); e.target.value = ""; return;
+                    } else {
+                        res = "Unknown Command.";
+                    }
+
+                    log.innerHTML += `<br><span class="text-white">> ${cmd}</span><br>${res}`;
+                    e.target.value = "";
+                    log.scrollTop = log.scrollHeight;
+                }
+            }
+
+            setupGraphics() {
                 const c = document.getElementById('stars');
                 const ctx = c.getContext('2d');
                 let pts = [];
                 const res = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
                 window.onresize = res; res();
-                for(let i=0; i<150; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*2});
+                for(let i=0; i<180; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*1.5});
                 const draw = () => {
                     ctx.fillStyle = '#010101'; ctx.fillRect(0,0,c.width,c.height);
                     ctx.fillStyle = '#fff';
                     pts.forEach(p => {
                         ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill();
-                        p.y += this.turbo ? 0.3 : 0.1;
-                        if(p.y > c.height) p.y = 0;
+                        p.y += 0.2; if(p.y > c.height) p.y = 0;
                     });
                     requestAnimationFrame(draw);
                 };
@@ -231,7 +257,7 @@
             }
         }
 
-        const OS = new NebulaTactical();
+        const OS = new NebulaApex();
     </script>
 </body>
 </html>
