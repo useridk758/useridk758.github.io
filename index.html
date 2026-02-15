@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="os-title">NEBULA OS | V10.3</title>
+    <title id="os-title">NEBULA OS | V10.4</title>
     <link id="os-favicon" rel="icon" href="https://cdn-icons-png.flaticon.com/512/606/606547.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
@@ -17,19 +17,19 @@
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; user-select: none; }
         body { background: #000; color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
         
-        /* --- THE FIXED CONTEXT MENU --- */
+        /* --- CONTEXT MENU (TERMINAL REMOVED) --- */
         #context-menu {
-            position: fixed; z-index: 10001; width: 200px; background: rgba(10,10,10,0.85); 
+            position: fixed; z-index: 10001; width: 190px; background: rgba(10,10,10,0.85); 
             backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 14px; padding: 8px; pointer-events: none; opacity: 0; 
+            border-radius: 14px; padding: 6px; pointer-events: none; opacity: 0; 
             transform: scale(0.9) translateY(10px); transition: opacity 0.2s, transform 0.2s var(--ease);
         }
         #context-menu.active { opacity: 1; transform: scale(1) translateY(0); pointer-events: all; }
         .menu-item { 
-            padding: 12px 16px; border-radius: 10px; font-size: 11px; font-weight: 700; 
+            padding: 10px 14px; border-radius: 10px; font-size: 11px; font-weight: 700; 
             display: flex; justify-content: space-between; transition: 0.2s; color: rgba(255,255,255,0.6);
         }
-        .menu-item:hover { background: var(--theme-main); color: white; transform: translateX(5px); }
+        .menu-item:hover { background: var(--theme-main); color: white; transform: translateX(4px); }
 
         /* --- CURSOR --- */
         #c-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10005; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); }
@@ -68,7 +68,6 @@
     <div id="context-menu">
         <div class="menu-item hoverable" onclick="OS.showDesktop()"><span>Show Desktop</span><span>🏠</span></div>
         <div class="menu-item hoverable" onclick="OS.toggleLayer('search-layer')"><span>Global Search</span><span>🔍</span></div>
-        <div class="menu-item hoverable" onclick="OS.toggleLayer('term-layer')"><span>Terminal</span><span>>_</span></div>
         <div class="menu-item hoverable" onclick="OS.toggleSettings()"><span>Settings</span><span>⚙️</span></div>
         <div class="border-t border-white/5 my-2"></div>
         <div class="menu-item hoverable" onclick="location.reload()"><span>Reboot System</span><span>🔄</span></div>
@@ -93,7 +92,7 @@
 
     <div id="term-layer" class="layer">
         <div class="w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-3xl overflow-hidden">
-            <div id="term-out" class="p-6 h-64 overflow-y-auto font-mono text-blue-400 text-xs">Nebula Kernel v10.3 active.</div>
+            <div id="term-out" class="p-6 h-64 overflow-y-auto font-mono text-blue-400 text-xs">Nebula Kernel v10.4 active. Hotkey bound.</div>
             <div class="p-4 bg-[#050505] flex gap-3 border-t border-white/5">
                 <span class="text-blue-500 font-bold">$</span>
                 <input type="text" id="term-in" class="bg-transparent border-none outline-none text-white font-mono w-full" autocomplete="off" onkeypress="OS.handleTerm(event)">
@@ -134,7 +133,6 @@
                 this.setupMouse();
                 this.setupStars();
                 
-                // GLOBAL RIGHT CLICK LISTENER
                 window.addEventListener('contextmenu', (e) => {
                     e.preventDefault();
                     this.openMenu(e);
@@ -221,8 +219,8 @@
                     else if(cmd.startsWith('global ')) {
                         const msg = cmd.replace('global ', '');
                         document.getElementById('announcement-text').innerText = msg;
-                        document.getElementById('announcement-bar').classList.add(msg === 'clear' ? '' : 'active');
                         if(msg === 'clear') document.getElementById('announcement-bar').classList.remove('active');
+                        else document.getElementById('announcement-bar').classList.add('active');
                         res = "Broadcast updated.";
                     } else if(cmd === 'clear') { out.innerHTML = ""; e.target.value = ""; return; }
                     else if(cmd === 'exit') { this.toggleLayer('term-layer'); e.target.value = ""; return; }
