@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA OS | V9.7 APEX</title>
+    <title>NEBULA OS | V9.8 HORIZON</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
@@ -11,57 +11,59 @@
             --theme-main: #3b82f6;
             --m-x: 0px; --m-y: 0px; --r-x: 0px; --r-y: 0px;
             --bg: #010101;
-            --bezier: cubic-bezier(0.2, 0, 0, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; user-select: none; }
-        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
+        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
 
-        /* --- SMOOTH HARDWARE CURSOR --- */
-        #c-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10000; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); will-change: transform; }
+        /* --- MOUSE KERNEL --- */
+        #c-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10000; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); }
         #c-ring { 
             position: fixed; top: 0; left: 0; width: 35px; height: 35px; border: 1.5px solid var(--theme-main); border-radius: 50%; z-index: 9999; pointer-events: none; 
             transform: translate3d(calc(var(--r-x) - 15px), calc(var(--r-y) - 15px), 0);
-            mix-blend-mode: difference; transition: width 0.3s var(--bezier), height 0.3s var(--bezier), background 0.3s; will-change: transform;
+            mix-blend-mode: difference; transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .hover-state #c-ring { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-color: #fff; }
+        .hover-state #c-ring { width: 65px; height: 65px; background: rgba(255,255,255,0.1); border-color: #fff; }
 
-        /* --- UNIFIED TRANSITION OVERLAYS --- */
-        .system-layer {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 5000; 
-            display: none; align-items: center; justify-content: center; backdrop-filter: blur(0px);
-            opacity: 0; transition: opacity 0.4s var(--bezier), backdrop-filter 0.4s var(--bezier);
+        /* --- UI OVERLAYS (SEARCH & TERM) --- */
+        .layer {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; 
+            display: none; align-items: center; justify-content: center; backdrop-filter: blur(40px);
+            opacity: 0; transition: opacity 0.5s ease;
         }
-        .system-layer.active { display: flex; opacity: 1; backdrop-filter: blur(30px); }
+        .layer.active { display: flex; opacity: 1; }
+        .modal { transform: scale(0.95) translateY(20px); transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); width: 100%; max-width: 800px; padding: 20px; }
+        .layer.active .modal { transform: scale(1) translateY(0); }
 
-        /* Terminal & Search Boxes */
-        .modal-box {
-            width: 700px; transform: scale(0.9) translateY(30px); opacity: 0;
-            transition: transform 0.5s var(--bezier), opacity 0.4s var(--bezier);
-            will-change: transform, opacity;
+        /* --- DOCK (FIXED CUT-OFF) --- */
+        .dock-container {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            z-index: 1000; display: none; opacity: 0; transition: 1s ease;
+            padding: 10px; /* Space to prevent clipping during hover scale */
         }
-        .system-layer.active .modal-box { transform: scale(1) translateY(0); opacity: 1; }
+        .dock {
+            display: flex; gap: 12px; background: rgba(20,20,20,0.6); 
+            padding: 12px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(20px); box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+        .dock-btn {
+            width: 52px; height: 52px; background: #1a1a1a; border-radius: 16px; 
+            display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+            border: 1px solid #333; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .dock-btn:hover { transform: translateY(-12px) scale(1.15); border-color: var(--theme-main); background: #222; }
 
-        /* --- DOCK --- */
-        .dock-wrap { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1000; display: none; opacity: 0; transition: 1s var(--bezier); }
-        .dock { display: flex; gap: 15px; background: rgba(15,15,15,0.7); padding: 12px 20px; border-radius: 28px; border: 1px solid rgba(255,255,255,0.05); }
-        .btn { width: 50px; height: 50px; background: #111; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; border: 1px solid #222; transition: 0.3s var(--bezier); }
-        .btn:hover { transform: translateY(-10px); border-color: var(--theme-main); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        /* --- HERO --- */
+        #desktop { height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 2s ease; }
+        .hero-text { font-size: 14vw; font-weight: 900; italic; letter-spacing: -0.05em; background: linear-gradient(180deg, #fff 30%, #444 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* --- LOGIN & HERO --- */
-        #gate { position: fixed; inset: 0; background: #010101; z-index: 8000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.8s var(--bezier); }
-        .gate-in { background: transparent; border: none; border-bottom: 2px solid #111; width: 450px; padding: 15px; font-size: 3rem; font-weight: 900; color: #fff; text-align: center; outline: none; transition: 0.5s; }
-        .gate-in:focus { border-color: var(--theme-main); }
-        
-        #desktop { height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 1.5s var(--bezier); }
-        .hero { font-size: 13vw; font-weight: 950; font-style: italic; background: linear-gradient(to bottom, #fff, #222); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.05em; }
+        /* --- LOGIN --- */
+        #gate { position: fixed; inset: 0; background: #000; z-index: 8000; display: flex; align-items: center; justify-content: center; }
+        .gate-input { background: transparent; border: none; border-bottom: 2px solid #222; text-6xl font-black text-center text-white outline-none w-full max-w-2xl focus:border-blue-500 transition-all; }
 
         /* --- PROXY --- */
-        #proxy-wrap { 
-            position: fixed; inset: 0; background: #000; z-index: 7000; 
-            clip-path: circle(0% at 50% 50%); transition: 1s cubic-bezier(0.8, 0, 0.2, 1);
-        }
-        #proxy-wrap.open { clip-path: circle(150% at 50% 50%); }
+        #proxy-layer { position: fixed; inset: 0; background: #000; z-index: 9000; transform: translateY(100%); transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        #proxy-layer.active { transform: translateY(0); }
     </style>
 </head>
 <body>
@@ -71,89 +73,82 @@
     <div id="c-ring"></div>
 
     <div id="gate">
-        <p class="text-[9px] font-black tracking-[12px] text-gray-600 uppercase mb-4">Apex Kernel Initialized</p>
-        <input type="text" id="user-id" class="gate-in hoverable" placeholder="IDENTIFY" autocomplete="off" onkeypress="if(event.key==='Enter')OS.validate()">
+        <input type="text" id="user-in" class="gate-input hoverable" placeholder="IDENTIFY" autocomplete="off" onkeypress="if(event.key==='Enter')OS.validate()">
     </div>
 
-    <div id="win-search" class="system-layer">
-        <div class="modal-box text-center">
-            <p class="text-blue-500 font-black tracking-[1.5em] mb-8 text-[10px] uppercase">Neural Search Core</p>
-            <input type="text" id="search-in" class="bg-transparent border-b-4 border-white/10 text-7xl font-black text-center text-white outline-none w-full hoverable focus:border-blue-500 transition-all" placeholder="..." onkeypress="if(event.key==='Enter')OS.runSearch()">
-            <button class="mt-12 text-gray-500 hover:text-white font-bold text-[10px] tracking-widest hoverable" onclick="OS.toggleLayer('win-search')">ESC TO CLOSE</button>
+    <div id="search-layer" class="layer">
+        <div class="modal text-center">
+            <p class="text-blue-500 font-black tracking-[1.5em] mb-10 text-xs">CORE SEARCH</p>
+            <input type="text" id="search-field" class="bg-transparent border-b-4 border-white/10 text-7xl font-black text-center text-white outline-none w-full hoverable focus:border-blue-500 transition-all" placeholder="..." onkeypress="if(event.key==='Enter')OS.runSearch()">
+            <p class="mt-10 text-gray-600 text-[10px] tracking-widest uppercase">Press ESC to return</p>
         </div>
     </div>
 
-    <div id="win-term" class="system-layer">
-        <div class="modal-box bg-[#080808] border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
-            <div class="p-4 bg-[#111] border-b border-white/5 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-500">
-                <span>Apex System Terminal</span>
-                <span class="opacity-50">v9.7.0</span>
+    <div id="term-layer" class="layer">
+        <div class="modal max-w-2xl bg-[#0a0a0a] border border-white/5 rounded-3xl overflow-hidden">
+            <div class="p-4 bg-[#111] border-b border-white/5 flex justify-between text-[10px] font-black uppercase text-gray-500">
+                <span>Nebula Terminal</span>
+                <span>Alt + T</span>
             </div>
-            <div id="term-log" class="p-6 h-[300px] overflow-y-auto font-mono text-blue-400 text-xs leading-relaxed">
-                [SYSTEM]: Kernel Link Active.<br>
-                [SYSTEM]: Performance Optimization... DONE.<br>
-                [SYSTEM]: Type 'help' for global commands.
+            <div id="term-out" class="p-6 h-64 overflow-y-auto font-mono text-green-500 text-xs">
+                Welcome to Nebula Kernel v9.8.0...<br>Type 'help' for instructions.
             </div>
-            <div class="p-5 bg-[#050505] border-t border-white/5 flex gap-4 items-center">
+            <div class="p-4 bg-[#050505] flex gap-3 border-t border-white/5">
                 <span class="text-blue-500 font-bold">$</span>
-                <input type="text" id="term-field" class="bg-transparent border-none outline-none text-white font-mono w-full" autocomplete="off" onkeypress="OS.handleTerm(event)">
+                <input type="text" id="term-in" class="bg-transparent border-none outline-none text-white font-mono w-full" autocomplete="off" onkeypress="OS.handleTerm(event)">
             </div>
         </div>
+    </div>
+
+    <div id="proxy-layer">
+        <button class="absolute top-8 left-1/2 -translate-x-1/2 px-10 py-3 bg-white text-black font-black rounded-full z-[10000] hoverable text-xs" onclick="OS.closeProxy()">CLOSE PORTAL</button>
+        <iframe id="proxy-frame" class="w-full h-full border-none bg-white"></iframe>
     </div>
 
     <main id="desktop">
-        <h1 class="hero" id="hero-name">USERIDK</h1>
+        <h1 class="hero-text" id="hero-title">ZAP</h1>
     </main>
 
-    <div id="proxy-wrap">
-        <button class="absolute top-8 left-1/2 -translate-x-1/2 px-10 py-3 bg-white text-black font-black rounded-full z-[8000] hoverable text-[10px] tracking-widest" onclick="OS.closeProxy()">EXIT PORTAL</button>
-        <iframe id="proxy-frame" class="w-full h-full bg-white border-none"></iframe>
-    </div>
-
-    <div id="dock-wrap" class="dock-wrap">
+    <div id="dock-wrap" class="dock-container">
         <div class="dock">
-            <div class="btn hoverable" onclick="location.reload()">🏠</div>
-            <div class="btn hoverable" onclick="OS.toggleLayer('win-search')">🔍</div>
-            <div class="btn hoverable" onclick="OS.openProxy('https://cineby.gd')">🎬</div>
-            <div class="btn hoverable" onclick="OS.toggleLayer('win-term')">⚙️</div>
+            <div class="dock-btn hoverable" onclick="location.reload()">🏠</div>
+            <div class="dock-btn hoverable" onclick="OS.toggle('search-layer')">🔍</div>
+            <div class="dock-btn hoverable" onclick="OS.openProxy('https://cineby.gd')">🎬</div>
+            <div class="dock-btn hoverable" onclick="OS.toggle('term-layer')">⚙️</div>
         </div>
     </div>
 
     <script>
-        class NebulaApex {
+        class NebulaHorizon {
             constructor() {
                 this.m = { x: 0, y: 0, rx: 0, ry: 0 };
                 this.init();
             }
 
             init() {
-                this.setupInput();
-                this.setupGraphics();
+                this.setupMouse();
+                this.setupStars();
                 window.onkeydown = (e) => {
-                    if(e.altKey && e.key === 't') this.toggleLayer('win-term');
-                    if(e.key === 'Escape') {
-                        document.querySelectorAll('.system-layer').forEach(l => {
-                            if(l.classList.contains('active')) this.toggleLayer(l.id);
-                        });
-                    }
+                    if(e.altKey && e.key === 't') this.toggle('term-layer');
+                    if(e.key === 'Escape') this.closeAll();
                 };
             }
 
-            setupInput() {
+            setupMouse() {
                 const r = document.documentElement;
                 window.onmousemove = (e) => {
                     this.m.x = e.clientX; this.m.y = e.clientY;
                     r.style.setProperty('--m-x', `${this.m.x}px`);
                     r.style.setProperty('--m-y', `${this.m.y}px`);
                 };
-                const sync = () => {
+                const lerp = () => {
                     this.m.rx += (this.m.x - this.m.rx) * 0.15;
                     this.m.ry += (this.m.y - this.m.ry) * 0.15;
                     r.style.setProperty('--r-x', `${this.m.rx}px`);
                     r.style.setProperty('--r-y', `${this.m.ry}px`);
-                    requestAnimationFrame(sync);
+                    requestAnimationFrame(lerp);
                 };
-                sync();
+                lerp();
                 document.onmouseover = (e) => {
                     if(e.target.classList.contains('hoverable')) document.body.classList.add('hover-state');
                     else document.body.classList.remove('hover-state');
@@ -161,9 +156,8 @@
             }
 
             validate() {
-                const val = document.getElementById('user-id').value;
-                if(!val) return;
-                document.getElementById('hero-name').innerText = val.toUpperCase();
+                const name = document.getElementById('user-in').value || "ZAP";
+                document.getElementById('hero-title').innerText = name.toUpperCase();
                 document.getElementById('gate').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('gate').style.display = 'none';
@@ -177,75 +171,76 @@
                 setTimeout(() => { d.style.opacity = '1'; dw.style.opacity = '1'; }, 100);
             }
 
-            toggleLayer(id) {
-                const l = document.getElementById(id);
-                if(l.classList.contains('active')) {
-                    l.classList.remove('active');
-                    setTimeout(() => l.style.display = 'none', 400);
+            toggle(id) {
+                const el = document.getElementById(id);
+                if(el.classList.contains('active')) {
+                    el.classList.remove('active');
+                    setTimeout(() => el.style.display = 'none', 500);
                 } else {
-                    l.style.display = 'flex';
+                    el.style.display = 'flex';
                     setTimeout(() => {
-                        l.classList.add('active');
-                        const input = l.querySelector('input');
+                        el.classList.add('active');
+                        const input = el.querySelector('input');
                         if(input) input.focus();
                     }, 10);
                 }
             }
 
+            closeAll() {
+                document.querySelectorAll('.layer').forEach(l => {
+                    if(l.classList.contains('active')) this.toggle(l.id);
+                });
+            }
+
             runSearch() {
-                let v = document.getElementById('search-in').value;
+                let v = document.getElementById('search-field').value;
                 if(!v) return;
                 if(!v.includes('.')) v = 'https://google.com/search?q=' + v;
                 else if(!v.startsWith('http')) v = 'https://' + v;
                 this.openProxy(v);
-                this.toggleLayer('win-search');
+                this.toggle('search-layer');
             }
 
             openProxy(url) {
-                const p = document.getElementById('proxy-wrap');
                 document.getElementById('proxy-frame').src = url;
-                p.classList.add('open');
+                document.getElementById('proxy-layer').classList.add('active');
             }
 
             closeProxy() {
-                document.getElementById('proxy-wrap').classList.remove('open');
-                setTimeout(() => document.getElementById('proxy-frame').src = '', 1000);
+                document.getElementById('proxy-layer').classList.remove('active');
+                setTimeout(() => document.getElementById('proxy-frame').src = '', 800);
             }
 
             handleTerm(e) {
                 if(e.key === 'Enter') {
                     const cmd = e.target.value.trim().toLowerCase();
-                    const log = document.getElementById('term-log');
+                    const out = document.getElementById('term-out');
                     let res = "";
 
-                    if(cmd === 'help') res = "COMMANDS: help, clear, theme [color], exit";
+                    if(cmd === 'help') res = "AVAILABLE: help, clear, exit, theme [color]";
+                    else if(cmd === 'clear') { out.innerHTML = "Console cleared."; e.target.value = ""; return; }
+                    else if(cmd === 'exit') { this.toggle('term-layer'); e.target.value = ""; return; }
                     else if(cmd.startsWith('theme ')) {
-                        const color = cmd.split(' ')[1];
-                        document.documentElement.style.setProperty('--theme-main', color);
-                        res = `Theme adjusted to ${color}`;
-                    } else if(cmd === 'clear') {
-                        log.innerHTML = "Console cleared."; e.target.value = ""; return;
-                    } else if(cmd === 'exit') {
-                        this.toggleLayer('win-term'); e.target.value = ""; return;
-                    } else {
-                        res = "Unknown Command.";
-                    }
+                        const c = cmd.split(' ')[1];
+                        document.documentElement.style.setProperty('--theme-main', c);
+                        res = "Theme color updated.";
+                    } else res = "Error: Unknown Command.";
 
-                    log.innerHTML += `<br><span class="text-white">> ${cmd}</span><br>${res}`;
+                    out.innerHTML += `<br><span class="text-white">> ${cmd}</span><br>${res}`;
                     e.target.value = "";
-                    log.scrollTop = log.scrollHeight;
+                    out.scrollTop = out.scrollHeight;
                 }
             }
 
-            setupGraphics() {
+            setupStars() {
                 const c = document.getElementById('stars');
                 const ctx = c.getContext('2d');
                 let pts = [];
                 const res = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
                 window.onresize = res; res();
-                for(let i=0; i<180; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*1.5});
+                for(let i=0; i<150; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*1.5});
                 const draw = () => {
-                    ctx.fillStyle = '#010101'; ctx.fillRect(0,0,c.width,c.height);
+                    ctx.fillStyle = '#000'; ctx.fillRect(0,0,c.width,c.height);
                     ctx.fillStyle = '#fff';
                     pts.forEach(p => {
                         ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill();
@@ -257,7 +252,7 @@
             }
         }
 
-        const OS = new NebulaApex();
+        const OS = new NebulaHorizon();
     </script>
 </body>
 </html>
