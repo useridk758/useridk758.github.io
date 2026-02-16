@@ -19,24 +19,40 @@
         * { 
             margin: 0; padding: 0; box-sizing: border-box; 
             cursor: none !important; user-select: none; 
-            transition: all 0.4s var(--ease);
         }
         
         body { background: #000; color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
+
+        /* --- HOVER PHYSICS --- */
+        .hoverable { transition: transform 0.4s var(--ease), filter 0.3s ease, background 0.3s ease; }
+        .hoverable:hover { transform: scale(1.05); }
+        
+        .btn { 
+            transition: all 0.4s var(--ease); 
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn:hover { 
+            transform: translateY(-12px) scale(1.18); 
+            border-color: var(--theme-main); 
+            box-shadow: 0 15px 35px -5px var(--theme-main);
+            background: rgba(255,255,255,0.05);
+        }
 
         /* --- LAYERS --- */
         .layer { 
             position: fixed; inset: 0; z-index: 8000; display: none; 
             align-items: center; justify-content: center; opacity: 0; 
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(0px);
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(0px);
             transition: opacity 0.5s var(--ease), backdrop-filter 0.5s var(--ease);
         }
-        .layer.active { display: flex; opacity: 1; backdrop-filter: blur(40px); }
+        .layer.active { display: flex; opacity: 1; backdrop-filter: blur(45px); }
+        .layer-content { transform: scale(0.9); transition: 0.6s var(--ease); }
+        .layer.active .layer-content { transform: scale(1); }
 
         /* --- HERO --- */
         .hero { 
             font-size: clamp(3rem, 15vw, 18vh); font-weight: 900; font-style: italic;
-            text-transform: uppercase; text-align: center; line-height: 1.1; padding-bottom: 20px;
+            text-transform: uppercase; text-align: center; line-height: 1.2;
             background: linear-gradient(180deg, #fff 20%, #444 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 0 30px var(--theme-main));
@@ -44,31 +60,33 @@
 
         /* --- CONTEXT MENU --- */
         #context-menu {
-            position: fixed; z-index: 10001; width: 160px; background: rgba(10,10,10,0.95); 
+            position: fixed; z-index: 10001; width: 150px; background: rgba(10,10,10,0.95); 
             backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); 
             border-radius: 8px; padding: 4px; pointer-events: none; opacity: 0; transform: scale(0.9);
+            transition: opacity 0.2s ease, transform 0.2s var(--ease);
         }
         #context-menu.active { opacity: 1; transform: scale(1); pointer-events: all; }
         .menu-item { 
-            padding: 10px 12px; border-radius: 6px; display: flex; justify-content: space-between; 
-            align-items: center; font-size: 10px; font-weight: 900; color: #fff; text-transform: uppercase;
+            padding: 8px 10px; border-radius: 5px; display: flex; justify-content: space-between; 
+            align-items: center; font-size: 10px; font-weight: 900; color: #fff;
         }
         .menu-item:hover { background: var(--theme-main); }
 
         /* --- SETTINGS --- */
         #settings-panel { 
-            position: fixed; right: -400px; top: 0; width: 320px; height: 100vh; 
+            position: fixed; right: -400px; top: 0; width: 300px; height: 100vh; 
             background: rgba(10,10,10,0.98); backdrop-filter: blur(40px); z-index: 9000; 
-            border-left: 1px solid rgba(255,255,255,0.1); padding: 50px 20px; 
+            border-left: 1px solid rgba(255,255,255,0.1); padding: 50px 20px;
+            transition: right 0.6s var(--ease);
         }
         #settings-panel.active { right: 0; }
-        .setting-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; font-size: 11px; width: 100%; color: #fff; outline: none; margin-bottom: 12px; }
-        .setting-input:focus { border-color: var(--theme-main); background: rgba(255,255,255,0.08); }
+        .setting-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; font-size: 11px; width: 100%; color: #fff; outline: none; margin-bottom: 12px; transition: 0.3s; }
+        .setting-input:focus { border-color: var(--theme-main); background: rgba(255,255,255,0.1); }
 
         /* --- CURSOR --- */
         #c-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10005; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); }
-        #c-ring { position: fixed; top: 0; left: 0; width: 35px; height: 35px; border: 1.5px solid var(--theme-main); border-radius: 50%; z-index: 10004; pointer-events: none; transform: translate3d(calc(var(--r-x) - 15px), calc(var(--r-y) - 15px), 0); mix-blend-mode: difference; }
-        .hover-state #c-ring { width: 50px; height: 50px; border-color: #fff; }
+        #c-ring { position: fixed; top: 0; left: 0; width: 35px; height: 35px; border: 1.5px solid var(--theme-main); border-radius: 50%; z-index: 10004; pointer-events: none; transform: translate3d(calc(var(--r-x) - 15px), calc(var(--r-y) - 15px), 0); mix-blend-mode: difference; transition: width 0.3s, height 0.3s, border-color 0.3s; }
+        .hover-state #c-ring { width: 55px; height: 55px; border-color: #fff; }
     </style>
 </head>
 <body>
@@ -79,22 +97,24 @@
 
     <div id="context-menu">
         <div class="menu-item hoverable" onclick="OS.closeAll()"><span>HOME</span><span>🏠</span></div>
-        <div class="menu-item hoverable" onclick="OS.toggleLayer('search-layer', event)"><span>SEARCH</span><span>🔍</span></div>
-        <div class="menu-item hoverable" onclick="OS.toggleSettings(event)"><span>SETTINGS</span><span>⚙️</span></div>
+        <div class="menu-item hoverable" onclick="OS.toggleLayer('search-layer')"><span>SEARCH</span><span>🔍</span></div>
+        <div class="menu-item hoverable" onclick="OS.toggleSettings()"><span>SETTINGS</span><span>⚙️</span></div>
         <div class="border-t border-white/5 my-2"></div>
         <div class="menu-item text-rose-500 hoverable" onclick="location.reload()"><span>REBOOT</span><span>🔄</span></div>
     </div>
 
     <div id="gate" class="fixed inset-0 bg-black z-[10000] flex items-center justify-center transition-opacity duration-1000">
-        <input type="text" id="user-in" class="bg-transparent border-none text-7xl font-black text-center outline-none w-full hoverable placeholder-white/5" placeholder="NAME" onkeypress="if(event.key==='Enter')OS.validate()">
+        <div class="text-center w-full">
+            <input type="text" id="user-in" class="bg-transparent border-none text-7xl font-black text-center outline-none w-full hoverable placeholder-white/5 uppercase" placeholder="NAME" onkeypress="if(event.key==='Enter')OS.validate()">
+        </div>
     </div>
 
     <aside id="settings-panel">
         <h2 class="text-xl font-black italic mb-8 tracking-tighter">PREFERENCES</h2>
-        <input type="text" id="cloak-name" class="setting-input hoverable" placeholder="Cloak Title" onkeypress="if(event.key==='Enter')OS.saveSettings()">
+        <input type="text" id="cloak-name" class="setting-input hoverable" placeholder="Tab Title" onkeypress="if(event.key==='Enter')OS.saveSettings()">
         <input type="text" id="cloak-icon" class="setting-input hoverable" placeholder="Favicon URL" onkeypress="if(event.key==='Enter')OS.saveSettings()">
 
-        <p class="text-[9px] font-black uppercase tracking-widest text-white/30 mt-6 mb-4">Themes</p>
+        <p class="text-[10px] font-black uppercase tracking-widest text-white/30 mt-6 mb-4">Themes</p>
         <div class="grid grid-cols-4 gap-2 mb-8">
             <div class="h-8 rounded bg-blue-600 hoverable" onclick="OS.setTheme('#3b82f6')"></div>
             <div class="h-8 rounded bg-rose-600 hoverable" onclick="OS.setTheme('#e11d48')"></div>
@@ -102,18 +122,18 @@
             <div class="h-8 rounded bg-orange-500 hoverable" onclick="OS.setTheme('#f97316')"></div>
         </div>
 
-        <button class="w-full py-4 bg-white text-black rounded-xl font-black text-[10px] uppercase tracking-widest hoverable" onclick="OS.saveSettings()">Apply & Close</button>
+        <button class="w-full py-4 bg-white text-black rounded-xl font-black text-[10px] uppercase tracking-widest hoverable" onclick="OS.saveSettings()">Save Configuration</button>
     </aside>
 
     <div id="search-layer" class="layer" onclick="OS.closeAll()">
-        <div class="w-full max-w-4xl text-center px-10" onclick="event.stopPropagation()">
-            <input type="text" id="search-field" class="bg-transparent border-none border-b-4 border-white/10 w-full text-8xl font-black text-center outline-none py-10 hoverable focus:border-white transition-all uppercase" placeholder="SEARCH" onkeypress="if(event.key==='Enter')OS.runSearch()">
+        <div class="layer-content w-full max-w-4xl text-center px-10" onclick="event.stopPropagation()">
+            <input type="text" id="search-field" class="bg-transparent border-none border-b-4 border-white/10 w-full text-8xl font-black text-center outline-none py-10 hoverable focus:border-white transition-all uppercase" placeholder="URL / SEARCH" onkeypress="if(event.key==='Enter')OS.runSearch()">
         </div>
     </div>
 
     <div id="term-layer" class="layer" onclick="OS.closeAll()">
-        <div class="w-full max-w-2xl bg-black border border-white/10 rounded-3xl overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
-            <div id="term-out" class="p-6 h-64 font-mono text-blue-400 text-xs">Kernel v11.7.</div>
+        <div class="layer-content w-full max-w-2xl bg-black border border-white/10 rounded-3xl overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
+            <div id="term-out" class="p-6 h-64 font-mono text-blue-400 text-xs leading-relaxed">System Shield Active. Shortcut: Alt+T.</div>
             <div class="p-4 bg-black flex gap-3 border-t border-white/5">
                 <span class="text-blue-500 font-bold">$</span>
                 <input type="text" id="term-in" class="bg-transparent border-none outline-none text-white font-mono w-full" onkeypress="OS.handleTerm(event)">
@@ -126,11 +146,11 @@
     </main>
 
     <div id="dock-wrap" class="fixed bottom-[-100px] left-1/2 -translate-x-1/2 z-[1000] transition-all duration-700">
-        <div class="flex gap-4 p-3 bg-white/5 border border-white/10 rounded-[24px] backdrop-blur-xl">
-            <div class="btn w-[54px] h-[54px] bg-[#111] rounded-2xl flex items-center justify-center text-xl hoverable" onclick="OS.closeAll()">🏠</div>
-            <div class="btn w-[54px] h-[54px] bg-[#111] rounded-2xl flex items-center justify-center text-xl hoverable" onclick="OS.toggleLayer('search-layer', event)">🔍</div>
-            <div class="btn w-[54px] h-[54px] bg-[#111] rounded-2xl flex items-center justify-center text-xl hoverable" onclick="OS.toggleSettings(event)">⚙️</div>
-            <div class="btn w-[54px] h-[54px] bg-[#111] rounded-2xl flex items-center justify-center text-xl hoverable" onclick="OS.runSearch('https://google.com')">🌐</div>
+        <div class="flex gap-4 p-3 bg-white/5 border border-white/10 rounded-[28px] backdrop-blur-xl">
+            <div class="btn w-[56px] h-[56px] bg-[#0a0a0a] rounded-2xl flex items-center justify-center text-xl hoverable" onclick="OS.closeAll()">🏠</div>
+            <div class="btn w-[56px] h-[56px] bg-[#0a0a0a] rounded-2xl flex items-center justify-center text-xl hoverable" onclick="OS.toggleLayer('search-layer')">🔍</div>
+            <div class="btn w-[56px] h-[56px] bg-[#0a0a0a] rounded-2xl flex items-center justify-center text-xl hoverable" onclick="OS.toggleSettings()">⚙️</div>
+            <div class="btn w-[56px] h-[56px] bg-[#0a0a0a] rounded-2xl flex items-center justify-center text-xl hoverable" onclick="OS.runSearch('https://google.com')">🌐</div>
         </div>
     </div>
 
@@ -149,7 +169,7 @@
                 this.setupRightClick();
                 this.setupCloak();
                 window.onkeydown = (e) => {
-                    if(e.altKey && e.key === 't') { e.preventDefault(); e.stopImmediatePropagation(); this.toggleLayer('term-layer'); }
+                    if(e.altKey && e.key === 't') { e.preventDefault(); this.toggleLayer('term-layer'); }
                     if(e.key === 'Escape') this.closeAll();
                 };
             }
@@ -166,7 +186,7 @@
                     m.style.left = `${e.clientX}px`; m.style.top = `${e.clientY}px`;
                     m.classList.add('active');
                 };
-                window.onclick = () => document.getElementById('context-menu').classList.remove('active');
+                window.onmousedown = (e) => { if(!e.target.closest('#context-menu')) document.getElementById('context-menu').classList.remove('active'); };
             }
 
             setupMouse() {
@@ -201,8 +221,7 @@
                 }, 1000);
             }
 
-            toggleLayer(id, e) {
-                if(e) { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); }
+            toggleLayer(id) {
                 const el = document.getElementById(id);
                 if(el.classList.contains('active')) {
                     this.closeAll();
@@ -213,9 +232,9 @@
                 }
             }
 
-            toggleSettings(e) {
-                if(e) { e.preventDefault(); e.stopPropagation(); }
-                document.getElementById('settings-panel').classList.toggle('active');
+            toggleSettings() {
+                const s = document.getElementById('settings-panel');
+                s.classList.toggle('active');
             }
 
             saveSettings() {
@@ -223,7 +242,7 @@
                 const i = document.getElementById('cloak-icon').value;
                 if(n) this.savedTitle = n;
                 if(i) this.savedIcon = i;
-                this.toggleSettings();
+                document.getElementById('settings-panel').classList.remove('active');
             }
 
             setTheme(c) { document.documentElement.style.setProperty('--theme-main', c); }
