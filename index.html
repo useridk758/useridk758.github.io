@@ -12,211 +12,179 @@
             --accent: #00d2ff; 
             --bg: #000000;
             --card-bg: #111111;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; transition: var(--transition); }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; transition: all 0.2s ease; }
 
         body { 
             background: var(--bg); color: #fff; 
             font-family: 'Inter', sans-serif; 
             overflow: hidden; height: 100vh;
             background-image: 
-                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-            background-size: 50px 50px; /* Grid background matching screenshot */
+                linear-gradient(rgba(0,210,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,210,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
         }
 
-        /* --- PRECISION DOT CURSOR --- */
         #cursor {
             position: fixed; width: 6px; height: 6px; background: var(--accent);
             border-radius: 50%; z-index: 10000000; pointer-events: none;
             box-shadow: 0 0 15px var(--accent); transform: translate(-50%, -50%);
-            transition: transform 0.05s linear;
         }
 
-        /* --- BOOT / SETTINGS OVERHAUL --- */
-        #boot-screen { 
-            position: fixed; inset: 0; background: #000; z-index: 99999; 
-            display: flex; align-items: center; justify-content: center; 
-        }
-        .boot-box { width: 400px; text-align: center; }
-        
-        /* --- MAIN UI --- */
-        #nebula-text { 
-            font-size: 8vw; font-weight: 900; letter-spacing: -0.05em; 
-            filter: drop-shadow(0 0 30px rgba(0,210,255,0.3));
-        }
-
-        /* --- DOCK (SHRUNK) --- */
-        #dock { 
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
-            display: flex; gap: 8px; background: rgba(20,20,20,0.8);
-            padding: 8px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px); z-index: 1000;
-        }
-        .dock-btn { 
-            width: 40px; height: 40px; background: #111; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 16px; border: 1px solid #333;
-        }
-        .dock-btn:hover { background: var(--accent); color: #000; transform: translateY(-3px); }
-
-        /* --- GAMES GRID (MATCHING SCREENSHOT) --- */
-        .games-container {
-            width: 90%; max-width: 1400px; height: 80vh;
-            overflow-y: auto; padding: 20px;
-        }
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 15px;
-        }
-        .game-card {
-            background: var(--card-bg); border-radius: 12px;
-            overflow: hidden; border: 1px solid #222;
-            display: flex; flex-direction: column;
-        }
-        .game-card:hover { border-color: var(--accent); transform: scale(1.02); }
-        .game-thumb { aspect-ratio: 1/1; width: 100%; object-fit: cover; background: #222; }
-        .game-info { padding: 10px; }
-        .game-title { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .game-sub { font-size: 10px; color: #666; font-weight: 400; }
-
-        /* --- P*XIESS BAR --- */
-        .pxiess-wrapper { text-align: center; }
-        #pxiess-input {
-            width: 500px; padding: 20px; background: #111; border-radius: 12px;
-            border: 1px solid #333; outline: none; font-size: 18px; font-weight: 700;
-            color: var(--accent); text-align: center;
-        }
-
-        /* --- LAYERS --- */
+        /* --- UI COMPONENTS --- */
         .layer { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.98); 
             z-index: 5000; display: none; opacity: 0; 
-            align-items: center; justify-content: center; backdrop-filter: blur(20px);
+            align-items: center; justify-content: center; backdrop-filter: blur(25px);
         }
         .layer.active { display: flex; opacity: 1; }
 
+        /* --- GAMES GRID (GN-MATH STYLE) --- */
+        .games-container { width: 92%; max-width: 1400px; height: 85vh; overflow-y: auto; padding: 20px; }
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        .game-card {
+            background: #080808; border-radius: 10px; border: 1px solid #1a1a1a;
+            overflow: hidden; cursor: none;
+        }
+        .game-card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .game-thumb { aspect-ratio: 1/1; width: 100%; object-fit: cover; background: #111; }
+        .game-info { padding: 12px; }
+        .game-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* --- DOCK --- */
+        #dock { 
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+            display: flex; gap: 10px; background: rgba(10,10,10,0.9);
+            padding: 10px; border-radius: 20px; border: 1px solid #222; z-index: 1000;
+        }
+        .dock-btn { 
+            width: 45px; height: 45px; background: #151515; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 20px;
+        }
+        .dock-btn:hover { background: var(--accent); color: #000; transform: scale(1.1); }
+
         /* --- WORKSPACE --- */
         #workspace { position: fixed; inset: 0; z-index: 4000; display: none; background: #000; }
-        #workspace iframe { width: 100%; height: 100%; border: none; }
-        
-        .hud-top {
+        #view { width: 100%; height: 100%; border: none; }
+
+        .hud {
             position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 20px; background: #111; padding: 10px 30px;
-            border-radius: 12px; border: 1px solid #333; z-index: 6000; opacity: 0;
+            display: flex; gap: 25px; background: #111; padding: 12px 35px;
+            border-radius: 15px; border: 1px solid #333; z-index: 6000; opacity: 0; pointer-events: none;
         }
-        .hud-top.active { opacity: 1; }
+        .hud.active { opacity: 1; pointer-events: all; }
     </style>
 </head>
-<body oncontextmenu="OS.ctx(event)">
+<body oncontextmenu="return false">
 
     <div id="cursor"></div>
 
-    <div id="boot-screen">
-        <div class="boot-box">
-            <h1 class="text-6xl font-black italic mb-8">NEBULA</h1>
-            <input type="text" id="name-input" placeholder="USER ID..." class="bg-transparent border-b border-white/20 w-full p-3 outline-none mb-6 text-center text-xl font-bold uppercase">
-            <button onclick="OS.boot()" class="w-full py-4 bg-white text-black font-black rounded-lg hover:bg-cyan-400 transition-all uppercase tracking-tighter">Enter Session</button>
-            <p class="mt-4 text-[10px] text-white/30 font-bold tracking-[5px]">SYSTEM_v21.0</p>
+    <div id="boot-screen" class="fixed inset-0 bg-black z-[99999] flex items-center justify-center">
+        <div class="w-96 text-center">
+            <h1 class="text-7xl font-black italic mb-10 tracking-tighter">NEBULA</h1>
+            <input type="text" id="uid" placeholder="ACCESS KEY..." class="w-full bg-[#111] border border-[#222] p-4 rounded-xl mb-4 text-center text-lg font-bold">
+            <button onclick="OS.boot()" class="w-full py-4 bg-white text-black font-black rounded-xl hover:bg-[#00d2ff]">INITIALIZE</button>
+            <p class="text-[9px] mt-6 opacity-20 tracking-[10px] font-bold">GN-MATH ASSETS LOADED</p>
         </div>
     </div>
 
-    <main id="desktop" class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-1000">
-        <h1 id="nebula-text" class="italic">NEBULA</h1>
+    <main id="desktop" class="absolute inset-0 flex items-center justify-center opacity-0">
+        <h1 class="text-[12vw] font-black italic opacity-10">NEBULA</h1>
     </main>
+
+    <div id="pxiess-layer" class="layer" onclick="OS.close()">
+        <div class="text-center" onclick="event.stopPropagation()">
+            <h1 class="text-8xl font-black italic mb-8 tracking-tighter">P*XIESS</h1>
+            <input type="text" id="p-search" placeholder="UNFILTERED WEB ACCESS..." 
+                   class="w-[600px] bg-[#080808] border border-[#222] p-6 rounded-2xl text-2xl font-bold text-center outline-none focus:border-[#00d2ff]"
+                   onkeypress="if(event.key==='Enter')OS.launch(this.value)">
+        </div>
+    </div>
 
     <div id="games-layer" class="layer" onclick="OS.close()">
         <div class="games-container" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-3xl font-black italic">629 LESSONS</h2>
-                <div class="flex gap-2">
-                    <span class="px-4 py-2 bg-[#111] border border-[#333] rounded-lg text-[10px] font-bold">Sort A-Z</span>
-                    <span class="px-4 py-2 bg-[#111] border border-[#333] rounded-lg text-[10px] font-bold">Emulator</span>
-                </div>
+            <div class="flex justify-between items-end mb-10">
+                <h2 class="text-4xl font-black italic uppercase">The Library</h2>
+                <p class="text-xs font-bold text-white/40 uppercase tracking-widest">Assets: gn-math/repo</p>
             </div>
-            <div class="games-grid" id="game-inject"></div>
+            <div class="games-grid" id="game-inject">
+                </div>
         </div>
     </div>
 
-    <div id="pxiess-layer" class="layer" onclick="OS.close()">
-        <div class="pxiess-wrapper" onclick="event.stopPropagation()">
-            <h1 class="text-7xl font-black italic mb-10 tracking-tighter">P*XIESS</h1>
-            <input type="text" id="pxiess-input" placeholder="SEARCH WITH FREEDOM..." onkeypress="if(event.key==='Enter')OS.launch(this.value)">
-        </div>
-    </div>
-
-    <div class="hud-top" id="hud">
-        <button onclick="OS.home()" class="text-[10px] font-black hover:text-cyan-400">DASHBOARD</button>
-        <button onclick="OS.open('games')" class="text-[10px] font-black hover:text-cyan-400">GAMES</button>
-        <button onclick="OS.open('pxiess')" class="text-[10px] font-black hover:text-cyan-400">P*XIESS</button>
+    <div class="hud" id="hud">
+        <button onclick="OS.home()" class="text-[10px] font-black tracking-widest hover:text-[#00d2ff]">EXIT WORKSPACE</button>
+        <button onclick="OS.open('games')" class="text-[10px] font-black tracking-widest hover:text-[#00d2ff]">SWITCH GAME</button>
+        <button onclick="OS.open('pxiess')" class="text-[10px] font-black tracking-widest hover:text-[#00d2ff]">P*XIESS</button>
     </div>
 
     <div id="workspace"><iframe id="view"></iframe></div>
 
-    <div id="dock" class="opacity-0 translate-y-20 transition-all duration-700">
+    <div id="dock" class="opacity-0 translate-y-20">
         <div class="dock-btn" onclick="OS.home()">🏠</div>
-        <div class="dock-btn" onclick="OS.open('pxiess')">🔍</div>
+        <div class="dock-btn" onclick="OS.open('pxiess')">🌐</div>
         <div class="dock-btn" onclick="OS.open('games')">🎮</div>
-        <div class="dock-btn" onclick="OS.showBoot()">⚙️</div> </div>
+        <div class="dock-btn" onclick="OS.showSettings()">⚙️</div>
+    </div>
 
     <script>
-        // High-Density Database matching your recording
-        const GAMES = [
-            { n: "Bowmasters", s: "Azur Games", i: "https://images.crazygames.com/bowmasters/20231026111306/bowmasters-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=160&h=160&fit=crop", u: "https://html5games.com/game/Bowmasters" },
-            { n: "OvO", s: "Dedra Games", i: "https://images.crazygames.com/ovo/20201026111306/ovo-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=160&h=160&fit=crop", u: "https://html5games.com/game/Ovo" },
-            { n: "OvO 2", s: "Dedra Games", i: "https://images.crazygames.com/ovo-2/20230222101413/ovo-2-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=160&h=160&fit=crop", u: "https://html5games.com/game/Ovo-2" },
-            { n: "Friday Night Funkin", s: "ninja_muffin24", i: "https://images.crazygames.com/friday-night-funkin/20210512163457/friday-night-funkin-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=160&h=160&fit=crop", u: "https://html5games.com/game/Friday-Night-Funkin" },
-            { n: "Stickman Hook", s: "Madbox", i: "https://images.crazygames.com/stickman-hook/20240112101413/stickman-hook-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=160&h=160&fit=crop", u: "https://html5games.com/game/Stickman-Hook" },
-            { n: "Jetpack Joyride", s: "Halfbrick", i: "https://images.crazygames.com/jetpack-joyride/20210712163457/jetpack-joyride-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=160&h=160&fit=crop", u: "https://html5games.com/game/Jetpack-Joyride" },
-            { n: "Retro Bowl", s: "New Star Games", i: "https://images.crazygames.com/retro-bowl/20220204111306/retro-bowl-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=160&h=160&fit=crop", u: "https://html5games.com/game/Retro-Bowl" },
-            { n: "Slope", s: "cowegg", i: "https://images.crazygames.com/slope/20201026111306/slope-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=160&h=160&fit=crop", u: "https://html5games.com/game/Slope" },
-            { n: "1v1.LOL", s: "JustPlay", i: "https://images.crazygames.com/1v1-lol/20220913134354/1v1-lol-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=160&h=160&fit=crop", u: "https://1v1.lol" },
-            { n: "Tunnel Rush", s: "Deer Cat", i: "https://images.crazygames.com/tunnel-rush/20201026111306/tunnel-rush-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=160&h=160&fit=crop", u: "https://html5games.com/game/Tunnel-Rush" },
-            { n: "BitLife", s: "Candywriter", i: "https://images.crazygames.com/bitlife-life-simulator/20231127092955/bitlife-life-simulator-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=160&h=160&fit=crop", u: "https://html5games.com/game/BitLife" },
-            { n: "Vex 7", s: "Amazing Adam", i: "https://images.crazygames.com/vex-7/20221017101413/vex-7-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=160&h=160&fit=crop", u: "https://html5games.com/game/Vex-7" }
+        // GN-MATH ASSETS SOURCE (Logic mapped to the repo structure)
+        const ASSET_ROOT = "https://cdn.jsdelivr.net/gh/gn-math/assets@main/";
+        const REPO_GAMES = [
+            { n: "FNAF 1", u: "fnaf/1/index.html" },
+            { n: "FNAF 2", u: "fnaf/2/index.html" },
+            { n: "Ultrakill", u: "ports/ultrakill/index.html" },
+            { n: "Bendy", u: "ports/bendy/index.html" },
+            { n: "Undertale", u: "ports/undertale/index.html" },
+            { n: "Baldi", u: "ports/baldi/index.html" },
+            { n: "Buckshot", u: "ports/buckshot/index.html" },
+            { n: "Minecraft", u: "eagler/1.8/index.html" },
+            { n: "Retro Bowl", u: "games/retrobowl/index.html" },
+            { n: "Slope", u: "games/slope/index.html" },
+            { n: "1v1 LOL", u: "games/1v1lol/index.html" },
+            { n: "Subway Surf", u: "games/subwaysurfers/index.html" }
         ];
 
         const OS = {
             init() {
                 const dot = document.getElementById('cursor');
-                window.addEventListener('mousemove', (e) => {
+                window.addEventListener('mousemove', e => {
                     dot.style.left = e.clientX + 'px';
                     dot.style.top = e.clientY + 'px';
                 });
 
-                // Inject Grid
                 const grid = document.getElementById('game-inject');
-                GAMES.forEach(g => {
+                REPO_GAMES.forEach(g => {
                     const card = document.createElement('div');
                     card.className = "game-card";
                     card.innerHTML = `
-                        <img src="${g.i}" class="game-thumb">
+                        <img src="https://api.dicebear.com/7.x/shapes/svg?seed=${g.n}" class="game-thumb">
                         <div class="game-info">
                             <div class="game-title">${g.n}</div>
-                            <div class="game-sub">${g.s}</div>
                         </div>`;
-                    card.onclick = () => this.launch(g.u);
+                    card.onclick = () => this.launch(ASSET_ROOT + g.u);
                     grid.appendChild(card);
                 });
             },
 
             boot() {
-                if(!document.getElementById('name-input').value) return;
-                document.getElementById('boot-screen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('boot-screen').style.display = 'none';
-                    document.getElementById('desktop').style.opacity = '1';
-                    document.getElementById('dock').style.opacity = '1';
-                    document.getElementById('dock').style.transform = 'translateX(-50%) translateY(0)';
-                }, 500);
+                if(!document.getElementById('uid').value) return;
+                document.getElementById('boot-screen').style.display = 'none';
+                document.getElementById('desktop').style.opacity = '1';
+                document.getElementById('dock').style.opacity = '1';
+                document.getElementById('dock').style.transform = 'translateX(-50%) translateY(0)';
+                this.init();
             },
 
-            showBoot() {
+            showSettings() {
                 document.getElementById('boot-screen').style.display = 'flex';
-                document.getElementById('boot-screen').style.opacity = '1';
+                document.getElementById('desktop').style.opacity = '0';
+                document.getElementById('dock').style.opacity = '0';
             },
 
             open(id) {
@@ -229,14 +197,13 @@
             close() {
                 document.querySelectorAll('.layer').forEach(l => {
                     l.classList.remove('active');
-                    setTimeout(() => { if(!l.classList.contains('active')) l.style.display = 'none'; }, 300);
+                    setTimeout(() => { if(!l.classList.contains('active')) l.style.display = 'none'; }, 200);
                 });
             },
 
             launch(url) {
-                if(!url) return;
-                let t = url.includes('.') ? (url.startsWith('http') ? url : 'https://' + url) : 'https://www.google.com/search?q=' + encodeURIComponent(url);
-                document.getElementById('view').src = t;
+                let target = url.startsWith('http') ? url : 'https://www.google.com/search?q=' + encodeURIComponent(url);
+                document.getElementById('view').src = target;
                 document.getElementById('workspace').style.display = 'block';
                 document.getElementById('hud').classList.add('active');
                 this.close();
@@ -248,8 +215,6 @@
                 document.getElementById('hud').classList.remove('active');
             }
         };
-
-        window.onload = () => OS.init();
     </script>
 </body>
 </html>
