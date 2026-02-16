@@ -11,180 +11,208 @@
         :root { 
             --accent: #00d2ff; 
             --bg: #000000;
-            --card-bg: #111111;
+            --card: #0c0c0c;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; transition: all 0.2s ease; }
+        /* --- MOUSE SYSTEM --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+        
+        #dot {
+            position: fixed; width: 8px; height: 8px; background: var(--accent);
+            border-radius: 50%; z-index: 2147483647; pointer-events: none;
+            box-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent);
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, background 0.2s;
+            display: block !important; /* Force visibility */
+        }
 
         body { 
             background: var(--bg); color: #fff; 
             font-family: 'Inter', sans-serif; 
             overflow: hidden; height: 100vh;
-            background-image: 
-                linear-gradient(rgba(0,210,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,210,255,0.03) 1px, transparent 1px);
+            background-image: radial-gradient(circle at 2px 2px, rgba(0,210,255,0.05) 1px, transparent 0);
             background-size: 40px 40px;
         }
 
-        #cursor {
-            position: fixed; width: 6px; height: 6px; background: var(--accent);
-            border-radius: 50%; z-index: 10000000; pointer-events: none;
-            box-shadow: 0 0 15px var(--accent); transform: translate(-50%, -50%);
-        }
-
-        /* --- UI COMPONENTS --- */
+        /* --- LAYERS --- */
         .layer { 
             position: fixed; inset: 0; background: rgba(0,0,0,0.98); 
             z-index: 5000; display: none; opacity: 0; 
-            align-items: center; justify-content: center; backdrop-filter: blur(25px);
+            align-items: center; justify-content: center; backdrop-filter: blur(20px);
+            transition: var(--transition);
         }
         .layer.active { display: flex; opacity: 1; }
 
-        /* --- GAMES GRID (GN-MATH STYLE) --- */
-        .games-container { width: 92%; max-width: 1400px; height: 85vh; overflow-y: auto; padding: 20px; }
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 20px;
-        }
-        .game-card {
-            background: #080808; border-radius: 10px; border: 1px solid #1a1a1a;
-            overflow: hidden; cursor: none;
-        }
-        .game-card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .game-thumb { aspect-ratio: 1/1; width: 100%; object-fit: cover; background: #111; }
-        .game-info { padding: 12px; }
-        .game-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        /* --- DOCK --- */
+        /* --- NAVIGATION --- */
         #dock { 
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
-            display: flex; gap: 10px; background: rgba(10,10,10,0.9);
-            padding: 10px; border-radius: 20px; border: 1px solid #222; z-index: 1000;
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(100px); 
+            display: flex; gap: 10px; background: rgba(15,15,15,0.9);
+            padding: 8px 15px; border-radius: 18px; border: 1px solid #222; 
+            z-index: 10000; transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s;
+            opacity: 0;
         }
+        #dock.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        
         .dock-btn { 
-            width: 45px; height: 45px; background: #151515; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center; font-size: 20px;
+            width: 42px; height: 42px; background: #111; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 18px; border: 1px solid #333; transition: var(--transition);
         }
-        .dock-btn:hover { background: var(--accent); color: #000; transform: scale(1.1); }
+        .dock-btn:hover { background: var(--accent); color: #000; transform: translateY(-4px) scale(1.1); }
 
-        /* --- WORKSPACE --- */
+        /* --- GAMES MATRIX --- */
+        .g-container { width: 90%; max-width: 1300px; height: 80vh; overflow-y: auto; padding-right: 10px; }
+        .g-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        
+        .g-card { 
+            background: var(--card); border-radius: 12px; border: 1px solid #1a1a1a; 
+            overflow: hidden; transition: var(--transition); position: relative;
+        }
+        .g-card:hover { border-color: var(--accent); transform: scale(1.03); z-index: 5; }
+        .g-img { aspect-ratio: 1/1; width: 100%; object-fit: cover; background: #111; opacity: 0.8; }
+        .g-card:hover .g-img { opacity: 1; }
+        .g-label { padding: 10px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* --- HUD --- */
+        #hud {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 30px; background: #0a0a0a; padding: 12px 40px;
+            border-radius: 0 0 20px 20px; border: 1px solid #222; z-index: 15000;
+            transition: top 0.5s var(--transition);
+        }
+        #hud.active { top: 0; }
+
+        /* --- P*XIESS --- */
+        .p-input {
+            width: 550px; background: #080808; border: 1px solid #222;
+            padding: 22px; rounded-xl; text-align: center; font-size: 20px;
+            font-weight: 700; outline: none; color: var(--accent);
+            transition: var(--transition);
+        }
+        .p-input:focus { border-color: var(--accent); box-shadow: 0 0 30px rgba(0,210,255,0.2); }
+
         #workspace { position: fixed; inset: 0; z-index: 4000; display: none; background: #000; }
-        #view { width: 100%; height: 100%; border: none; }
-
-        .hud {
-            position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 25px; background: #111; padding: 12px 35px;
-            border-radius: 15px; border: 1px solid #333; z-index: 6000; opacity: 0; pointer-events: none;
-        }
-        .hud.active { opacity: 1; pointer-events: all; }
+        iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body oncontextmenu="return false">
 
-    <div id="cursor"></div>
+    <div id="dot"></div>
 
-    <div id="boot-screen" class="fixed inset-0 bg-black z-[99999] flex items-center justify-center">
-        <div class="w-96 text-center">
-            <h1 class="text-7xl font-black italic mb-10 tracking-tighter">NEBULA</h1>
-            <input type="text" id="uid" placeholder="ACCESS KEY..." class="w-full bg-[#111] border border-[#222] p-4 rounded-xl mb-4 text-center text-lg font-bold">
-            <button onclick="OS.boot()" class="w-full py-4 bg-white text-black font-black rounded-xl hover:bg-[#00d2ff]">INITIALIZE</button>
-            <p class="text-[9px] mt-6 opacity-20 tracking-[10px] font-bold">GN-MATH ASSETS LOADED</p>
+    <div id="boot" class="fixed inset-0 bg-black z-[100000] flex items-center justify-center transition-opacity duration-700">
+        <div class="w-80 text-center">
+            <h1 class="text-6xl font-black italic mb-8 tracking-tighter">NEBULA</h1>
+            <input type="text" id="uid" placeholder="IDENTIFY..." class="w-full bg-[#111] border border-[#222] p-4 rounded-xl mb-4 text-center text-sm font-bold tracking-widest outline-none focus:border-[#00d2ff]">
+            <button onclick="OS.boot()" class="w-full py-4 bg-white text-black font-black rounded-xl hover:bg-[#00d2ff] transition-all">INITIALIZE</button>
+            <p class="text-[8px] mt-6 opacity-20 tracking-[8px] font-black">ASSETS: GN-MATH/PROD</p>
         </div>
     </div>
 
-    <main id="desktop" class="absolute inset-0 flex items-center justify-center opacity-0">
-        <h1 class="text-[12vw] font-black italic opacity-10">NEBULA</h1>
+    <main id="main" class="absolute inset-0 flex items-center justify-center opacity-0 transition-all duration-1000 scale-95">
+        <h1 class="text-[10vw] font-black italic text-white/5 select-none">NEBULA</h1>
     </main>
 
     <div id="pxiess-layer" class="layer" onclick="OS.close()">
         <div class="text-center" onclick="event.stopPropagation()">
-            <h1 class="text-8xl font-black italic mb-8 tracking-tighter">P*XIESS</h1>
-            <input type="text" id="p-search" placeholder="UNFILTERED WEB ACCESS..." 
-                   class="w-[600px] bg-[#080808] border border-[#222] p-6 rounded-2xl text-2xl font-bold text-center outline-none focus:border-[#00d2ff]"
-                   onkeypress="if(event.key==='Enter')OS.launch(this.value)">
+            <h1 class="text-7xl font-black italic mb-8 tracking-tighter">P*XIESS</h1>
+            <input type="text" id="p-search" placeholder="ACCESS EXTERNAL NODES..." class="p-input" onkeypress="if(event.key==='Enter')OS.launch(this.value)">
         </div>
     </div>
 
     <div id="games-layer" class="layer" onclick="OS.close()">
-        <div class="games-container" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-end mb-10">
-                <h2 class="text-4xl font-black italic uppercase">The Library</h2>
-                <p class="text-xs font-bold text-white/40 uppercase tracking-widest">Assets: gn-math/repo</p>
-            </div>
-            <div class="games-grid" id="game-inject">
-                </div>
+        <div class="g-container" onclick="event.stopPropagation()">
+            <h2 class="text-2xl font-black italic mb-8 border-l-4 border-[#00d2ff] pl-4 uppercase">Archive_Assets</h2>
+            <div class="g-grid" id="g-inject"></div>
         </div>
     </div>
 
-    <div class="hud" id="hud">
-        <button onclick="OS.home()" class="text-[10px] font-black tracking-widest hover:text-[#00d2ff]">EXIT WORKSPACE</button>
-        <button onclick="OS.open('games')" class="text-[10px] font-black tracking-widest hover:text-[#00d2ff]">SWITCH GAME</button>
-        <button onclick="OS.open('pxiess')" class="text-[10px] font-black tracking-widest hover:text-[#00d2ff]">P*XIESS</button>
+    <div id="hud">
+        <button onclick="OS.home()" class="text-[10px] font-black hover:text-[#00d2ff] tracking-widest">CLOSE_SESSION</button>
+        <button onclick="OS.open('games')" class="text-[10px] font-black hover:text-[#00d2ff] tracking-widest">LIBRARY</button>
+        <button onclick="OS.open('pxiess')" class="text-[10px] font-black hover:text-[#00d2ff] tracking-widest">P*XIESS</button>
     </div>
 
     <div id="workspace"><iframe id="view"></iframe></div>
 
-    <div id="dock" class="opacity-0 translate-y-20">
+    <div id="dock">
         <div class="dock-btn" onclick="OS.home()">🏠</div>
         <div class="dock-btn" onclick="OS.open('pxiess')">🌐</div>
         <div class="dock-btn" onclick="OS.open('games')">🎮</div>
-        <div class="dock-btn" onclick="OS.showSettings()">⚙️</div>
+        <div class="dock-btn" onclick="OS.settings()">⚙️</div>
     </div>
 
     <script>
-        // GN-MATH ASSETS SOURCE (Logic mapped to the repo structure)
-        const ASSET_ROOT = "https://cdn.jsdelivr.net/gh/gn-math/assets@main/";
-        const REPO_GAMES = [
-            { n: "FNAF 1", u: "fnaf/1/index.html" },
-            { n: "FNAF 2", u: "fnaf/2/index.html" },
-            { n: "Ultrakill", u: "ports/ultrakill/index.html" },
-            { n: "Bendy", u: "ports/bendy/index.html" },
-            { n: "Undertale", u: "ports/undertale/index.html" },
-            { n: "Baldi", u: "ports/baldi/index.html" },
-            { n: "Buckshot", u: "ports/buckshot/index.html" },
-            { n: "Minecraft", u: "eagler/1.8/index.html" },
-            { n: "Retro Bowl", u: "games/retrobowl/index.html" },
-            { n: "Slope", u: "games/slope/index.html" },
-            { n: "1v1 LOL", u: "games/1v1lol/index.html" },
-            { n: "Subway Surf", u: "games/subwaysurfers/index.html" }
+        const ASSET_PATH = "https://cdn.jsdelivr.net/gh/gn-math/assets@main/";
+        
+        // Extended Library based on gn-math assets
+        const LIBRARY = [
+            { n: "FNAF 1", p: "fnaf/1/index.html" },
+            { n: "FNAF 2", p: "fnaf/2/index.html" },
+            { n: "Ultrakill", p: "ports/ultrakill/index.html" },
+            { n: "Bendy", p: "ports/bendy/index.html" },
+            { n: "Undertale", p: "ports/undertale/index.html" },
+            { n: "Buckshot", p: "ports/buckshot/index.html" },
+            { n: "Baldi", p: "ports/baldi/index.html" },
+            { n: "Minecraft", p: "eagler/1.8/index.html" },
+            { n: "Retro Bowl", p: "games/retrobowl/index.html" },
+            { n: "Slope", p: "games/slope/index.html" },
+            { n: "1v1 LOL", p: "games/1v1lol/index.html" },
+            { n: "Subway Surf", p: "games/subwaysurfers/index.html" },
+            { n: "Bitlife", p: "games/bitlife/index.html" },
+            { n: "Cookie Clicker", p: "games/cookieclicker/index.html" }
         ];
 
         const OS = {
             init() {
-                const dot = document.getElementById('cursor');
-                window.addEventListener('mousemove', e => {
+                // Mouse Follower
+                const dot = document.getElementById('dot');
+                document.addEventListener('mousemove', e => {
                     dot.style.left = e.clientX + 'px';
                     dot.style.top = e.clientY + 'px';
                 });
 
-                const grid = document.getElementById('game-inject');
-                REPO_GAMES.forEach(g => {
+                // Click Effect
+                document.addEventListener('mousedown', () => {
+                    dot.style.width = '15px';
+                    dot.style.height = '15px';
+                    dot.style.background = '#fff';
+                });
+                document.addEventListener('mouseup', () => {
+                    dot.style.width = '8px';
+                    dot.style.height = '8px';
+                    dot.style.background = 'var(--accent)';
+                });
+
+                // Inject Games
+                const grid = document.getElementById('g-inject');
+                LIBRARY.forEach(g => {
                     const card = document.createElement('div');
-                    card.className = "game-card";
+                    card.className = "g-card";
                     card.innerHTML = `
-                        <img src="https://api.dicebear.com/7.x/shapes/svg?seed=${g.n}" class="game-thumb">
-                        <div class="game-info">
-                            <div class="game-title">${g.n}</div>
-                        </div>`;
-                    card.onclick = () => this.launch(ASSET_ROOT + g.u);
+                        <img src="https://api.dicebear.com/7.x/identicon/svg?seed=${g.n}" class="g-img">
+                        <div class="g-label">${g.n}</div>
+                    `;
+                    card.onclick = () => this.launch(ASSET_PATH + g.p);
                     grid.appendChild(card);
                 });
             },
 
             boot() {
                 if(!document.getElementById('uid').value) return;
-                document.getElementById('boot-screen').style.display = 'none';
-                document.getElementById('desktop').style.opacity = '1';
-                document.getElementById('dock').style.opacity = '1';
-                document.getElementById('dock').style.transform = 'translateX(-50%) translateY(0)';
-                this.init();
+                document.getElementById('boot').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('boot').style.display = 'none';
+                    document.getElementById('main').style.opacity = '1';
+                    document.getElementById('main').style.transform = 'scale(1)';
+                    document.getElementById('dock').classList.add('show');
+                }, 700);
             },
 
-            showSettings() {
-                document.getElementById('boot-screen').style.display = 'flex';
-                document.getElementById('desktop').style.opacity = '0';
-                document.getElementById('dock').style.opacity = '0';
+            settings() {
+                document.getElementById('boot').style.display = 'flex';
+                setTimeout(() => document.getElementById('boot').style.opacity = '1', 10);
+                document.getElementById('dock').classList.remove('show');
             },
 
             open(id) {
@@ -197,7 +225,7 @@
             close() {
                 document.querySelectorAll('.layer').forEach(l => {
                     l.classList.remove('active');
-                    setTimeout(() => { if(!l.classList.contains('active')) l.style.display = 'none'; }, 200);
+                    setTimeout(() => { if(!l.classList.contains('active')) l.style.display = 'none'; }, 300);
                 });
             },
 
@@ -215,6 +243,9 @@
                 document.getElementById('hud').classList.remove('active');
             }
         };
+
+        // Start Mouse immediately
+        OS.init();
     </script>
 </body>
 </html>
