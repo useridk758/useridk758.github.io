@@ -13,7 +13,7 @@
         :root {
             --theme-main: #3b82f6;
             --m-x: 0px; --m-y: 0px; --r-x: 0px; --r-y: 0px;
-            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease: cubic-bezier(0.19, 1, 0.22, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; user-select: none; }
@@ -21,61 +21,63 @@
 
         /* --- HOVER PHYSICS --- */
         .btn { 
-            transition: all 0.3s var(--ease); 
-            border: 1px solid rgba(255,255,255,0.1);
-            will-change: transform;
+            transition: all 0.4s var(--ease); 
+            border: 1px solid rgba(255,255,255,0.08);
+            transform-origin: bottom;
+            will-change: transform, box-shadow;
         }
         .btn:hover { 
-            transform: translateY(-15px) scale(1.25); 
+            transform: translateY(-20px) scale(1.3); 
             border-color: var(--theme-main); 
-            box-shadow: 0 20px 40px -10px var(--theme-main);
-            background: rgba(255,255,255,0.05);
+            box-shadow: 0 25px 50px -12px var(--theme-main);
+            background: rgba(255,255,255,0.1);
         }
 
         /* --- LAYERS --- */
         .layer { 
             position: fixed; inset: 0; z-index: 8000; display: none; 
             align-items: center; justify-content: center; opacity: 0; 
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(0px);
-            transition: opacity 0.4s var(--ease), backdrop-filter 0.4s var(--ease);
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(0px);
+            transition: opacity 0.5s var(--ease), backdrop-filter 0.5s var(--ease);
         }
-        .layer.active { display: flex; opacity: 1; backdrop-filter: blur(50px); }
-        .layer-content { transform: translateY(30px); transition: 0.5s var(--ease); }
-        .layer.active .layer-content { transform: translateY(0); }
+        .layer.active { display: flex; opacity: 1; backdrop-filter: blur(60px); }
+        .layer-content { transform: scale(0.8) translateY(40px); transition: 0.6s var(--ease); }
+        .layer.active .layer-content { transform: scale(1) translateY(0); }
 
         /* --- HERO --- */
         .hero { 
-            font-size: clamp(3rem, 15vw, 18vh); font-weight: 900; font-style: italic;
-            text-transform: uppercase; text-align: center; line-height: 1.1;
-            background: linear-gradient(180deg, #fff 20%, #444 100%);
+            font-size: clamp(4rem, 18vw, 22vh); font-weight: 900; font-style: italic;
+            text-transform: uppercase; text-align: center; line-height: 0.9;
+            background: linear-gradient(180deg, #fff 30%, #333 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 30px var(--theme-main));
+            filter: drop-shadow(0 0 40px var(--theme-main));
         }
 
         /* --- CONTEXT MENU --- */
         #context-menu {
-            position: fixed; z-index: 10001; width: 150px; background: rgba(10,10,10,0.98); 
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 4px; 
+            position: fixed; z-index: 10001; width: 140px; background: #0a0a0a; 
+            border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 4px; 
             pointer-events: none; opacity: 0; transform: scale(0.9);
             transition: opacity 0.2s ease, transform 0.2s var(--ease);
         }
         #context-menu.active { opacity: 1; transform: scale(1); pointer-events: all; }
-        .menu-item { padding: 10px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; font-weight: 900; color: #fff; transition: 0.2s; }
+        .menu-item { padding: 8px 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 9px; font-weight: 900; color: #fff; text-transform: uppercase; transition: 0.2s; }
         .menu-item:hover { background: var(--theme-main); }
 
         /* --- SETTINGS --- */
         #settings-panel { 
-            position: fixed; right: -400px; top: 0; width: 300px; height: 100vh; 
-            background: #0a0a0a; border-left: 1px solid rgba(255,255,255,0.1); 
-            padding: 50px 20px; transition: right 0.5s var(--ease); z-index: 9000;
+            position: fixed; right: -400px; top: 0; width: 320px; height: 100vh; 
+            background: #080808; border-left: 1px solid rgba(255,255,255,0.1); 
+            padding: 60px 25px; transition: right 0.6s var(--ease); z-index: 9000;
         }
         #settings-panel.active { right: 0; }
-        .setting-input { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 14px; font-size: 11px; width: 100%; color: #fff; outline: none; margin-bottom: 15px; }
+        .setting-input { background: #111; border: 1px solid #222; border-radius: 8px; padding: 14px; font-size: 11px; width: 100%; color: #fff; outline: none; margin-bottom: 15px; }
         .setting-input:focus { border-color: var(--theme-main); }
 
         /* --- CURSOR --- */
         #c-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10005; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); }
         #c-ring { position: fixed; top: 0; left: 0; width: 35px; height: 35px; border: 1.5px solid var(--theme-main); border-radius: 50%; z-index: 10004; pointer-events: none; transform: translate3d(calc(var(--r-x) - 15px), calc(var(--r-y) - 15px), 0); mix-blend-mode: difference; transition: width 0.3s, height 0.3s; }
+        .hover-state #c-ring { width: 60px; height: 60px; border-color: #fff; }
     </style>
 </head>
 <body>
@@ -91,35 +93,37 @@
         <div class="menu-item text-rose-500" onclick="location.reload()"><span>REBOOT</span><span>🔄</span></div>
     </div>
 
-    <div id="gate" class="fixed inset-0 bg-black z-[10000] flex items-center justify-center transition-opacity duration-1000">
-        <input type="text" id="user-in" class="bg-transparent border-none text-7xl font-black text-center outline-none w-full placeholder-white/5 uppercase" placeholder="NAME" onkeypress="if(event.key==='Enter')OS.validate()">
+    <div id="gate" class="fixed inset-0 bg-black z-[10000] flex items-center justify-center">
+        <div class="text-center opacity-0 transition-opacity duration-1000" id="gate-content" style="opacity: 1;">
+            <input type="text" id="user-in" class="bg-transparent border-none text-8xl font-black text-center outline-none w-full placeholder-white/5 uppercase" placeholder="ENTER NAME" onkeypress="if(event.key==='Enter')OS.validate()">
+        </div>
     </div>
 
     <aside id="settings-panel">
-        <h2 class="text-xl font-black italic mb-10 tracking-tighter text-blue-500">SYSTEM</h2>
+        <h2 class="text-2xl font-black italic mb-10 tracking-tighter text-blue-500">SYSTEM</h2>
         <input type="text" id="cloak-name" class="setting-input" placeholder="Custom Tab Title" onkeypress="if(event.key==='Enter')OS.saveSettings()">
-        <input type="text" id="cloak-icon" class="setting-input" placeholder="Custom Favicon URL" onkeypress="if(event.key==='Enter')OS.saveSettings()">
+        <input type="text" id="cloak-icon" class="setting-input" placeholder="Favicon URL" onkeypress="if(event.key==='Enter')OS.saveSettings()">
         
         <p class="text-[10px] font-black uppercase tracking-widest text-white/20 mb-4 mt-8">Accent Color</p>
         <div class="grid grid-cols-4 gap-2 mb-10">
-            <div class="h-8 rounded bg-blue-600" onclick="OS.setTheme('#3b82f6')"></div>
-            <div class="h-8 rounded bg-rose-600" onclick="OS.setTheme('#e11d48')"></div>
-            <div class="h-8 rounded bg-emerald-600" onclick="OS.setTheme('#059669')"></div>
-            <div class="h-8 rounded bg-orange-500" onclick="OS.setTheme('#f97316')"></div>
+            <div class="h-10 rounded bg-blue-600" onclick="OS.setTheme('#3b82f6')"></div>
+            <div class="h-10 rounded bg-rose-600" onclick="OS.setTheme('#e11d48')"></div>
+            <div class="h-10 rounded bg-emerald-600" onclick="OS.setTheme('#059669')"></div>
+            <div class="h-10 rounded bg-orange-500" onclick="OS.setTheme('#f97316')"></div>
         </div>
-        <button class="w-full py-4 bg-white text-black rounded-xl font-black text-[10px] uppercase tracking-widest" onclick="OS.saveSettings()">Apply Changes</button>
+        <button class="w-full py-5 bg-white text-black rounded-xl font-black text-[11px] uppercase tracking-widest" onclick="OS.saveSettings()">Save & Exit</button>
     </aside>
 
     <div id="search-layer" class="layer" onclick="OS.closeAll()">
-        <div class="layer-content w-full max-w-4xl text-center px-10" onclick="event.stopPropagation()">
-            <input type="text" id="search-field" class="bg-transparent border-none border-b-4 border-white/10 w-full text-8xl font-black text-center outline-none py-10 focus:border-white transition-all uppercase" placeholder="SEARCH" onkeypress="if(event.key==='Enter')OS.runSearch()">
+        <div class="layer-content w-full max-w-5xl text-center px-10" onclick="event.stopPropagation()">
+            <input type="text" id="search-field" class="bg-transparent border-none border-b-8 border-white/10 w-full text-9xl font-black text-center outline-none py-10 focus:border-white transition-all uppercase" placeholder="URL / SEARCH" onkeypress="if(event.key==='Enter')OS.runSearch()">
         </div>
     </div>
 
     <div id="term-layer" class="layer" onclick="OS.closeAll()">
-        <div class="layer-content w-full max-w-2xl bg-black border border-white/10 rounded-3xl overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
-            <div id="term-out" class="p-8 h-72 font-mono text-blue-400 text-xs">Nebula Kernel v11.9. Type 'exit' to close.</div>
-            <div class="p-4 bg-[#050505] flex gap-3 border-t border-white/5">
+        <div class="layer-content w-full max-w-3xl bg-black border border-white/10 rounded-3xl overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
+            <div id="term-out" class="p-10 h-80 font-mono text-blue-400 text-sm leading-relaxed">Nebula OS Kernel [v12.0]. Active.</div>
+            <div class="p-5 bg-[#050505] flex gap-3 border-t border-white/5">
                 <span class="text-blue-500 font-bold">$</span>
                 <input type="text" id="term-in" class="bg-transparent border-none outline-none text-white font-mono w-full" onkeypress="OS.handleTerm(event)">
             </div>
@@ -130,12 +134,12 @@
         <h1 class="hero" id="hero-title">NEBULA</h1>
     </main>
 
-    <div id="dock-wrap" class="fixed bottom-[-100px] left-1/2 -translate-x-1/2 z-[1000] transition-all duration-700">
-        <div class="flex gap-5 p-4 bg-white/5 border border-white/10 rounded-[30px] backdrop-blur-2xl">
-            <div class="btn w-[60px] h-[60px] bg-[#0a0a0a] rounded-2xl flex items-center justify-center text-xl" onclick="OS.closeAll()">🏠</div>
-            <div class="btn w-[60px] h-[60px] bg-[#0a0a0a] rounded-2xl flex items-center justify-center text-xl" onclick="OS.openLayer('search-layer')">🔍</div>
-            <div class="btn w-[60px] h-[60px] bg-[#0a0a0a] rounded-2xl flex items-center justify-center text-xl" onclick="OS.openSettings()">⚙️</div>
-            <div class="btn w-[60px] h-[60px] bg-[#0a0a0a] rounded-2xl flex items-center justify-center text-xl" onclick="OS.runSearch('https://google.com')">🌐</div>
+    <div id="dock-wrap" class="fixed bottom-[-120px] left-1/2 -translate-x-1/2 z-[1000] transition-all duration-700">
+        <div class="flex gap-6 p-5 bg-white/5 border border-white/10 rounded-[35px] backdrop-blur-3xl">
+            <div class="btn w-[65px] h-[65px] bg-[#0a0a0a] rounded-2xl flex items-center justify-center text-2xl" onclick="OS.closeAll()">🏠</div>
+            <div class="btn w-[65px] h-[65px] bg-[#0a0a0a] rounded-2xl flex items-center justify-center text-2xl" onclick="OS.openLayer('search-layer')">🔍</div>
+            <div class="btn w-[65px] h-[65px] bg-[#0a0a0a] rounded-2xl flex items-center justify-center text-2xl" onclick="OS.openSettings()">⚙️</div>
+            <div class="btn w-[65px] h-[65px] bg-[#0a0a0a] rounded-2xl flex items-center justify-center text-2xl" onclick="OS.runSearch('https://google.com')">🌐</div>
         </div>
     </div>
 
@@ -145,6 +149,7 @@
                 this.m = { x: 0, y: 0, rx: 0, ry: 0 };
                 this.savedTitle = "NEBULA OS";
                 this.savedIcon = "https://cdn-icons-png.flaticon.com/512/606/606547.png";
+                this.isLayerOpen = false;
                 this.init();
             }
 
@@ -153,8 +158,8 @@
                 this.setupStars();
                 this.setupRightClick();
                 
-                // TAB CLOAK ENFORCER
-                setInterval(() => {
+                // HIGH-SPEED CLOAK REINFORCEMENT
+                const cloakLoop = () => {
                     if (document.hidden) {
                         document.title = this.savedTitle;
                         document.getElementById('os-favicon').href = this.savedIcon;
@@ -162,7 +167,9 @@
                         document.title = "NEBULA OS";
                         document.getElementById('os-favicon').href = "https://cdn-icons-png.flaticon.com/512/606/606547.png";
                     }
-                }, 200);
+                    requestAnimationFrame(cloakLoop);
+                };
+                cloakLoop();
 
                 window.onkeydown = (e) => {
                     if(e.altKey && e.key === 't') { e.preventDefault(); this.openLayer('term-layer'); }
@@ -177,7 +184,11 @@
                     m.style.left = `${e.clientX}px`; m.style.top = `${e.clientY}px`;
                     m.classList.add('active');
                 };
-                window.onmousedown = () => setTimeout(() => document.getElementById('context-menu').classList.remove('active'), 100);
+                window.onmousedown = (e) => {
+                    if (!e.target.closest('#context-menu')) {
+                        document.getElementById('context-menu').classList.remove('active');
+                    }
+                };
             }
 
             setupMouse() {
@@ -206,22 +217,22 @@
                     document.getElementById('gate').style.display = 'none';
                     document.getElementById('desktop').style.opacity = '1';
                     document.getElementById('desktop').style.transform = 'scale(1)';
-                    document.getElementById('dock-wrap').style.bottom = '40px';
+                    document.getElementById('dock-wrap').style.bottom = '50px';
                 }, 1000);
             }
 
             openLayer(id) {
-                this.closeAll();
+                this.isLayerOpen = true;
                 const el = document.getElementById(id);
                 el.style.display = 'flex';
                 setTimeout(() => {
                     el.classList.add('active');
                     el.querySelector('input')?.focus();
-                }, 50);
+                }, 10);
             }
 
             openSettings() {
-                this.closeAll();
+                this.isLayerOpen = true;
                 document.getElementById('settings-panel').classList.add('active');
             }
 
@@ -251,22 +262,22 @@
             }
 
             closeAll() {
+                this.isLayerOpen = false;
                 document.querySelectorAll('.layer').forEach(l => {
                     l.classList.remove('active');
-                    setTimeout(() => l.style.display = 'none', 500);
+                    setTimeout(() => { if(!this.isLayerOpen) l.style.display = 'none'; }, 500);
                 });
                 document.getElementById('settings-panel').classList.remove('active');
-                document.getElementById('context-menu').classList.remove('active');
             }
 
             setupStars() {
                 const c = document.getElementById('stars'); const ctx = c.getContext('2d');
                 let pts = []; const res = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
                 window.onresize = res; res();
-                for(let i=0; i<150; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*1.5});
+                for(let i=0; i<180; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*1.8});
                 const draw = () => {
                     ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle = '#fff';
-                    pts.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); p.y += 0.2; if(p.y > c.height) p.y = 0; });
+                    pts.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); p.y += 0.25; if(p.y > c.height) p.y = 0; });
                     requestAnimationFrame(draw);
                 };
                 draw();
