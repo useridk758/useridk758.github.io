@@ -7,7 +7,7 @@
     <link id="os-favicon" rel="icon" href="https://cdn-icons-png.flaticon.com/512/606/606547.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -19,25 +19,10 @@
         * { 
             margin: 0; padding: 0; box-sizing: border-box; 
             cursor: none !important; user-select: none; 
-            transition: all 0.5s var(--ease), border-color 0.3s ease, transform 0.4s var(--ease);
+            transition: all 0.4s var(--ease);
         }
         
         body { background: #000; color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
-
-        /* --- GATE --- */
-        #gate { 
-            position: fixed; inset: 0; background: #000; z-index: 10000; 
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        /* --- HERO --- */
-        .hero { 
-            font-size: clamp(3rem, 15vw, 18vh); font-weight: 900; font-style: italic;
-            text-transform: uppercase; text-align: center; line-height: 1.2; padding-bottom: 20px;
-            background: linear-gradient(180deg, #fff 20%, #444 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 30px var(--theme-main));
-        }
 
         /* --- LAYERS --- */
         .layer { 
@@ -46,35 +31,44 @@
             background: rgba(0,0,0,0.4); backdrop-filter: blur(0px);
             transition: opacity 0.5s var(--ease), backdrop-filter 0.5s var(--ease);
         }
-        .layer.active { display: flex; opacity: 1; backdrop-filter: blur(20px); }
+        .layer.active { display: flex; opacity: 1; backdrop-filter: blur(35px); }
+        .search-container { transform: scale(0.9); transition: 0.6s var(--ease); }
+        .layer.active .search-container { transform: scale(1); }
 
-        .search-container { transform: translateY(50px); transition: 0.6s var(--ease); }
-        .layer.active .search-container { transform: translateY(0); }
+        /* --- HERO & TEXT --- */
+        .hero { 
+            font-size: clamp(3rem, 15vw, 18vh); font-weight: 900; font-style: italic;
+            text-transform: uppercase; text-align: center; line-height: 1.4;
+            background: linear-gradient(180deg, #fff 20%, #444 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 30px var(--theme-main));
+        }
+
+        /* --- CONTEXT MENU (Compact & Bold) --- */
+        #context-menu {
+            position: fixed; z-index: 10001; width: 170px; background: rgba(10,10,10,0.9); 
+            backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 10px; padding: 5px; pointer-events: none; opacity: 0; transform: scale(0.95);
+        }
+        #context-menu.active { opacity: 1; transform: scale(1); pointer-events: all; }
+        .menu-item { 
+            padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; 
+            align-items: center; font-size: 11px; font-weight: 700; color: #eee;
+        }
+        .menu-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
 
         /* --- SETTINGS --- */
         #settings-panel { 
-            position: fixed; right: -400px; top: 0; width: 350px; height: 100vh; 
-            background: rgba(10,10,10,0.95); backdrop-filter: blur(40px); z-index: 9000; 
-            border-left: 1px solid rgba(255,255,255,0.1); padding: 60px 25px; 
+            position: fixed; right: -400px; top: 0; width: 320px; height: 100vh; 
+            background: rgba(10,10,10,0.98); backdrop-filter: blur(40px); z-index: 9000; 
+            border-left: 1px solid rgba(255,255,255,0.1); padding: 50px 20px; 
         }
         #settings-panel.active { right: 0; }
-        .setting-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; font-size: 11px; width: 100%; color: #fff; outline: none; margin-bottom: 15px; }
-
-        /* --- THEMES --- */
-        .swatch { width: 100%; height: 35px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
-        .swatch:hover { transform: scale(1.05); filter: brightness(1.2); }
-
-        /* --- CONTEXT MENU --- */
-        #context-menu {
-            position: fixed; z-index: 10001; width: 200px; background: rgba(10,10,10,0.9); 
-            backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 12px; padding: 6px; pointer-events: none; opacity: 0; transform: scale(0.9);
-        }
-        #context-menu.active { opacity: 1; transform: scale(1); pointer-events: all; }
+        .setting-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; font-size: 11px; width: 100%; color: #fff; outline: none; margin-bottom: 12px; }
 
         /* --- HOVER PHYSICS --- */
-        .hoverable:hover { transform: scale(1.02); }
-        .btn:hover { transform: translateY(-10px) scale(1.15); border-color: var(--theme-main); box-shadow: 0 10px 30px -5px var(--theme-main); }
+        .btn { transition: 0.3s var(--ease); }
+        .btn:hover { transform: translateY(-8px) scale(1.1); border-color: var(--theme-main); box-shadow: 0 10px 30px -5px var(--theme-main); }
 
         /* --- CURSOR --- */
         #c-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10005; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); }
@@ -88,52 +82,47 @@
     <div id="c-ring"></div>
 
     <div id="context-menu">
-        <div class="p-3 hover:bg-white/10 rounded-lg flex justify-between items-center hoverable" onclick="OS.closeAll()"><span>Home</span><span>🏠</span></div>
-        <div class="p-3 hover:bg-white/10 rounded-lg flex justify-between items-center hoverable" onclick="OS.toggleLayer('search-layer')"><span>Search</span><span>🔍</span></div>
-        <div class="p-3 hover:bg-white/10 rounded-lg flex justify-between items-center hoverable" onclick="OS.toggleSettings()"><span>Settings</span><span>⚙️</span></div>
+        <div class="menu-item hoverable" onclick="OS.closeAll()"><span>HOME</span><span>🏠</span></div>
+        <div class="menu-item hoverable" onclick="OS.toggleLayer('search-layer', event)"><span>SEARCH</span><span>🔍</span></div>
+        <div class="menu-item hoverable" onclick="OS.toggleSettings(event)"><span>SETTINGS</span><span>⚙️</span></div>
         <div class="border-t border-white/5 my-2"></div>
-        <div class="p-3 hover:bg-rose-600/20 hover:text-rose-400 rounded-lg flex justify-between items-center hoverable" onclick="location.reload()"><span>Reboot</span><span>🔄</span></div>
+        <div class="menu-item text-rose-400 hoverable" onclick="location.reload()"><span>REBOOT</span><span>🔄</span></div>
     </div>
 
-    <div id="gate">
-        <input type="text" id="user-in" class="bg-transparent border-none text-7xl font-black text-center outline-none w-full hoverable" placeholder="NAME" onkeypress="if(event.key==='Enter')OS.validate()">
+    <div id="gate" class="fixed inset-0 bg-black z-[10000] flex items-center justify-center transition-opacity duration-1000">
+        <input type="text" id="user-in" class="bg-transparent border-none text-7xl font-black text-center outline-none w-full hoverable placeholder-white/5" placeholder="NAME" onkeypress="if(event.key==='Enter')OS.validate()">
     </div>
 
     <aside id="settings-panel">
-        <h2 class="text-xl font-black italic mb-8 tracking-tighter">SYSTEM CONFIG</h2>
+        <h2 class="text-xl font-black italic mb-8 tracking-tighter">OS PREFERENCES</h2>
         
-        <label class="text-[10px] uppercase tracking-widest text-white/40 mb-2 block">Cloak Name</label>
-        <input type="text" id="cloak-name" class="setting-input hoverable" placeholder="e.g. Google Docs" onkeypress="if(event.key==='Enter')OS.saveSettings()">
+        <label class="text-[9px] uppercase tracking-widest text-white/30 mb-2 block font-bold">Cloak Title</label>
+        <input type="text" id="cloak-name" class="setting-input hoverable" placeholder="My Drive" onkeypress="if(event.key==='Enter')OS.saveSettings()">
         
-        <label class="text-[10px] uppercase tracking-widest text-white/40 mb-2 block">Favicon URL</label>
-        <input type="text" id="cloak-icon" class="setting-input hoverable" placeholder="https://..." onkeypress="if(event.key==='Enter')OS.saveSettings()">
+        <label class="text-[9px] uppercase tracking-widest text-white/30 mb-2 block font-bold">Cloak Favicon</label>
+        <input type="text" id="cloak-icon" class="setting-input hoverable" placeholder="URL to .ico/.png" onkeypress="if(event.key==='Enter')OS.saveSettings()">
 
-        <p class="text-[10px] uppercase tracking-widest text-white/40 mt-6 mb-4">Color Themes</p>
-        <div class="grid grid-cols-2 gap-2 mb-8">
-            <div class="swatch bg-blue-600 hoverable" onclick="OS.setTheme('#3b82f6')"></div>
-            <div class="swatch bg-rose-600 hoverable" onclick="OS.setTheme('#e11d48')"></div>
-            <div class="swatch bg-emerald-600 hoverable" onclick="OS.setTheme('#059669')"></div>
-            <div class="swatch bg-purple-600 hoverable" onclick="OS.setTheme('#9333ea')"></div>
+        <p class="text-[9px] uppercase tracking-widest text-white/30 mt-6 mb-4 font-bold">Accent Theme</p>
+        <div class="grid grid-cols-4 gap-2 mb-8">
+            <div class="h-8 rounded bg-blue-600 hoverable" onclick="OS.setTheme('#3b82f6')"></div>
+            <div class="h-8 rounded bg-rose-600 hoverable" onclick="OS.setTheme('#e11d48')"></div>
+            <div class="h-8 rounded bg-emerald-600 hoverable" onclick="OS.setTheme('#059669')"></div>
+            <div class="h-8 rounded bg-orange-500 hoverable" onclick="OS.setTheme('#f97316')"></div>
         </div>
 
-        <div class="flex justify-between items-center p-4 bg-white/5 rounded-xl mb-8 hoverable" onclick="OS.toggleOpt()">
-            <span class="text-xs font-bold">Performance Mode</span>
-            <div id="opt-status" class="text-[10px] font-black text-rose-500">OFF</div>
-        </div>
-
-        <button class="w-full py-4 bg-white text-black rounded-xl font-bold text-[10px] uppercase tracking-widest hoverable" onclick="OS.saveSettings()">Apply Changes</button>
+        <button class="w-full py-4 bg-white text-black rounded-xl font-black text-[10px] uppercase tracking-widest hoverable" onclick="OS.saveSettings()">Save & Close</button>
     </aside>
 
-    <div id="search-layer" class="layer">
-        <div class="search-container w-full max-w-4xl text-center px-10">
-            <input type="text" id="search-field" class="bg-transparent border-none border-b-2 border-white/10 w-full text-7xl font-black text-center outline-none py-10 hoverable focus:border-white transition-all" placeholder="URL / SEARCH" onkeypress="if(event.key==='Enter')OS.runSearch()">
-            <p class="text-[10px] tracking-[1.5em] text-white/20 mt-8">IMP PROXY READY</p>
+    <div id="search-layer" class="layer" onclick="OS.closeAll()">
+        <div class="search-container w-full max-w-4xl text-center px-10" onclick="event.stopPropagation()">
+            <input type="text" id="search-field" class="bg-transparent border-none border-b-4 border-white/10 w-full text-8xl font-black text-center outline-none py-10 hoverable focus:border-white transition-all uppercase" placeholder="SEARCH" onkeypress="if(event.key==='Enter')OS.runSearch()">
+            <p class="text-[11px] font-black tracking-[1.5em] text-white/20 mt-10">IMP PROXY ENGINE v2</p>
         </div>
     </div>
 
-    <div id="term-layer" class="layer">
-        <div class="w-full max-w-2xl bg-black/95 border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
-            <div id="term-out" class="p-6 h-64 font-mono text-blue-400 text-xs">Kernel v11.5 Online.</div>
+    <div id="term-layer" class="layer" onclick="OS.closeAll()">
+        <div class="w-full max-w-2xl bg-black/95 border border-white/10 rounded-3xl overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
+            <div id="term-out" class="p-6 h-64 font-mono text-blue-400 text-xs leading-relaxed">System Ready. Shortcut: Alt+T.</div>
             <div class="p-4 bg-black flex gap-3 border-t border-white/5">
                 <span class="text-blue-500 font-bold">$</span>
                 <input type="text" id="term-in" class="bg-transparent border-none outline-none text-white font-mono w-full" onkeypress="OS.handleTerm(event)">
@@ -141,16 +130,16 @@
         </div>
     </div>
 
-    <main id="desktop" class="absolute inset-0 flex items-center justify-center opacity-0 scale-110 pointer-events-none">
+    <main id="desktop" class="absolute inset-0 flex items-center justify-center opacity-0 scale-110 pointer-events-none transition-all duration-1000">
         <h1 class="hero" id="hero-title">NEBULA</h1>
     </main>
 
     <div id="dock-wrap" class="fixed bottom-[-100px] left-1/2 -translate-x-1/2 z-[1000] transition-all duration-700">
         <div class="flex gap-4 p-3 bg-white/5 border border-white/10 rounded-[24px] backdrop-blur-xl">
-            <div class="btn w-[52px] h-[52px] bg-[#111] rounded-2xl flex items-center justify-center text-xl hoverable" onclick="OS.closeAll()">🏠</div>
-            <div class="btn w-[52px] h-[52px] bg-[#111] rounded-2xl flex items-center justify-center text-xl hoverable" onclick="OS.toggleLayer('search-layer')">🔍</div>
-            <div class="btn w-[52px] h-[52px] bg-[#111] rounded-2xl flex items-center justify-center text-xl hoverable" onclick="OS.toggleSettings()">⚙️</div>
-            <div class="btn w-[52px] h-[52px] bg-[#111] rounded-2xl flex items-center justify-center text-xl hoverable" onclick="OS.runSearch('https://google.com')">🌐</div>
+            <div class="btn w-[54px] h-[54px] bg-[#111] rounded-2xl flex items-center justify-center text-xl hoverable" onclick="OS.closeAll()">🏠</div>
+            <div class="btn w-[54px] h-[54px] bg-[#111] rounded-2xl flex items-center justify-center text-xl hoverable" onclick="OS.toggleLayer('search-layer', event)">🔍</div>
+            <div class="btn w-[54px] h-[54px] bg-[#111] rounded-2xl flex items-center justify-center text-xl hoverable" onclick="OS.toggleSettings(event)">⚙️</div>
+            <div class="btn w-[54px] h-[54px] bg-[#111] rounded-2xl flex items-center justify-center text-xl hoverable" onclick="OS.runSearch('https://google.com')">🌐</div>
         </div>
     </div>
 
@@ -158,7 +147,8 @@
         class NebulaOS {
             constructor() {
                 this.m = { x: 0, y: 0, rx: 0, ry: 0 };
-                this.isOpt = false;
+                this.savedTitle = "NEBULA OS";
+                this.savedIcon = "https://cdn-icons-png.flaticon.com/512/606/606547.png";
                 this.init();
             }
 
@@ -166,19 +156,30 @@
                 this.setupMouse();
                 this.setupStars();
                 this.setupRightClick();
+                this.setupCloak();
                 window.onkeydown = (e) => {
-                    if(e.altKey && e.key === 't') this.toggleLayer('term-layer');
+                    if(e.altKey && e.key === 't') { e.preventDefault(); this.toggleLayer('term-layer', e); }
                     if(e.key === 'Escape') this.closeAll();
                 };
+            }
+
+            setupCloak() {
+                window.addEventListener('blur', () => {
+                    document.title = this.savedTitle;
+                    document.getElementById('os-favicon').href = this.savedIcon;
+                });
+                window.addEventListener('focus', () => {
+                    document.title = "NEBULA OS";
+                    document.getElementById('os-favicon').href = "https://cdn-icons-png.flaticon.com/512/606/606547.png";
+                });
             }
 
             setupRightClick() {
                 window.addEventListener('contextmenu', (e) => {
                     e.preventDefault();
-                    const menu = document.getElementById('context-menu');
-                    menu.style.left = `${e.clientX}px`;
-                    menu.style.top = `${e.clientY}px`;
-                    menu.classList.add('active');
+                    const m = document.getElementById('context-menu');
+                    m.style.left = `${e.clientX}px`; m.style.top = `${e.clientY}px`;
+                    m.classList.add('active');
                 });
                 window.addEventListener('click', () => document.getElementById('context-menu').classList.remove('active'));
             }
@@ -197,15 +198,15 @@
                     requestAnimationFrame(lerp);
                 };
                 lerp();
-                document.body.addEventListener('mouseover', (e) => {
+                document.body.onmouseover = (e) => {
                     if(e.target.classList.contains('hoverable')) document.body.classList.add('hover-state');
                     else document.body.classList.remove('hover-state');
-                });
+                };
             }
 
             validate() {
-                const name = document.getElementById('user-in').value || "NEBULA";
-                document.getElementById('hero-title').innerText = name.toUpperCase();
+                const n = document.getElementById('user-in').value || "NEBULA";
+                document.getElementById('hero-title').innerText = n.toUpperCase();
                 document.getElementById('gate').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('gate').style.display = 'none';
@@ -215,11 +216,11 @@
                 }, 1000);
             }
 
-            toggleLayer(id) {
+            toggleLayer(id, e) {
+                if(e) e.stopPropagation();
                 const el = document.getElementById(id);
                 if(el.classList.contains('active')) {
-                    el.classList.remove('active');
-                    setTimeout(() => el.style.display = 'none', 500);
+                    this.closeAll();
                 } else {
                     this.closeAll();
                     el.style.display = 'flex';
@@ -227,35 +228,32 @@
                 }
             }
 
-            toggleSettings() { document.getElementById('settings-panel').classList.toggle('active'); }
-            
+            toggleSettings(e) {
+                if(e) e.stopPropagation();
+                document.getElementById('settings-panel').classList.toggle('active');
+            }
+
             saveSettings() {
-                const name = document.getElementById('cloak-name').value;
-                const icon = document.getElementById('cloak-icon').value;
-                if(name) { document.title = name; this.savedTitle = name; }
-                if(icon) { document.getElementById('os-favicon').href = icon; this.savedIcon = icon; }
+                const n = document.getElementById('cloak-name').value;
+                const i = document.getElementById('cloak-icon').value;
+                if(n) this.savedTitle = n;
+                if(i) this.savedIcon = i;
                 this.toggleSettings();
             }
 
             setTheme(c) { document.documentElement.style.setProperty('--theme-main', c); }
 
-            toggleOpt() {
-                this.isOpt = !this.isOpt;
-                document.getElementById('opt-status').innerText = this.isOpt ? "ON" : "OFF";
-                document.getElementById('opt-status').style.color = this.isOpt ? "#10b981" : "#f43f5e";
-            }
-
             handleTerm(e) {
                 if(e.key === 'Enter') {
-                    const cmd = e.target.value.toLowerCase();
-                    if(cmd === 'exit') this.toggleLayer('term-layer');
-                    if(cmd === 'clear') document.getElementById('term-out').innerHTML = "";
+                    const c = e.target.value.toLowerCase();
+                    if(c === 'exit') this.closeAll();
+                    if(c === 'clear') document.getElementById('term-out').innerHTML = "";
                     e.target.value = "";
                 }
             }
 
-            runSearch(customUrl) {
-                let v = customUrl || document.getElementById('search-field').value;
+            runSearch(url) {
+                let v = url || document.getElementById('search-field').value;
                 if(!v) return;
                 v = v.includes('.') ? (v.startsWith('http') ? v : 'https://' + v) : 'https://google.com/search?q=' + v;
                 window.open(v, '_blank');
@@ -274,15 +272,10 @@
                 const c = document.getElementById('stars'); const ctx = c.getContext('2d');
                 let pts = []; const res = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
                 window.onresize = res; res();
-                for(let i=0; i<100; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*1.5});
+                for(let i=0; i<120; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*1.5});
                 const draw = () => {
-                    ctx.clearRect(0,0,c.width,c.height); 
-                    ctx.fillStyle = '#fff';
-                    const speed = this.isOpt ? 0.05 : 0.3;
-                    pts.forEach(p => { 
-                        ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); 
-                        p.y += speed; if(p.y > c.height) p.y = 0; 
-                    });
+                    ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle = '#fff';
+                    pts.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); p.y += 0.2; if(p.y > c.height) p.y = 0; });
                     requestAnimationFrame(draw);
                 };
                 draw();
