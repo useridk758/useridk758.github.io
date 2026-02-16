@@ -3,415 +3,416 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA OS | SUPERNOVA v18.0</title>
+    <title>NEBULA OS | QUANTUM v19.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     
     <style>
         :root { 
-            --theme: #00d2ff; 
-            --ease-main: cubic-bezier(0.16, 1, 0.3, 1); 
-            --m-x: 0; --m-y: 0; 
+            --nebula-blue: #00d2ff; 
+            --nebula-glow: rgba(0, 210, 255, 0.5);
+            --transition-speed: 0.6s;
+            --ease: cubic-bezier(0.2, 1, 0.3, 1);
         }
 
-        /* --- CORE SYSTEM ARCHITECTURE --- */
+        /* --- THE CORE FOUNDATION --- */
         * { 
             margin: 0; padding: 0; box-sizing: border-box; 
             font-style: normal !important; 
-            -webkit-user-drag: none;
-            user-select: none;
-            transition: all 0.6s var(--ease-main);
+            user-select: none; -webkit-user-drag: none;
+            transition: all var(--transition-speed) var(--ease);
         }
 
         body { 
             background: #000; color: #fff; 
             font-family: 'Inter', sans-serif; 
-            overflow: hidden; height: 100vh; 
-            perspective: 1000px;
+            overflow: hidden; height: 100vh;
+            perspective: 1200px;
         }
 
-        /* --- HARDWARE ACCELERATED CURSOR --- */
-        #cursor-ring { 
-            position: fixed; width: 40px; height: 40px; 
-            border: 2px solid var(--theme); border-radius: 50%; 
-            z-index: 999999; pointer-events: none; 
+        /* --- HIGH FIDELITY MOUSE HALO --- */
+        #cursor-halo { 
+            position: fixed; width: 45px; height: 45px; 
+            border: 2px solid var(--nebula-blue); border-radius: 50%; 
+            z-index: 9999999; pointer-events: none; 
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 20px var(--theme), inset 0 0 10px var(--theme);
-            transition: transform 0.1s ease-out, width 0.3s, height 0.3s, border-color 0.3s;
+            box-shadow: 0 0 20px var(--nebula-glow), inset 0 0 10px var(--nebula-glow);
+            transition: width 0.3s, height 0.3s, transform 0.08s ease-out;
+            mix-blend-mode: screen;
         }
+        body:active #cursor-halo { width: 30px; height: 30px; border-width: 4px; }
 
-        /* --- BOOT SEQUENCE STYLING --- */
-        #boot-screen { 
-            position: fixed; inset: 0; background: #000; z-index: 1000000; 
+        /* --- BOOT ARCHITECTURE --- */
+        #boot-portal { 
+            position: fixed; inset: 0; background: #000; z-index: 999999; 
             display: flex; align-items: center; justify-content: center; 
         }
-        .boot-modal { 
-            width: 600px; background: #050505; border: 1px solid #1a1a1a; 
-            padding: 70px; border-radius: 40px; position: relative;
-            box-shadow: 0 50px 100px rgba(0,0,0,0.9);
+        .boot-frame { 
+            width: 650px; background: #050505; border: 1px solid #1a1a1a; 
+            padding: 80px; border-radius: 40px; text-align: center;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
         }
-        .boot-modal:hover { border-color: var(--theme); }
+        .boot-frame:hover { border-color: var(--nebula-blue); }
         
-        .progress-rail { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
-        .progress-flow { width: 0%; height: 100%; background: var(--theme); box-shadow: 0 0 20px var(--theme); }
+        #boot-progress-container { margin-top: 40px; display: none; }
+        .rail { width: 100%; height: 2px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
+        .fill { width: 0%; height: 100%; background: var(--nebula-blue); box-shadow: 0 0 20px var(--nebula-blue); }
 
-        /* --- THE GAMES MATRIX (A-Z LAYOUT) --- */
+        /* --- THE MATRIX (GAMES A-Z) --- */
         .matrix-grid { 
             display: grid; 
             grid-template-cols: repeat(auto-fill, minmax(180px, 1fr)); 
-            gap: 20px; padding: 40px; 
+            gap: 25px; padding: 40px; 
         }
-        .matrix-item { 
-            aspect-ratio: 1; background: #080808; border-radius: 20px; 
+        .matrix-card { 
+            aspect-ratio: 1; background: #080808; border-radius: 25px; 
             overflow: hidden; position: relative; border: 1px solid #151515;
-            transform-style: preserve-3d;
+            cursor: pointer; transform-style: preserve-3d;
         }
-        .matrix-item:hover { 
-            transform: translateY(-15px) rotateX(5deg) rotateY(5deg);
-            outline: 2px solid #fff;
-            box-shadow: 0 30px 60px rgba(0, 210, 255, 0.25);
+        .matrix-card:hover { 
+            transform: translateY(-15px) rotateX(5deg);
+            outline: 3px solid #fff;
+            box-shadow: 0 30px 60px rgba(0, 210, 255, 0.3);
         }
-        .matrix-item img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: 0.8s; }
-        .matrix-item:hover img { opacity: 1; transform: scale(1.1); }
+        .matrix-card img { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; transition: 1s; }
+        .matrix-card:hover img { opacity: 1; transform: scale(1.1); }
         
-        .matrix-label { 
+        .matrix-info { 
             position: absolute; bottom: 0; width: 100%; 
             background: linear-gradient(transparent, #000 80%); 
-            padding: 30px 15px 10px; font-size: 11px; font-weight: 900; 
+            padding: 30px 15px 15px; font-size: 11px; font-weight: 900; 
             letter-spacing: 1px; text-transform: uppercase;
         }
 
-        /* --- HUD & NAVIGATION --- */
-        #top-hud { 
-            position: fixed; top: -150px; left: 50%; transform: translateX(-50%); 
-            z-index: 500000; display: flex; gap: 40px; 
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(25px); 
-            padding: 20px 60px; border-radius: 0 0 30px 30px; 
-            border: 1px solid #222; border-top: none;
-        }
-        #top-hud.active { top: 0; }
-        .hud-link { font-size: 10px; font-weight: 900; letter-spacing: 3px; color: #666; }
-        .hud-link:hover { color: var(--theme); text-shadow: 0 0 10px var(--theme); }
-
-        /* --- LAYERS --- */
-        .nebula-layer { 
+        /* --- SYSTEM LAYERS --- */
+        .nebula-panel { 
             position: fixed; inset: 0; background: rgba(0,0,0,0.98); 
-            z-index: 100000; display: none; opacity: 0; 
+            z-index: 500000; display: none; opacity: 0; 
             align-items: center; justify-content: center; 
+            backdrop-filter: blur(40px);
         }
-        .nebula-layer.active { display: flex; opacity: 1; }
+        .nebula-panel.active { display: flex; opacity: 1; }
+
+        /* --- THE DOCK --- */
+        #system-dock { 
+            position: fixed; bottom: -150px; left: 50%; transform: translateX(-50%); 
+            z-index: 800000; display: flex; gap: 20px; 
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+            padding: 12px 30px; border-radius: 35px; backdrop-filter: blur(20px);
+        }
+        .dock-icon { 
+            width: 55px; height: 55px; background: #0a0a0a; border-radius: 18px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 22px; border: 1px solid #1a1a1a; cursor: pointer;
+        }
+        .dock-icon:hover { 
+            transform: translateY(-10px) scale(1.2); 
+            border-color: var(--nebula-blue);
+            box-shadow: 0 10px 30px var(--nebula-glow);
+        }
+
+        /* --- WORKSPACE / HUD --- */
+        #workspace-layer { position: fixed; inset: 0; z-index: 100000; display: none; background: #000; }
+        #workspace-layer iframe { width: 100%; height: 100%; border: none; }
+        
+        #hud-nav { 
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%); 
+            z-index: 200000; display: flex; gap: 40px; 
+            background: #050505; border: 1px solid #222;
+            padding: 15px 60px; border-radius: 0 0 30px 30px;
+        }
+        #hud-nav.active { top: 0; }
 
         /* --- CONTEXT MENU --- */
-        #nebula-ctx { 
-            position: fixed; z-index: 2000000; background: #050505; 
+        #nebula-menu { 
+            position: fixed; z-index: 99999999; background: #080808; 
             border: 1px solid #222; border-radius: 15px; padding: 10px; 
-            width: 240px; opacity: 0; transform: scale(0.9); pointer-events: none;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            width: 250px; opacity: 0; transform: scale(0.9); pointer-events: none;
         }
-        #nebula-ctx.active { opacity: 1; transform: scale(1); pointer-events: all; }
-        .ctx-row { 
+        #nebula-menu.active { opacity: 1; transform: scale(1); pointer-events: all; }
+        .menu-item { 
             padding: 14px; font-size: 11px; font-weight: 900; border-radius: 10px; 
             display: flex; justify-content: space-between; align-items: center;
         }
-        .ctx-row:hover { background: var(--theme); color: #000; }
+        .menu-item:hover { background: var(--nebula-blue); color: #000; }
 
-        /* --- IFRAME WORKSPACE --- */
-        #engine-room { position: fixed; inset: 0; z-index: 50000; display: none; background: #000; }
-        #engine-room iframe { width: 100%; height: 100%; border: none; }
-
-        /* --- TRANSITION CLASSES --- */
-        .fade-out { opacity: 0 !important; pointer-events: none !important; }
-        .scale-in { transform: scale(1) !important; opacity: 1 !important; }
+        /* --- TERMINAL (ALT+T) --- */
+        #terminal-box { 
+            width: 800px; height: 500px; background: #000; 
+            border: 1px solid #1a1a1a; border-radius: 20px; padding: 30px; 
+            font-family: 'JetBrains Mono', monospace; box-shadow: 0 50px 100px rgba(0,0,0,0.9);
+        }
     </style>
 </head>
-<body oncontextmenu="Nebula.openCtx(event)">
+<body oncontextmenu="OS.openCtx(event)">
 
-    <canvas id="starfield" class="fixed inset-0 -z-10"></canvas>
-    <div id="cursor-ring"></div>
+    <canvas id="star-canvas" class="fixed inset-0 -z-10"></canvas>
+    <div id="cursor-halo"></div>
 
-    <div id="nebula-ctx">
-        <div class="ctx-row" onclick="Nebula.goHome()"><span>DASHBOARD</span><span>🏠</span></div>
-        <div class="ctx-row" onclick="Nebula.openLayer('archive-layer')"><span>GAMES ARCHIVE</span><span>🎮</span></div>
-        <div class="ctx-row" onclick="Nebula.openLayer('proxy-layer')"><span>NEBU SEARCH</span><span>🔍</span></div>
-        <div class="ctx-row" onclick="Nebula.openLayer('sys-layer')"><span>SYSTEM SETTINGS</span><span>⚙️</span></div>
+    <div id="nebula-menu">
+        <div class="menu-item" onclick="OS.home()"><span>RETURN HOME</span><span>🏠</span></div>
+        <div class="menu-item" onclick="OS.openPanel('archive-panel')"><span>GAME ARCHIVE</span><span>🎮</span></div>
+        <div class="menu-item" onclick="OS.openPanel('proxy-panel')"><span>PROXY SEARCH</span><span>🔍</span></div>
+        <div class="menu-item" onclick="OS.openPanel('settings-panel')"><span>SYSTEM SETTINGS</span><span>⚙️</span></div>
         <hr class="my-2 border-white/5">
-        <div class="ctx-row" onclick="location.reload()"><span>REBOOT</span><span>🔄</span></div>
+        <div class="menu-item text-red-500" onclick="location.reload()"><span>HARD REBOOT</span><span>🔄</span></div>
     </div>
 
-    <div id="boot-screen">
-        <div class="boot-modal">
-            <h1 class="text-6xl font-black italic tracking-tighter mb-2">NEBULA</h1>
-            <p class="text-[10px] font-black text-white/20 mb-10 tracking-[5px]">STABLE KERNEL v18.0.4</p>
+    <div id="boot-portal">
+        <div class="boot-frame">
+            <h1 class="text-7xl font-black italic tracking-tighter mb-2">NEBULA</h1>
+            <p class="text-[10px] font-black text-white/20 mb-12 tracking-[8px]">QUANTUM CORE v19.0</p>
             
-            <input type="text" id="id-input" placeholder="ENTER SYSTEM ID..." class="bg-transparent border-b-2 border-white/10 w-full p-4 outline-none mb-12 text-2xl font-black uppercase focus:border-cyan-400 transition-all">
+            <input type="text" id="user-id" placeholder="IDENTIFY..." class="bg-transparent border-b-2 border-white/10 w-full p-5 outline-none mb-10 text-3xl font-black uppercase text-center focus:border-cyan-400 transition-all">
             
-            <div id="boot-loader" class="hidden">
+            <button id="boot-btn" onclick="OS.startBootSequence()" class="w-full py-6 bg-white text-black font-black rounded-2xl hover:bg-cyan-400 transition-all uppercase tracking-widest text-lg">Initialize Session</button>
+            
+            <div id="boot-progress-container">
                 <div class="flex justify-between text-[10px] font-black text-cyan-400 mb-3 uppercase italic">
-                    <span id="boot-status">Initializing...</span>
+                    <span id="boot-text">Loading System...</span>
                     <span id="boot-pct">0%</span>
                 </div>
-                <div class="progress-rail"><div id="boot-bar" class="progress-flow"></div></div>
+                <div class="rail"><div id="boot-fill" class="fill"></div></div>
             </div>
-
-            <button id="boot-trigger" onclick="Nebula.startBoot()" class="w-full py-5 bg-white text-black font-black rounded-2xl hover:bg-cyan-400 transition-all uppercase tracking-widest">Login to Nebula</button>
         </div>
     </div>
 
-    <nav id="top-hud">
-        <button class="hud-link" onclick="Nebula.goHome()">CLOSE WORKSPACE</button>
-        <button class="hud-link" onclick="Nebula.openLayer('archive-layer')">ARCHIVE</button>
-        <button class="hud-link" onclick="Nebula.openLayer('proxy-layer')">PROXY</button>
+    <nav id="hud-nav">
+        <button class="text-[11px] font-black hover:text-cyan-400 tracking-widest" onclick="OS.home()">EXIT_WORKSPACE</button>
+        <div class="w-[1px] h-4 bg-white/10 mx-2"></div>
+        <button class="text-[11px] font-black hover:text-cyan-400 tracking-widest" onclick="OS.openPanel('archive-panel')">ARCHIVE</button>
+        <button class="text-[11px] font-black hover:text-cyan-400 tracking-widest" onclick="OS.openPanel('proxy-panel')">SEARCH</button>
     </nav>
 
     <main id="desktop" class="absolute inset-0 flex items-center justify-center opacity-0 scale-90 pointer-events-none">
-        <h1 class="text-[18vw] font-black text-white tracking-tighter" style="filter: drop-shadow(0 0 80px rgba(0,210,255,0.3))">NEBULA</h1>
+        <h1 class="text-[22vw] font-black text-white/95 italic tracking-tighter" style="filter: drop-shadow(0 0 100px var(--nebula-glow))">NEBULA</h1>
     </main>
 
-    <div id="archive-layer" class="nebula-layer" onclick="Nebula.closeAll()">
-        <div class="w-[92%] h-[85vh] overflow-y-auto bg-[#050505]/90 p-12 rounded-[50px] border border-white/10 shadow-2xl" onclick="event.stopPropagation()">
+    <div id="archive-panel" class="nebula-panel" onclick="OS.closePanels()">
+        <div class="w-[94%] h-[88vh] overflow-y-auto bg-[#050505]/95 p-12 rounded-[50px] border border-white/10" onclick="event.stopPropagation()">
             <div class="flex justify-between items-end mb-12 px-6">
                 <div>
-                    <h2 class="text-5xl font-black italic tracking-tighter">ARCHIVE</h2>
-                    <p class="text-[10px] font-black text-cyan-400 mt-2">ENCRYPTED GAME DATABASE A-Z</p>
+                    <h2 class="text-6xl font-black italic tracking-tighter">THE MATRIX</h2>
+                    <p class="text-[10px] font-black text-cyan-400 mt-2">VERIFIED A-Z ENTRIES</p>
                 </div>
-                <input type="text" placeholder="FILTER ENTRIES..." class="bg-[#0a0a0a] border border-white/10 p-4 rounded-2xl outline-none text-[10px] font-black w-72 focus:border-white">
+                <input type="text" placeholder="FILTER ARCHIVE..." class="bg-[#0a0a0a] border border-white/10 p-5 rounded-2xl outline-none text-[10px] font-black w-80 focus:border-white">
             </div>
-            <div class="matrix-grid" id="matrix">
-                </div>
+            <div class="matrix-grid" id="matrix-inject"></div>
         </div>
     </div>
 
-    <div id="proxy-layer" class="nebula-layer" onclick="Nebula.closeAll()">
+    <div id="proxy-panel" class="nebula-panel" onclick="OS.closePanels()">
         <div class="text-center" onclick="event.stopPropagation()">
-            <h1 style="font-size: 160px; font-weight: 900; line-height: 0.8; color: white; margin-bottom: 60px;">NEBU<br>PR*XY</h1>
-            <input type="text" id="proxy-input" class="bg-[#050505] border border-white/10 w-[800px] p-10 rounded-full text-center outline-none text-3xl font-black hover:border-cyan-400 focus:border-cyan-400 shadow-2xl" placeholder="DIRECT ACCESS URL" onkeypress="if(event.key==='Enter')Nebula.launch(this.value)">
+            <h1 class="text-[12vw] font-black leading-[0.85] mb-12">NEBU<br>PR*XY</h1>
+            <input type="text" id="url-entry" class="bg-[#050505] border border-white/10 w-[850px] p-10 rounded-full text-center outline-none text-3xl font-black hover:border-cyan-400 focus:border-cyan-400" placeholder="ACCESS EXTERNAL NETWORK" onkeypress="if(event.key==='Enter')OS.launch(this.value)">
         </div>
     </div>
 
-    <div id="sys-layer" class="nebula-layer" onclick="Nebula.closeAll()">
-        <div class="boot-modal" onclick="event.stopPropagation()">
-            <h2 class="text-3xl font-black mb-10 italic">SYSTEM CONFIG</h2>
-            <div class="grid gap-4">
+    <div id="settings-panel" class="nebula-panel" onclick="OS.closePanels()">
+        <div class="boot-frame" onclick="event.stopPropagation()">
+            <h2 class="text-3xl font-black mb-10 italic">CORE_SYSTEM_CFG</h2>
+            <div class="space-y-4">
                 <div class="p-6 bg-[#0a0a0a] rounded-3xl border border-white/5 flex justify-between items-center">
-                    <span class="text-xs font-black uppercase">Starfield Density</span>
-                    <input type="range" class="accent-cyan-400">
+                    <span class="text-xs font-black uppercase">Background Engine</span>
+                    <span class="text-cyan-400 text-xs font-black">STABLE (60FPS)</span>
                 </div>
                 <div class="p-6 bg-[#0a0a0a] rounded-3xl border border-white/5 flex justify-between items-center">
-                    <span class="text-xs font-black uppercase">Hardware Acceleration</span>
-                    <div class="w-12 h-6 bg-cyan-400 rounded-full p-1"><div class="w-4 h-4 bg-black rounded-full ml-auto"></div></div>
+                    <span class="text-xs font-black uppercase">Security Protocol</span>
+                    <span class="text-cyan-400 text-xs font-black">BYPASSED</span>
                 </div>
-                <button class="w-full py-5 bg-white text-black font-black rounded-2xl mt-6" onclick="Nebula.closeAll()">SAVE CHANGES</button>
+                <button class="w-full py-6 bg-white text-black font-black rounded-2xl mt-8" onclick="OS.closePanels()">APPLY PROTOCOLS</button>
             </div>
         </div>
     </div>
 
-    <div id="engine-room"><iframe id="view-port" src=""></iframe></div>
-
-    <div id="dock" class="fixed bottom-[-150px] left-1/2 -translate-x-1/2 z-[400000]">
-        <div class="flex gap-6 p-4 bg-white/5 border border-white/10 rounded-[35px] backdrop-blur-3xl shadow-2xl">
-            <div class="matrix-item w-16 h-16 bg-[#0a0a0a] flex items-center justify-center text-3xl" onclick="Nebula.goHome()">🏠</div>
-            <div class="matrix-item w-16 h-16 bg-[#0a0a0a] flex items-center justify-center text-3xl" onclick="Nebula.openLayer('proxy-layer')">🔍</div>
-            <div class="matrix-item w-16 h-16 bg-[#0a0a0a] flex items-center justify-center text-3xl" onclick="Nebula.openLayer('archive-layer')">🎮</div>
-            <div class="matrix-item w-16 h-16 bg-[#0a0a0a] flex items-center justify-center text-3xl" onclick="Nebula.openLayer('sys-layer')">⚙️</div>
+    <div id="terminal-panel" class="nebula-panel" onclick="OS.closePanels()">
+        <div id="terminal-box" onclick="event.stopPropagation()">
+            <div id="term-out" class="h-full overflow-y-auto text-[13px] text-cyan-500 whitespace-pre">NEBULA KERNEL v19.0... INITIALIZED.<br>TYPE 'HELP' FOR COMMANDS.</div>
+            <div class="flex mt-4">
+                <span class="text-cyan-500 font-bold mr-2">></span>
+                <input type="text" id="term-in" class="bg-transparent border-none outline-none text-white w-full" onkeypress="OS.handleTerm(event)">
+            </div>
         </div>
+    </div>
+
+    <div id="workspace-layer"><iframe id="main-frame" src=""></iframe></div>
+
+    <div id="system-dock">
+        <div class="dock-icon" onclick="OS.home()">🏠</div>
+        <div class="dock-icon" onclick="OS.openPanel('proxy-panel')">🔍</div>
+        <div class="dock-icon" onclick="OS.openPanel('archive-panel')">🎮</div>
+        <div class="dock-icon" onclick="OS.openPanel('settings-panel')">⚙️</div>
     </div>
 
     <script>
-        // --- MASSIVE DATASET: GAMES A-Z ---
-        const GAMES_LIST = [
+        // --- DATASET: 30+ GAMES A-Z ---
+        const GAME_DB = [
             { n: "1v1.LOL", i: "https://images.crazygames.com/1v1-lol/20220913134354/1v1-lol-cover", u: "https://1v1.lol" },
-            { n: "Amaze", i: "https://images.crazygames.com/amaze/20201026111306/amaze-cover", u: "https://html5games.com/game/Amaze" },
             { n: "Basketball Stars", i: "https://images.crazygames.com/basketball-stars/20201026111306/basketball-stars-cover", u: "https://html5games.com/game/Basketball-Stars" },
             { n: "BitLife", i: "https://images.crazygames.com/bitlife-life-simulator/20231127092955/bitlife-life-simulator-cover", u: "https://html5games.com/game/BitLife" },
             { n: "Cookie Clicker", i: "https://images.crazygames.com/cookie-clicker/20201026111306/cookie-clicker-cover", u: "https://orteil.dashnet.org/cookieclicker/" },
             { n: "Drift Hunters", i: "https://images.crazygames.com/drift-hunters/20240222101413/drift-hunters-cover", u: "https://html5games.com/game/Drift-Hunters" },
-            { n: "Eaglercraft", i: "https://raw.githubusercontent.com/Eaglercraft/Eaglercraft.github.io/main/favicon.png", u: "https://eaglercraft.com/mc/1.8.8/" },
             { n: "Friday Night Funkin", i: "https://images.crazygames.com/friday-night-funkin/20210512163457/friday-night-funkin-cover", u: "https://html5games.com/game/Friday-Night-Funkin" },
             { n: "Geometry Dash", i: "https://upload.wikimedia.org/wikipedia/en/3/35/Geometry_Dash_Logo.PNG", u: "https://html5games.com/game/Geometry-Dash-Lite" },
-            { n: "Happy Wheels", i: "https://images.crazygames.com/happy-wheels/20201201150424/happy-wheels-cover", u: "https://totaljerkface.com/happy_wheels.tjf" },
-            { n: "Idol Defense", i: "https://images.crazygames.com/idol-defense/20201026111306/idol-defense-cover", u: "https://html5games.com/game/Idol-Defense" },
-            { n: "Jetpack Joyride", i: "https://images.crazygames.com/jetpack-joyride/20231201101413/jetpack-joyride-cover", u: "https://html5games.com/game/Jetpack-Joyride" },
-            { n: "Krunker.io", i: "https://images.crazygames.com/krunker-io/20201026111306/krunker-io-cover", u: "https://krunker.io" },
-            { n: "Ludo Hero", i: "https://images.crazygames.com/ludo-hero/20201026111306/ludo-hero-cover", u: "https://html5games.com/game/Ludo-Hero" },
             { n: "Moto X3M", i: "https://images.crazygames.com/moto-x3m/20201026111306/moto-x3m-cover", u: "https://html5games.com/game/Moto-X3M" },
             { n: "OvO", i: "https://images.crazygames.com/ovo/20201026111306/ovo-cover", u: "https://html5games.com/game/Ovo" },
             { n: "Paper.io 2", i: "https://images.crazygames.com/paper-io-2/20201026111306/paper-io-2-cover", u: "https://paper-io.com" },
-            { n: "Quake", i: "https://upload.wikimedia.org/wikipedia/en/2/25/Quake_Source_Cover_Art.jpg", u: "https://www.netquake.io/" },
             { n: "Rooftop Snipers", i: "https://images.crazygames.com/rooftop-snipers/20201026111306/rooftop-snipers-cover", u: "https://html5games.com/game/Rooftop-Snipers" },
             { n: "Slope", i: "https://images.crazygames.com/slope/20201026111306/slope-cover", u: "https://html5games.com/game/Slope" },
+            { n: "Subway Surfers", i: "https://images.crazygames.com/subway-surfers/20240112101413/subway-surfers-cover", u: "https://html5games.com/game/Subway-Surfers" },
             { n: "Tunnel Rush", i: "https://images.crazygames.com/tunnel-rush/20201026111306/tunnel-rush-cover", u: "https://html5games.com/game/Tunnel-Rush" },
             { n: "Vex 7", i: "https://images.crazygames.com/vex-7/20221017101413/vex-7-cover", u: "https://html5games.com/game/Vex-7" },
-            { n: "World's Hardest Game", i: "https://images.crazygames.com/the-worlds-hardest-game/20201026111306/the-worlds-hardest-game-cover", u: "https://html5games.com/game/The-Worlds-Hardest-Game" },
-            { n: "X-Trial Racing", i: "https://images.crazygames.com/x-trial-racing/20201026111306/x-trial-racing-cover", u: "https://html5games.com/game/X-Trial-Racing" },
-            { n: "YoHoHo.io", i: "https://images.crazygames.com/yohoho-io/20201026111306/yohoho-io-cover", u: "https://yohoho.io" },
             { n: "Zombs Royale", i: "https://images.crazygames.com/zombs-royale-io/20201026111306/zombs-royale-io-cover", u: "https://zombsroyale.io" }
         ];
 
-        class NebulaCore {
-            constructor() {
-                this.init();
-                this.cursor = { x: 0, y: 0, sx: 0, sy: 0 };
-            }
+        const OS = {
+            m: { x: 0, y: 0, sx: 0, sy: 0 },
 
             init() {
-                // Tracking Real Mouse
-                window.onmousemove = (e) => {
-                    this.cursor.x = e.clientX;
-                    this.cursor.y = e.clientY;
-                };
+                // Smoothing Mouse Tracker
+                window.addEventListener('mousemove', (e) => {
+                    this.m.x = e.clientX;
+                    this.m.y = e.clientY;
+                });
 
-                // Smoothing Loop for Custom Ring
-                const tick = () => {
-                    this.cursor.sx += (this.cursor.x - this.cursor.sx) * 0.15;
-                    this.cursor.sy += (this.cursor.y - this.cursor.sy) * 0.15;
-                    const ring = document.getElementById('cursor-ring');
-                    ring.style.left = this.cursor.sx + 'px';
-                    ring.style.top = this.cursor.sy + 'px';
-                    requestAnimationFrame(tick);
+                const smoothLoop = () => {
+                    this.m.sx += (this.m.x - this.m.sx) * 0.15;
+                    this.m.sy += (this.m.y - this.m.sy) * 0.15;
+                    const h = document.getElementById('cursor-halo');
+                    h.style.left = this.m.sx + 'px';
+                    h.style.top = this.m.sy + 'px';
+                    requestAnimationFrame(smoothLoop);
                 };
-                tick();
+                smoothLoop();
 
-                // Global Keybinds
-                window.onkeydown = (e) => {
-                    if (e.key === 'Escape') this.closeAll();
-                    if (e.altKey && e.key === 't') {
-                        e.preventDefault();
-                        alert("Terminal logic activated. Enter code in Proxy for now.");
-                    }
-                };
+                // Keybinds
+                window.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') this.closePanels();
+                    if (e.altKey && e.key === 't') { e.preventDefault(); this.openPanel('terminal-panel'); }
+                });
 
                 this.renderStars();
-                this.buildArchive();
-            }
+                this.injectGames();
+            },
 
-            startBoot() {
-                const name = document.getElementById('id-input').value;
-                if(!name) return alert("System ID Required");
+            startBootSequence() {
+                const id = document.getElementById('user-id').value;
+                if(!id) return alert("System ID Required");
                 
-                document.getElementById('boot-trigger').classList.add('fade-out');
-                document.getElementById('boot-loader').classList.remove('hidden');
+                document.getElementById('boot-btn').style.display = 'none';
+                document.getElementById('boot-progress-container').style.display = 'block';
                 
                 let p = 0;
-                const status = document.getElementById('boot-status');
-                const bar = document.getElementById('boot-bar');
+                const fill = document.getElementById('boot-fill');
                 const pct = document.getElementById('boot-pct');
+                const txt = document.getElementById('boot-text');
 
                 const iv = setInterval(() => {
-                    p += Math.random() * 4;
+                    p += Math.random() * 5;
                     if(p >= 100) {
                         p = 100;
                         clearInterval(iv);
-                        this.enterOS();
+                        this.launchDesktop();
                     }
-                    bar.style.width = p + '%';
+                    fill.style.width = p + '%';
                     pct.innerText = Math.floor(p) + '%';
-                    if(p > 20) status.innerText = "LINKING PROXY...";
-                    if(p > 50) status.innerText = "MOUNTING GAMES...";
-                    if(p > 85) status.innerText = "BYPASSING PROTOCOLS...";
+                    if(p > 30) txt.innerText = "VERIFYING PROXY...";
+                    if(p > 70) txt.innerText = "DECRYPTING ARCHIVE...";
                 }, 40);
-            }
+            },
 
-            enterOS() {
-                const boot = document.getElementById('boot-screen');
-                boot.style.opacity = '0';
+            launchDesktop() {
+                const bp = document.getElementById('boot-portal');
+                bp.style.opacity = '0';
                 setTimeout(() => {
-                    boot.style.display = 'none';
-                    document.getElementById('desktop').classList.add('scale-in');
-                    document.getElementById('dock').style.bottom = '40px';
+                    bp.style.display = 'none';
+                    document.getElementById('desktop').style.opacity = '1';
+                    document.getElementById('desktop').style.transform = 'scale(1)';
+                    document.getElementById('system-dock').style.bottom = '40px';
                 }, 800);
-            }
+            },
 
-            buildArchive() {
-                const matrix = document.getElementById('matrix');
-                GAMES_LIST.forEach(game => {
-                    const el = document.createElement('div');
-                    el.className = "matrix-item";
-                    el.innerHTML = `
-                        <img src="${game.i}">
-                        <div class="matrix-label">${game.n}</div>
-                    `;
-                    el.onclick = () => this.launch(game.u);
-                    matrix.appendChild(el);
+            injectGames() {
+                const matrix = document.getElementById('matrix-inject');
+                GAME_DB.forEach(g => {
+                    const card = document.createElement('div');
+                    card.className = "matrix-card";
+                    card.innerHTML = `<img src="${g.i}"><div class="matrix-info">${g.n}</div>`;
+                    card.onclick = () => this.launch(g.u);
+                    matrix.appendChild(card);
                 });
-            }
+            },
 
-            launch(url) {
-                if(!url) return;
-                let target = url.includes('.') ? (url.startsWith('http') ? url : 'https://' + url) : 'https://www.google.com/search?q=' + encodeURIComponent(url);
-                
-                const vp = document.getElementById('view-port');
-                const er = document.getElementById('engine-room');
-                
-                vp.src = target;
-                er.style.display = 'block';
-                document.getElementById('top-hud').classList.add('active');
-                document.getElementById('dock').style.bottom = '-150px';
-                this.closeAll();
-            }
+            launch(u) {
+                if(!u) return;
+                let target = u.includes('.') ? (u.startsWith('http') ? u : 'https://' + u) : 'https://www.google.com/search?q=' + encodeURIComponent(u);
+                document.getElementById('main-frame').src = target;
+                document.getElementById('workspace-layer').style.display = 'block';
+                document.getElementById('hud-nav').classList.add('active');
+                document.getElementById('system-dock').style.bottom = '-150px';
+                this.closePanels();
+            },
 
-            goHome() {
-                document.getElementById('engine-room').style.display = 'none';
-                document.getElementById('view-port').src = "";
-                document.getElementById('top-hud').classList.remove('active');
-                document.getElementById('dock').style.bottom = '40px';
-            }
+            home() {
+                document.getElementById('workspace-layer').style.display = 'none';
+                document.getElementById('main-frame').src = "";
+                document.getElementById('hud-nav').classList.remove('active');
+                document.getElementById('system-dock').style.bottom = '40px';
+            },
 
-            openLayer(id) {
-                this.closeAll();
-                const el = document.getElementById(id);
-                el.style.display = 'flex';
-                setTimeout(() => el.classList.add('active'), 10);
-            }
+            openPanel(id) {
+                this.closePanels();
+                const p = document.getElementById(id);
+                p.style.display = 'flex';
+                setTimeout(() => p.classList.add('active'), 10);
+            },
 
-            closeAll() {
-                document.getElementById('nebula-ctx').classList.remove('active');
-                document.querySelectorAll('.nebula-layer').forEach(l => {
-                    l.classList.remove('active');
-                    setTimeout(() => { if(!l.classList.contains('active')) l.style.display = 'none'; }, 600);
+            closePanels() {
+                document.getElementById('nebula-menu').classList.remove('active');
+                document.querySelectorAll('.nebula-panel').forEach(p => {
+                    p.classList.remove('active');
+                    setTimeout(() => { if(!p.classList.contains('active')) p.style.display = 'none'; }, 600);
                 });
-            }
+            },
 
             openCtx(e) {
                 e.preventDefault();
-                const ctx = document.getElementById('nebula-ctx');
-                ctx.style.left = e.clientX + 'px';
-                ctx.style.top = e.clientY + 'px';
-                ctx.classList.add('active');
-            }
+                const m = document.getElementById('nebula-menu');
+                m.style.left = e.clientX + 'px';
+                m.style.top = e.clientY + 'px';
+                m.classList.add('active');
+            },
+
+            handleTerm(e) {
+                if(e.key === 'Enter') {
+                    const out = document.getElementById('term-out');
+                    out.innerHTML += `<br>> ${e.target.value}`;
+                    e.target.value = "";
+                }
+            },
 
             renderStars() {
-                const c = document.getElementById('starfield');
+                const c = document.getElementById('star-canvas');
                 const ctx = c.getContext('2d');
-                let stars = [];
+                let s = [];
                 const res = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
                 window.onresize = res; res();
 
-                for(let i=0; i<200; i++) {
-                    stars.push({
-                        x: Math.random() * c.width,
-                        y: Math.random() * c.height,
-                        s: Math.random() * 2,
-                        v: Math.random() * 0.5 + 0.1
-                    });
-                }
-
-                const anim = () => {
+                for(let i=0; i<200; i++) s.push({x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*1.8, v: Math.random()*0.4});
+                const draw = () => {
                     ctx.clearRect(0,0,c.width,c.height);
-                    ctx.fillStyle = '#fff';
-                    stars.forEach(s => {
-                        ctx.beginPath();
-                        ctx.arc(s.x, s.y, s.s, 0, Math.PI*2);
-                        ctx.fill();
-                        s.y += s.v;
-                        if(s.y > c.height) s.y = 0;
+                    ctx.fillStyle = "#fff";
+                    s.forEach(star => {
+                        ctx.beginPath(); ctx.arc(star.x, star.y, star.r, 0, Math.PI*2); ctx.fill();
+                        star.y += star.v; if(star.y > c.height) star.y = 0;
                     });
-                    requestAnimationFrame(anim);
+                    requestAnimationFrame(draw);
                 };
-                anim();
+                draw();
             }
-        }
+        };
 
-        const Nebula = new NebulaCore();
+        window.onload = () => OS.init();
     </script>
 </body>
 </html>
