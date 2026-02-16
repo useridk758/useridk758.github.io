@@ -19,189 +19,179 @@
         * { 
             margin: 0; padding: 0; box-sizing: border-box; 
             cursor: none !important; user-select: none; 
-            transition: all 0.5s var(--ease), filter 0.8s var(--ease);
+            transition: all 0.5s var(--ease);
         }
         
         body { background: #000; color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
 
-        #stars { transition: filter 0.8s var(--ease); }
-        body.ui-open #stars { filter: blur(12px) brightness(0.3); }
-
-        /* --- HERO SECTION --- */
-        #desktop { 
-            position: absolute; inset: 0; display: none; flex-direction: column; 
-            align-items: center; justify-content: center; opacity: 0; z-index: 10;
-            transform: scale(1.1);
+        /* --- ENTRANCE ANIMATION --- */
+        #gate { 
+            position: fixed; inset: 0; background: #000; z-index: 9999; 
+            display: flex; align-items: center; justify-content: center;
+            animation: gateFade 1.5s var(--ease);
         }
-        #desktop.active { opacity: 1; transform: scale(1); }
+        @keyframes gateFade { from { opacity: 0; } to { opacity: 1; } }
 
-        .hero { 
-            font-size: clamp(2rem, 12vw, 15vh); font-weight: 900; font-style: italic;
-            text-transform: uppercase; text-align: center;
-            background: linear-gradient(180deg, #ffffff 20%, #444444 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 15px rgba(255,255,255,0.1)) drop-shadow(0 0 40px var(--theme-main));
-            line-height: 1.1; padding: 20px;
-            animation: breathe 4s infinite ease-in-out;
+        #user-in {
+            animation: flickerIn 2s var(--ease) forwards;
+            opacity: 0;
+        }
+        @keyframes flickerIn {
+            0% { opacity: 0; transform: scale(0.9); filter: blur(10px); }
+            50% { opacity: 0.2; }
+            100% { opacity: 1; transform: scale(1); filter: blur(0); }
         }
 
-        @keyframes breathe {
-            0%, 100% { filter: drop-shadow(0 0 15px rgba(255,255,255,0.1)) drop-shadow(0 0 30px var(--theme-main)); transform: scale(1); }
-            50% { filter: drop-shadow(0 0 25px rgba(255,255,255,0.2)) drop-shadow(0 0 60px var(--theme-main)); transform: scale(1.02); }
+        /* --- SEARCH (IMP STYLE) --- */
+        #search-layer { 
+            background: rgba(0,0,0,0.3); 
+            backdrop-filter: blur(0px); 
+            pointer-events: none;
+            transition: backdrop-filter 0.6s var(--ease), opacity 0.6s var(--ease);
         }
+        #search-layer.active { 
+            backdrop-filter: blur(25px); 
+            opacity: 1;
+            pointer-events: all;
+        }
+        .search-container {
+            transform: scale(0.8); opacity: 0; transition: 0.7s var(--ease);
+        }
+        #search-layer.active .search-container { transform: scale(1); opacity: 1; }
 
-        /* --- SETTINGS SIDEBAR --- */
+        /* --- CLOAKING & SETTINGS --- */
         #settings-panel { 
             position: fixed; right: -400px; top: 0; width: 350px; height: 100vh; 
-            background: rgba(10,10,10,0.9); backdrop-filter: blur(40px); z-index: 6000; 
+            background: rgba(10,10,10,0.9); backdrop-filter: blur(40px); z-index: 9000; 
             border-left: 1px solid rgba(255,255,255,0.1); padding: 60px 25px; 
             box-shadow: -20px 0 50px rgba(0,0,0,0.5);
         }
         #settings-panel.active { right: 0; }
-        .setting-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; font-size: 11px; width: 100%; color: #fff; outline: none; margin-bottom: 20px; transition: 0.3s; }
-        .setting-input:focus { border-color: var(--theme-main); background: rgba(255,255,255,0.08); }
+        .setting-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; font-size: 11px; width: 100%; color: #fff; outline: none; margin-bottom: 20px; }
+        .setting-input:focus { border-color: var(--theme-main); }
 
-        /* --- CONTEXT MENU --- */
-        #context-menu {
-            position: fixed; z-index: 10001; width: 220px; background: rgba(10,10,10,0.95); 
-            backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 12px; padding: 8px; pointer-events: none; opacity: 0; transform: scale(0.9);
+        /* --- HERO --- */
+        .hero { 
+            font-size: clamp(3rem, 15vw, 18vh); font-weight: 900; font-style: italic;
+            text-transform: uppercase; text-align: center;
+            background: linear-gradient(180deg, #fff 20%, #444 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 30px var(--theme-main));
         }
-        #context-menu.active { opacity: 1; transform: scale(1); pointer-events: all; }
 
-        /* --- LAYERS & UI --- */
-        .layer { position: fixed; inset: 0; z-index: 5000; display: none; align-items: center; justify-content: center; opacity: 0; }
+        /* --- CURSOR --- */
+        #c-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10005; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); }
+        #c-ring { position: fixed; top: 0; left: 0; width: 35px; height: 35px; border: 1.5px solid var(--theme-main); border-radius: 50%; z-index: 10004; pointer-events: none; transform: translate3d(calc(var(--r-x) - 15px), calc(var(--r-y) - 15px), 0); mix-blend-mode: difference; }
+        .hover-state #c-ring { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-color: #fff; }
+
+        .layer { position: fixed; inset: 0; z-index: 8000; display: none; align-items: center; justify-content: center; opacity: 0; }
         .layer.active { display: flex; opacity: 1; }
         .dock-wrap { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); z-index: 1000; opacity: 0; }
         .dock-wrap.active { bottom: 30px; opacity: 1; }
-        .btn { width: 52px; height: 52px; background: #111; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; border: 1px solid #222; }
-        .btn:hover { transform: translateY(-10px) scale(1.1); border-color: var(--theme-main); box-shadow: 0 10px 25px -5px var(--theme-main); }
-        
-        #announcement-bar { position: fixed; top: -100px; left: 0; width: 100%; background: var(--theme-main); padding: 12px; z-index: 8000; text-align: center; font-weight: 900; font-size: 10px; letter-spacing: 2px; }
-        #announcement-bar.active { top: 0; }
-
-        #c-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10005; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); }
-        #c-ring { position: fixed; top: 0; left: 0; width: 35px; height: 35px; border: 1.5px solid var(--theme-main); border-radius: 50%; z-index: 10004; pointer-events: none; transform: translate3d(calc(var(--r-x) - 15px), calc(var(--r-y) - 15px), 0); mix-blend-mode: difference; }
     </style>
 </head>
-<body class="bg-black">
+<body>
 
-    <canvas id="stars" class="fixed inset-0 -z-10"></canvas>
+    <canvas id="stars" class="fixed inset-0 -z-10 transition-opacity duration-1000"></canvas>
     <div id="c-dot"></div>
     <div id="c-ring"></div>
 
-    <div id="announcement-bar"><span id="announcement-text">SYSTEM BROADCAST ACTIVE</span></div>
-
-    <div id="context-menu">
-        <div class="p-3 hover:bg-white/10 rounded-lg flex justify-between items-center transition-all hoverable" onclick="OS.showDesktop()"><span>Home</span><span>🏠</span></div>
-        <div class="p-3 hover:bg-white/10 rounded-lg flex justify-between items-center transition-all hoverable" onclick="OS.toggleLayer('search-layer')"><span>Search</span><span>🔍</span></div>
-        <div class="p-3 hover:bg-white/10 rounded-lg flex justify-between items-center transition-all hoverable" onclick="OS.toggleSettings()"><span>Settings</span><span>⚙️</span></div>
-        <div class="border-t border-white/5 my-2"></div>
-        <div class="p-3 hover:bg-rose-600/20 hover:text-rose-400 rounded-lg flex justify-between items-center transition-all hoverable" onclick="location.reload()"><span>Reboot</span><span>🔄</span></div>
-    </div>
-
     <div id="gate">
-        <input type="text" id="user-in" class="bg-transparent border-b-2 border-white/10 text-6xl font-black text-center outline-none w-full max-w-xl hoverable focus:border-blue-500 transition-all duration-1000" placeholder="NAME" onkeypress="if(event.key==='Enter')OS.validate()">
+        <div class="text-center w-full">
+            <input type="text" id="user-in" class="bg-transparent border-none text-7xl font-black text-center outline-none w-full hoverable placeholder-white/10" placeholder="ENTER NAME" onkeypress="if(event.key==='Enter')OS.validate()">
+            <p class="text-[10px] tracking-[1em] text-white/20 mt-4">INITIALIZING NEBULA SESSION</p>
+        </div>
     </div>
 
     <aside id="settings-panel">
-        <h2 class="text-xl font-black italic mb-8 tracking-tighter">SPECTRE CLOAK</h2>
+        <h2 class="text-xl font-black italic mb-8 tracking-tighter">OS OPTIMIZATION</h2>
         
-        <label class="text-[10px] uppercase tracking-widest text-white/40 mb-2 block">Fake Tab Title</label>
-        <input type="text" id="cloak-name-input" class="setting-input hoverable" placeholder="e.g. Google Docs" onkeypress="if(event.key==='Enter')OS.toggleSettings()">
+        <label class="text-[10px] uppercase tracking-widest text-white/40 mb-2 block">Cloak Name</label>
+        <input type="text" id="cloak-name" class="setting-input hoverable" placeholder="e.g. My Drive" onkeypress="if(event.key==='Enter')OS.saveSettings()">
         
-        <label class="text-[10px] uppercase tracking-widest text-white/40 mb-2 block">Fake Favicon URL</label>
-        <input type="text" id="cloak-icon-input" class="setting-input hoverable" placeholder="e.g. https://google.com/favicon.ico" onkeypress="if(event.key==='Enter')OS.toggleSettings()">
+        <label class="text-[10px] uppercase tracking-widest text-white/40 mb-2 block">Favicon URL</label>
+        <input type="text" id="cloak-icon" class="setting-input hoverable" placeholder="https://..." onkeypress="if(event.key==='Enter')OS.saveSettings()">
 
-        <div class="flex justify-between items-center p-4 bg-white/5 rounded-xl mb-8 hoverable" onclick="document.getElementById('cloak-toggle').click()">
-            <span class="text-xs font-bold">Auto-Cloak on Blur</span>
-            <input type="checkbox" id="cloak-toggle" checked class="pointer-events-none">
+        <div class="flex justify-between items-center p-4 bg-white/5 rounded-xl mb-4 hover:bg-white/10 transition-all hoverable" onclick="OS.toggleOpt()">
+            <span class="text-xs font-bold">Performance Mode</span>
+            <div id="opt-status" class="text-[10px] font-black text-rose-500">OFF</div>
         </div>
 
-        <button class="w-full py-4 bg-white text-black rounded-xl font-bold text-[10px] uppercase tracking-widest hoverable" onclick="OS.toggleSettings()">Apply & Exit</button>
+        <button class="w-full py-4 bg-white text-black rounded-xl font-bold text-[10px] uppercase tracking-widest mt-10 hoverable" onclick="OS.saveSettings()">Save Configuration</button>
     </aside>
 
     <div id="search-layer" class="layer">
-        <div class="w-[90%] max-w-[900px] text-center">
-            <input type="text" id="search-field" class="bg-transparent border-none border-b-4 border-white/5 w-full text-7xl font-black text-center outline-none py-10 hoverable focus:border-blue-500 transition-all" placeholder="NEBULA" onkeypress="if(event.key==='Enter')OS.runSearch()">
+        <div class="search-container w-full max-w-4xl px-10">
+            <input type="text" id="search-field" class="bg-transparent border-none border-b-2 border-white/10 w-full text-8xl font-black text-center outline-none py-10 hoverable focus:border-white transition-all uppercase" placeholder="URL / SEARCH" onkeypress="if(event.key==='Enter')OS.runSearch()">
+            <p class="text-center text-[10px] tracking-[2em] text-white/20 mt-8">IMP PROXY ENGINE</p>
         </div>
     </div>
 
     <div id="term-layer" class="layer">
-        <div class="w-full max-w-2xl bg-[#0a0a0a]/95 border border-white/10 rounded-3xl overflow-hidden shadow-2xl backdrop-blur-3xl">
-            <div id="term-out" class="p-6 h-72 overflow-y-auto font-mono text-blue-400 text-xs leading-relaxed">Spectre Kernel v11.3 Online. System Ready.</div>
-            <div class="p-4 bg-[#050505] flex gap-3 border-t border-white/5">
+        <div class="w-full max-w-2xl bg-black/90 border border-white/10 rounded-3xl overflow-hidden shadow-2xl backdrop-blur-3xl">
+            <div id="term-out" class="p-6 h-64 font-mono text-blue-400 text-xs">Nebula Kernel v11.4 Ready. Type 'help'.</div>
+            <div class="p-4 bg-black flex gap-3 border-t border-white/5">
                 <span class="text-blue-500 font-bold">$</span>
-                <input type="text" id="term-in" class="bg-transparent border-none outline-none text-white font-mono w-full" autocomplete="off" onkeypress="OS.handleTerm(event)">
+                <input type="text" id="term-in" class="bg-transparent border-none outline-none text-white font-mono w-full" onkeypress="OS.handleTerm(event)">
             </div>
         </div>
     </div>
 
-    <main id="desktop">
+    <main id="desktop" class="absolute inset-0 flex items-center justify-center opacity-0 scale-110 transition-all duration-1000 pointer-events-none">
         <h1 class="hero" id="hero-title">NEBULA</h1>
     </main>
 
     <div id="dock-wrap" class="dock-wrap">
-        <div class="flex gap-4 p-3 bg-white/5 border border-white/10 rounded-[24px] backdrop-blur-xl transition-all">
-            <div class="btn hoverable" onclick="OS.showDesktop()">🏠</div>
+        <div class="flex gap-4 p-3 bg-white/5 border border-white/10 rounded-[24px] backdrop-blur-xl">
+            <div class="btn hoverable" onclick="OS.closeAll()">🏠</div>
             <div class="btn hoverable" onclick="OS.toggleLayer('search-layer')">🔍</div>
             <div class="btn hoverable" onclick="OS.toggleSettings()">⚙️</div>
-            <div class="btn hoverable" onclick="OS.openProxy('https://cineby.gd')">🎬</div>
+            <div class="btn hoverable" onclick="OS.openProxy('https://google.com')">🌐</div>
         </div>
-    </div>
-
-    <div id="proxy-layer" class="fixed inset-0 z-[9500] hidden bg-black opacity-0">
-        <button class="absolute top-8 left-1/2 -translate-x-1/2 px-8 py-2 bg-white text-black font-black rounded-full hoverable text-[10px] tracking-widest z-[9999]" onclick="OS.closeProxy()">EXIT PORTAL</button>
-        <iframe id="proxy-frame" class="w-full h-full border-none"></iframe>
     </div>
 
     <script>
         class NebulaOS {
             constructor() {
                 this.m = { x: 0, y: 0, rx: 0, ry: 0 };
-                this.trueTitle = "NEBULA OS";
-                this.trueIcon = "https://cdn-icons-png.flaticon.com/512/606/606547.png";
+                this.isOpt = false;
                 this.init();
             }
 
             init() {
                 this.setupMouse();
                 this.setupStars();
-                this.setupSpectre();
-                
-                window.addEventListener('contextmenu', (e) => { e.preventDefault(); this.openMenu(e); }, true);
-                window.addEventListener('click', () => { document.getElementById('context-menu').classList.remove('active'); });
+                this.setupCloakSystem();
                 window.onkeydown = (e) => {
                     if(e.altKey && e.key === 't') this.toggleLayer('term-layer');
                     if(e.key === 'Escape') this.closeAll();
                 };
             }
 
-            setupSpectre() {
+            setupCloakSystem() {
                 window.addEventListener('blur', () => {
-                    if(document.getElementById('cloak-toggle').checked) {
-                        document.title = document.getElementById('cloak-name-input').value || "Google";
-                        document.getElementById('os-favicon').href = document.getElementById('cloak-icon-input').value || "https://www.google.com/favicon.ico";
-                    }
+                    const n = document.getElementById('cloak-name').value;
+                    const i = document.getElementById('cloak-icon').value;
+                    if(n) document.title = n;
+                    if(i) document.getElementById('os-favicon').href = i;
                 });
                 window.addEventListener('focus', () => {
-                    document.title = this.trueTitle;
-                    document.getElementById('os-favicon').href = this.trueIcon;
+                    document.title = "NEBULA OS";
+                    document.getElementById('os-favicon').href = "https://cdn-icons-png.flaticon.com/512/606/606547.png";
                 });
             }
 
             setupMouse() {
-                const r = document.documentElement;
                 window.onmousemove = (e) => {
                     this.m.x = e.clientX; this.m.y = e.clientY;
-                    r.style.setProperty('--m-x', `${this.m.x}px`);
-                    r.style.setProperty('--m-y', `${this.m.y}px`);
+                    document.documentElement.style.setProperty('--m-x', `${this.m.x}px`);
+                    document.documentElement.style.setProperty('--m-y', `${this.m.y}px`);
                 };
                 const lerp = () => {
-                    this.m.rx += (this.m.x - this.m.rx) * 0.15;
-                    this.m.ry += (this.m.y - this.m.ry) * 0.15;
-                    r.style.setProperty('--r-x', `${this.m.rx}px`);
-                    r.style.setProperty('--r-y', `${this.m.ry}px`);
+                    this.m.rx += (this.m.x - this.m.rx) * 0.12;
+                    this.m.ry += (this.m.y - this.m.ry) * 0.12;
+                    document.documentElement.style.setProperty('--r-x', `${this.m.rx}px`);
+                    document.documentElement.style.setProperty('--r-y', `${this.m.ry}px`);
                     requestAnimationFrame(lerp);
                 };
                 lerp();
@@ -211,107 +201,75 @@
                 });
             }
 
-            openMenu(e) {
-                const menu = document.getElementById('context-menu');
-                menu.style.left = `${e.clientX}px`; menu.style.top = `${e.clientY}px`;
-                menu.classList.add('active');
-            }
-
             validate() {
                 const name = document.getElementById('user-in').value || "NEBULA";
                 document.getElementById('hero-title').innerText = name.toUpperCase();
                 document.getElementById('gate').style.opacity = '0';
-                setTimeout(() => { document.getElementById('gate').style.display = 'none'; this.reveal(); }, 1000);
-            }
-
-            reveal() {
-                const d = document.getElementById('desktop'), dw = document.getElementById('dock-wrap');
-                d.style.display = 'flex'; dw.style.display = 'block';
-                setTimeout(() => { d.classList.add('active'); dw.classList.add('active'); }, 100);
+                setTimeout(() => {
+                    document.getElementById('gate').style.display = 'none';
+                    document.getElementById('desktop').style.opacity = '1';
+                    document.getElementById('desktop').style.transform = 'scale(1)';
+                    document.getElementById('dock-wrap').classList.add('active');
+                }, 1000);
             }
 
             toggleLayer(id) {
                 const el = document.getElementById(id);
-                if(el.classList.contains('active')) {
-                    el.classList.remove('active');
-                    document.body.classList.remove('ui-open');
-                    setTimeout(() => el.style.display = 'none', 600);
-                } else {
-                    this.closeAll();
-                    document.body.classList.add('ui-open');
+                const isActive = el.classList.contains('active');
+                this.closeAll();
+                if(!isActive) {
                     el.style.display = 'flex';
                     setTimeout(() => { el.classList.add('active'); el.querySelector('input')?.focus(); }, 50);
                 }
             }
 
-            toggleSettings() { 
-                const s = document.getElementById('settings-panel');
-                s.classList.toggle('active'); 
-                if(s.classList.contains('active')) document.body.classList.add('ui-open');
-                else if (!document.querySelector('.layer.active')) document.body.classList.remove('ui-open');
+            toggleSettings() { document.getElementById('settings-panel').classList.toggle('active'); }
+            
+            saveSettings() { this.toggleSettings(); }
+
+            toggleOpt() {
+                this.isOpt = !this.isOpt;
+                document.getElementById('opt-status').innerText = this.isOpt ? "ON" : "OFF";
+                document.getElementById('opt-status').style.color = this.isOpt ? "#10b981" : "#f43f5e";
+                document.getElementById('stars').style.opacity = this.isOpt ? "0" : "1";
             }
 
             handleTerm(e) {
                 if(e.key === 'Enter') {
-                    const cmd = e.target.value.trim().toLowerCase();
+                    const cmd = e.target.value.toLowerCase();
                     const out = document.getElementById('term-out');
-                    let res = "";
-                    if(cmd === 'help') res = "COMMANDS: help, theme [hex], global [msg], clear, exit";
-                    else if(cmd.startsWith('theme ')) {
-                        document.documentElement.style.setProperty('--theme-main', cmd.split(' ')[1]);
-                        res = "Accent synchronized.";
-                    } else if(cmd.startsWith('global ')) {
-                        const msg = cmd.replace('global ', '').toUpperCase();
-                        const bar = document.getElementById('announcement-bar');
-                        document.getElementById('announcement-text').innerText = msg;
-                        if(msg === 'CLEAR') bar.classList.remove('active'); else bar.classList.add('active');
-                        res = "Broadcast live.";
-                    } else if(cmd === 'clear') { out.innerHTML = ""; e.target.value = ""; return; }
-                    else if(cmd === 'exit') { this.toggleLayer('term-layer'); e.target.value = ""; return; }
-                    else res = `Kernel: '${cmd}' executed.`;
-                    
-                    out.innerHTML += `<br><span class="text-white">> ${cmd}</span><br>${res}`;
-                    e.target.value = ""; out.scrollTop = out.scrollHeight;
+                    if(cmd === 'exit') this.toggleLayer('term-layer');
+                    if(cmd === 'help') out.innerHTML += "<br>help, clear, exit, optimization [on/off]";
+                    if(cmd === 'clear') out.innerHTML = "";
+                    e.target.value = "";
                 }
             }
 
             runSearch() {
                 let v = document.getElementById('search-field').value;
                 if(!v) return;
-                v = (!v.includes('.')) ? 'https://google.com/search?q=' + v : (!v.startsWith('http')) ? 'https://' + v : v;
-                this.openProxy(v); this.toggleLayer('search-layer');
-            }
-
-            openProxy(url) { 
-                const p = document.getElementById('proxy-layer');
-                document.getElementById('proxy-frame').src = url; 
-                p.classList.remove('hidden');
-                setTimeout(() => p.style.opacity = '1', 50);
-            }
-            
-            closeProxy() { 
-                const p = document.getElementById('proxy-layer');
-                p.style.opacity = '0';
-                setTimeout(() => p.classList.add('hidden'), 700);
+                v = v.includes('.') ? (v.startsWith('http') ? v : 'https://' + v) : 'https://google.com/search?q=' + v;
+                window.open(v, '_blank');
+                this.closeAll();
             }
 
             closeAll() {
-                document.querySelectorAll('.layer').forEach(l => { 
-                    if(l.classList.contains('active')) { l.classList.remove('active'); setTimeout(()=>l.style.display='none', 600); }
+                document.querySelectorAll('.layer').forEach(l => {
+                    l.classList.remove('active');
+                    setTimeout(() => l.style.display = 'none', 600);
                 });
                 document.getElementById('settings-panel').classList.remove('active');
-                document.body.classList.remove('ui-open');
-                this.closeProxy();
             }
 
             setupStars() {
                 const c = document.getElementById('stars'); const ctx = c.getContext('2d');
                 let pts = []; const res = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
                 window.onresize = res; res();
-                for(let i=0; i<150; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*1.2});
+                for(let i=0; i<100; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*1.5});
                 const draw = () => {
-                    ctx.fillStyle = '#000'; ctx.fillRect(0,0,c.width,c.height); ctx.fillStyle = '#fff';
-                    pts.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); p.y += 0.2; if(p.y > c.height) p.y = 0; });
+                    if(this.isOpt) return requestAnimationFrame(draw);
+                    ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle = '#fff';
+                    pts.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); p.y += 0.3; if(p.y > c.height) p.y = 0; });
                     requestAnimationFrame(draw);
                 };
                 draw();
