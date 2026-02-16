@@ -3,181 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="os-title">NEBULA OS</title>
-    <link id="os-favicon" rel="icon" href="https://cdn-icons-png.flaticon.com/512/606/606547.png">
+    <title>NEBULA OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap" rel="stylesheet">
     
     <style>
-        :root { --theme-main: #3b82f6; --ease: cubic-bezier(0.2, 1, 0.2, 1); --m-x: 0; --m-y: 0; }
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; font-style: normal !important; transition: all 0.5s var(--ease); }
-        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
-
-        /* --- LOADING / UPDATE SCREEN --- */
-        #update-screen { display: none; opacity: 0; transform: scale(1.1); }
-        .progress-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-top: 20px; }
-        .progress-fill { width: 0%; height: 100%; background: var(--theme-main); }
-
-        /* --- HUD (TOP MENU) --- */
-        #hud { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); z-index: 6000; background: rgba(10,10,10,0.8); backdrop-filter: blur(20px); padding: 10px 30px; border-radius: 0 0 20px 20px; border: 1px solid rgba(255,255,255,0.1); border-top: none; display: flex; gap: 40px; }
-        #hud.active { top: 0; }
-        .hud-btn { font-size: 10px; font-weight: 900; letter-spacing: 2px; color: #fff; opacity: 0.5; }
-        .hud-btn:hover { opacity: 1; color: var(--theme-main); }
-
-        /* --- GAMES GRID --- */
-        .game-card { width: 100%; aspect-ratio: 1; background: #111; border-radius: 15px; overflow: hidden; border: 1px solid #222; position: relative; }
-        .game-card:hover { transform: translateY(-10px); border-color: var(--theme-main); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-        .game-card img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
-
-        /* --- UI ELEMENTS --- */
-        .layer { position: fixed; inset: 0; z-index: 9000; display: none; align-items: center; justify-content: center; opacity: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(60px); }
-        .layer.active { display: flex; opacity: 1; }
-        .hero { font-size: 15vw; font-weight: 900; text-transform: uppercase; text-align: center; line-height: 0.9; background: linear-gradient(180deg, #fff 40%, #333 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 50px rgba(59,130,246,0.3)); }
+        :root { --theme: #3b82f6; --ease: cubic-bezier(0.16, 1, 0.3, 1); }
         
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            font-style: normal !important; 
+            cursor: none !important; /* Custom cursor only */
+        }
+
+        body { 
+            background: #000; color: #fff; 
+            font-family: 'Inter', sans-serif; 
+            overflow: hidden; height: 100vh; 
+        }
+
+        /* --- VISIBLE CUSTOM CURSOR --- */
+        #cursor-dot {
+            position: fixed; width: 8px; height: 8px; background: #fff;
+            border-radius: 50%; z-index: 100000; pointer-events: none;
+            transition: transform 0.1s linear;
+        }
+        #cursor-ring {
+            position: fixed; width: 34px; height: 34px; border: 2px solid var(--theme);
+            border-radius: 50%; z-index: 99999; pointer-events: none;
+            transition: transform 0.15s var(--ease), width 0.3s, height 0.3s;
+        }
+
+        /* --- UPDATE SCREEN (BIGGER) --- */
+        #update-screen {
+            position: fixed; inset: 0; background: #000; z-index: 20000;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .update-container { width: 70%; max-width: 900px; transform: scale(1.2); }
+        .bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 30px 0; overflow: hidden; }
+        .bar-fill { width: 0%; height: 100%; background: #fff; box-shadow: 0 0 20px #fff; transition: width 0.1s linear; }
+
+        /* --- HUD MENU (GAME/WEB MODE) --- */
+        #hud {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            z-index: 15000; background: rgba(10,10,10,0.9); backdrop-filter: blur(20px);
+            padding: 15px 40px; border-radius: 0 0 20px 20px; border: 1px solid #222;
+            display: flex; gap: 30px; transition: top 0.6s var(--ease);
+        }
+        #hud.visible { top: 0; }
+        .hud-item { font-size: 11px; font-weight: 900; letter-spacing: 2px; opacity: 0.6; transition: 0.3s; }
+        .hud-item:hover { opacity: 1; color: var(--theme); }
+
+        /* --- MAIN HERO --- */
+        .hero-text {
+            font-size: 16vw; font-weight: 900; text-transform: uppercase;
+            background: linear-gradient(to bottom, #fff, #444);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 60px rgba(255,255,255,0.1));
+            user-select: none;
+        }
+
+        /* --- LAYERS --- */
+        .layer {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.98);
+            z-index: 10000; display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.5s var(--ease);
+        }
+        .layer.active { display: flex; opacity: 1; }
+
         #workspace { position: fixed; inset: 0; z-index: 5000; display: none; }
         #workspace iframe { width: 100%; height: 100%; border: none; }
-        
-        #c-dot { position: fixed; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10000; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); transition: none; }
+
+        .game-grid { display: grid; grid-template-cols: repeat(4, 1fr); gap: 20px; width: 80%; }
+        .game-item { aspect-ratio: 1; background: #111; border: 1px solid #222; border-radius: 15px; position: relative; overflow: hidden; transition: 0.4s var(--ease); }
+        .game-item:hover { transform: translateY(-10px); border-color: var(--theme); }
+        .game-item img { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; }
     </style>
 </head>
 <body>
 
-    <canvas id="stars" class="fixed inset-0 -z-10"></canvas>
-    <div id="c-dot"></div>
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
 
     <div id="hud">
-        <button class="hud-btn" onclick="OS.goHome()">EXIT WORKSPACE</button>
-        <button class="hud-btn" onclick="OS.openLayer('search-layer')">NEW SEARCH</button>
-        <button class="hud-btn" onclick="OS.openLayer('games-layer')">GAMES LIBRARY</button>
+        <div class="hud-item" onclick="OS.goHome()">HOME</div>
+        <div class="hud-item" onclick="OS.openLayer('search-layer')">PROXY</div>
+        <div class="hud-item" onclick="OS.openLayer('games-layer')">GAMES</div>
     </div>
 
-    <div id="gate" class="fixed inset-0 flex items-center justify-center z-[10000] bg-black">
-        <input type="text" id="user-in" class="bg-transparent border-none text-8xl font-black text-center outline-none w-full placeholder-white/5" placeholder="NAME" onkeypress="if(event.key==='Enter')OS.startUpdate()">
+    <div id="login-gate" class="fixed inset-0 bg-black z-[30000] flex items-center justify-center">
+        <input type="text" id="name-input" class="bg-transparent border-none text-8xl font-black text-center outline-none w-full placeholder-white/5 uppercase" placeholder="ENTER NAME" onkeypress="if(event.key==='Enter')OS.runUpdate()">
     </div>
 
-    <div id="update-screen" class="fixed inset-0 flex flex-col items-center justify-center z-[10000] bg-black px-20">
-        <div class="w-full max-w-3xl">
-            <h2 class="text-4xl font-black mb-2">NEBULA_OS CORE</h2>
-            <p id="update-status" class="text-blue-500 font-bold tracking-widest text-xs uppercase">Initializing Kernel...</p>
-            <div class="progress-bar"><div id="p-fill" class="progress-fill"></div></div>
-            <div class="mt-10 grid grid-cols-2 gap-10 text-[10px] text-white/20 font-black uppercase">
-                <div>Memory: 64GB Virtual<br>GPU: WebGL_Accelerated<br>Location: <span id="loc">Detecting...</span></div>
-                <div class="text-right">Security: Proxy_Active<br>Encryption: AES_256<br>Status: Deployment</div>
+    <div id="update-screen">
+        <div class="update-container">
+            <h1 class="text-5xl font-black italic mb-2">SYSTEM UPDATE</h1>
+            <p id="status-text" class="text-xs font-black tracking-widest text-blue-500 uppercase">Verifying Kernel...</p>
+            <div class="bar-bg"><div id="bar-fill" class="bar-fill"></div></div>
+            <div class="flex justify-between text-[10px] font-black text-white/30 uppercase">
+                <div>Package: NEBULA_CORE_V15.2<br>Status: Heavy Loading</div>
+                <div class="text-right">DO NOT REFRESH PAGE<br>Initializing Virtual Environment...</div>
             </div>
         </div>
     </div>
 
-    <main id="desktop" class="absolute inset-0 flex items-center justify-center opacity-0 scale-90 pointer-events-none">
-        <h1 class="hero">NEBULA</h1>
-    </main>
-
-    <div id="workspace"><iframe id="browser-frame" src=""></iframe></div>
-
-    <div id="games-layer" class="layer" onclick="OS.closeAll()">
-        <div class="w-full max-w-5xl px-10" onclick="event.stopPropagation()">
-            <h2 class="text-center text-4xl font-black mb-12 tracking-tighter">GAMES_ARCHIVE</h2>
-            <div class="grid grid-cols-4 gap-6 overflow-y-auto max-h-[70vh] pr-4" id="games-grid">
-                </div>
-        </div>
+    <div id="desktop" class="absolute inset-0 flex items-center justify-center opacity-0 transition-all duration-1000">
+        <h1 class="hero-text">NEBULA</h1>
     </div>
 
     <div id="search-layer" class="layer" onclick="OS.closeAll()">
         <div class="w-full max-w-4xl text-center" onclick="event.stopPropagation()">
-            <h1 style="font-size: 120px; color: white; font-weight: 900; line-height: 0.8; margin-bottom: 50px;">NEBU<br>PR*XY</h1>
-            <input type="text" id="search-field" class="bg-[#111] border border-[#222] w-full max-w-2xl p-6 rounded-full text-center outline-none text-xl font-bold" placeholder="SEARCH THE VOID" onkeypress="if(event.key==='Enter')OS.runSearch()">
+            <h1 class="text-[130px] font-black leading-[0.8] mb-12">NEBU<br>PR*XY</h1>
+            <input type="text" id="search-input" class="bg-[#111] border border-[#222] w-full p-6 rounded-full text-center outline-none text-xl font-bold" placeholder="BROWSE ANONYMOUSLY" onkeypress="if(event.key==='Enter')OS.browse()">
         </div>
     </div>
 
-    <div id="dock-wrap" class="fixed bottom-[-100px] left-1/2 -translate-x-1/2 z-[5500]">
+    <div id="games-layer" class="layer" onclick="OS.closeAll()">
+        <div class="game-grid" onclick="event.stopPropagation()" id="game-list">
+            </div>
+    </div>
+
+    <div id="workspace"><iframe id="web-frame" src=""></iframe></div>
+
+    <div id="dock" class="fixed bottom-[-100px] left-1/2 -translate-x-1/2 z-[8000] transition-all duration-700">
         <div class="flex gap-4 p-2 bg-white/5 border border-white/10 rounded-[22px] backdrop-blur-3xl">
-            <div class="w-[42px] h-[42px] bg-[#0a0a0a] rounded-xl flex items-center justify-center text-sm" onclick="OS.goHome()">🏠</div>
-            <div class="w-[42px] h-[42px] bg-[#0a0a0a] rounded-xl flex items-center justify-center text-sm" onclick="OS.openLayer('search-layer')">🔍</div>
-            <div class="w-[42px] h-[42px] bg-[#0a0a0a] rounded-xl flex items-center justify-center text-sm" onclick="OS.openLayer('games-layer')">🎮</div>
-            <div class="w-[42px] h-[42px] bg-[#0a0a0a] rounded-xl flex items-center justify-center text-sm" onclick="OS.openLayer('settings-layer')">⚙️</div>
+            <div class="w-[44px] h-[44px] bg-[#0a0a0a] rounded-xl flex items-center justify-center text-lg" onclick="OS.goHome()">🏠</div>
+            <div class="w-[44px] h-[44px] bg-[#0a0a0a] rounded-xl flex items-center justify-center text-lg" onclick="OS.openLayer('search-layer')">🔍</div>
+            <div class="w-[44px] h-[44px] bg-[#0a0a0a] rounded-xl flex items-center justify-center text-lg" onclick="OS.openLayer('games-layer')">🎮</div>
         </div>
     </div>
 
     <script>
-        const GAMES = [
-            { n: "A-DRIFT", u: "https://html5games.com/game/Drift-Hunters", i: "https://images.crazygames.com/drift-hunters/20240222101413/drift-hunters-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=1200" },
-            { n: "B-BASKET", u: "https://html5games.com/game/Basketball-Stars", i: "https://play-lh.googleusercontent.com/9783D-wI30mC-Q5v-f2X9-qA7W6mG7-hGvYhM_6V6O-t1S9_J8_G_8" },
-            { n: "C-CROSSY", u: "https://crossyroad.com", i: "https://images.crazygames.com/crossy-road/20201026111306/crossy-road-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=1200" },
-            { n: "D-DOOM", u: "https://dos.zone/doom-dec-1993/", i: "https://upload.wikimedia.org/wikipedia/en/5/57/Doom_cover_art.jpg" }
+        const GAMES_DB = [
+            { n: "DRIFT HUNTERS", u: "https://html5games.com/game/Drift-Hunters", i: "https://images.crazygames.com/drift-hunters/20240222101413/drift-hunters-cover" },
+            { n: "BASKET STARS", u: "https://html5games.com/game/Basketball-Stars", i: "https://images.crazygames.com/basketball-stars/20201026111306/basketball-stars-cover" },
+            { n: "1V1 LOL", u: "https://1v1.lol", i: "https://images.crazygames.com/1v1-lol/20220913134354/1v1-lol-cover" },
+            { n: "SLOPE", u: "https://html5games.com/game/Slope", i: "https://images.crazygames.com/slope/20201026111306/slope-cover" }
         ];
 
         class NebulaOS {
             constructor() { this.init(); }
 
             init() {
+                // Mouse Follower
                 window.onmousemove = (e) => {
-                    document.documentElement.style.setProperty('--m-x', `${e.clientX}px`);
-                    document.documentElement.style.setProperty('--m-y', `${e.clientY}px`);
+                    document.getElementById('cursor-dot').style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+                    document.getElementById('cursor-ring').style.transform = `translate(${e.clientX - 17}px, ${e.clientY - 17}px)`;
                 };
-                this.setupStars();
+
                 this.loadGames();
             }
 
-            startUpdate() {
-                const name = document.getElementById('user-in').value || "USER";
-                document.getElementById('gate').style.opacity = '0';
+            runUpdate() {
+                document.getElementById('login-gate').style.opacity = '0';
                 setTimeout(() => {
-                    document.getElementById('gate').style.display = 'none';
+                    document.getElementById('login-gate').style.display = 'none';
                     const screen = document.getElementById('update-screen');
                     screen.style.display = 'flex';
-                    setTimeout(() => screen.style.opacity = '1', 10);
                     
-                    let p = 0;
+                    let progress = 0;
+                    const fill = document.getElementById('bar-fill');
+                    const status = document.getElementById('status-text');
+
                     const interval = setInterval(() => {
-                        p += Math.random() * 5;
-                        if(p >= 100) {
-                            p = 100; clearInterval(interval);
-                            this.finishBoot();
+                        progress += Math.random() * 2;
+                        if(progress >= 100) {
+                            progress = 100;
+                            clearInterval(interval);
+                            this.bootDesktop();
                         }
-                        document.getElementById('p-fill').style.width = p + '%';
-                        document.getElementById('update-status').innerText = p < 30 ? "MOUNTING DRIVES..." : p < 70 ? "OPTIMIZING PROXY NODES..." : "READY TO LAUNCH";
-                    }, 100);
-                }, 800);
+                        fill.style.width = progress + '%';
+                        if(progress > 20) status.innerText = "INITIALIZING CORE PROXY...";
+                        if(progress > 50) status.innerText = "LOADING GAMES DATABASE...";
+                        if(progress > 80) status.innerText = "BYPASSING FIREWALLS...";
+                    }, 50);
+                }, 500);
             }
 
-            finishBoot() {
+            bootDesktop() {
                 setTimeout(() => {
                     document.getElementById('update-screen').style.opacity = '0';
                     setTimeout(() => {
                         document.getElementById('update-screen').style.display = 'none';
                         document.getElementById('desktop').style.opacity = '1';
-                        document.getElementById('desktop').style.transform = 'scale(1)';
-                        document.getElementById('dock-wrap').style.bottom = '30px';
-                    }, 800);
+                        document.getElementById('dock').style.bottom = '30px';
+                    }, 500);
                 }, 500);
             }
 
             loadGames() {
-                const grid = document.getElementById('games-grid');
-                GAMES.forEach(g => {
-                    const div = document.createElement('div');
-                    div.className = "game-card";
-                    div.innerHTML = `<img src="${g.i}"><div class="absolute inset-0 flex items-center justify-center font-black text-xs">${g.n}</div>`;
-                    div.onclick = () => this.runSearch(g.u);
-                    grid.appendChild(div);
+                const list = document.getElementById('game-list');
+                GAMES_DB.forEach(g => {
+                    const el = document.createElement('div');
+                    el.className = "game-item";
+                    el.innerHTML = `<img src="${g.i}"><div class="absolute inset-0 flex items-center justify-center text-[10px] font-black">${g.n}</div>`;
+                    el.onclick = () => this.browse(g.u);
+                    list.appendChild(el);
                 });
             }
 
-            runSearch(url) {
-                let v = url || document.getElementById('search-field').value;
+            browse(url) {
+                let v = url || document.getElementById('search-input').value;
                 if(!v) return;
                 v = v.includes('.') ? (v.startsWith('http') ? v : 'https://' + v) : 'https://www.google.com/search?q=' + encodeURIComponent(v);
-                document.getElementById('browser-frame').src = v;
+                
+                document.getElementById('web-frame').src = v;
                 document.getElementById('workspace').style.display = 'block';
-                document.getElementById('dock-wrap').style.bottom = '-100px';
-                document.getElementById('hud').classList.add('active');
+                document.getElementById('hud').classList.add('visible');
+                document.getElementById('dock').style.bottom = '-100px';
                 this.closeAll();
             }
 
             goHome() {
                 document.getElementById('workspace').style.display = 'none';
-                document.getElementById('browser-frame').src = "";
-                document.getElementById('dock-wrap').style.bottom = '30px';
-                document.getElementById('hud').classList.remove('active');
+                document.getElementById('web-frame').src = "";
+                document.getElementById('hud').classList.remove('visible');
+                document.getElementById('dock').style.bottom = '30px';
             }
 
             openLayer(id) {
@@ -193,20 +234,8 @@
                     setTimeout(() => { if(!l.classList.contains('active')) l.style.display = 'none'; }, 500);
                 });
             }
-
-            setupStars() {
-                const c = document.getElementById('stars'); const ctx = c.getContext('2d');
-                let pts = []; const res = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
-                window.onresize = res; res();
-                for(let i=0; i<150; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*2});
-                const draw = () => {
-                    ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle = '#fff';
-                    pts.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); p.y += 0.15; if(p.y > c.height) p.y = 0; });
-                    requestAnimationFrame(draw);
-                };
-                draw();
-            }
         }
+
         const OS = new NebulaOS();
     </script>
 </body>
