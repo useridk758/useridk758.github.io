@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="os-title">NEBULA OS</title>
+    <title id="os-title">NEBULA OS v12.2</title>
     <link id="os-favicon" rel="icon" href="https://cdn-icons-png.flaticon.com/512/606/606547.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -24,17 +24,30 @@
         
         body { background: #000; color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
 
-        /* --- HOVER PHYSICS --- */
-        .btn { 
-            transition: all 0.4s var(--ease); 
+        /* --- HOVER PHYSICS & TRANSITIONS --- */
+        .btn, .setting-item, .setting-input { 
+            transition: all 0.3s var(--ease); 
             border: 1px solid rgba(255,255,255,0.08);
-            transform-origin: bottom;
+            transform-origin: center;
         }
-        .btn:hover { 
-            transform: translateY(-12px) scale(1.2); 
+        .btn:hover, .setting-item:hover { 
+            transform: translateY(-8px) scale(1.15); 
             border-color: var(--theme-main); 
-            box-shadow: 0 15px 40px -10px var(--theme-main);
-            background: rgba(255,255,255,0.1);
+            box-shadow: 0 10px 30px -10px var(--theme-main);
+            background: rgba(255,255,255,0.08);
+        }
+        .setting-input:hover { border-color: rgba(255,255,255,0.3); }
+        .setting-input:focus { transform: scale(1.02); border-color: var(--theme-main); }
+
+        /* --- HERO (CUT-OFF FIX) --- */
+        .hero { 
+            font-size: clamp(4rem, 18vw, 22vh); font-weight: 900; font-style: italic;
+            text-transform: uppercase; text-align: center; line-height: 1.2;
+            padding: 0 0.3em; /* Fixes right-side clipping */
+            background: linear-gradient(180deg, #fff 30%, #333 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 40px var(--theme-main));
+            display: inline-block;
         }
 
         /* --- LAYERS --- */
@@ -44,22 +57,8 @@
             background: rgba(0,0,0,0.8); backdrop-filter: blur(0px);
         }
         .layer.active { display: flex; opacity: 1; backdrop-filter: blur(50px); }
-        .layer-content { transform: scale(0.95) translateY(20px); transition: 0.5s var(--ease); }
-        .layer.active .layer-content { transform: scale(1) translateY(0); }
-
-        /* --- INPUT FIX (NO CUT-OFF) --- */
-        #user-in, #search-field {
-            line-height: 1.4;
-            padding-bottom: 0.2em;
-        }
-
-        .hero { 
-            font-size: clamp(4rem, 18vw, 22vh); font-weight: 900; font-style: italic;
-            text-transform: uppercase; text-align: center; line-height: 1.1;
-            background: linear-gradient(180deg, #fff 30%, #333 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 40px var(--theme-main));
-        }
+        .layer-content { transform: scale(0.95); transition: 0.5s var(--ease); }
+        .layer.active .layer-content { transform: scale(1); }
 
         /* --- CONTEXT MENU --- */
         #context-menu {
@@ -78,12 +77,11 @@
             padding: 60px 25px; z-index: 9000;
         }
         #settings-panel.active { right: 0; }
-        .setting-input { background: #111; border: 1px solid #222; border-radius: 8px; padding: 12px; font-size: 11px; width: 100%; color: #fff; outline: none; margin-bottom: 12px; }
+        .setting-input { background: #111; border-radius: 8px; padding: 12px; font-size: 11px; width: 100%; color: #fff; outline: none; margin-bottom: 12px; }
 
         /* --- CURSOR --- */
         #c-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10005; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); transition: none; }
         #c-ring { position: fixed; top: 0; left: 0; width: 35px; height: 35px; border: 1.5px solid var(--theme-main); border-radius: 50%; z-index: 10004; pointer-events: none; transform: translate3d(calc(var(--r-x) - 15px), calc(var(--r-y) - 15px), 0); mix-blend-mode: difference; transition: width 0.3s, height 0.3s; }
-        .hover-state #c-ring { width: 55px; height: 55px; border-color: #fff; }
     </style>
 </head>
 <body>
@@ -101,28 +99,28 @@
 
     <div id="gate" class="fixed inset-0 bg-black z-[10000] flex items-center justify-center">
         <div class="text-center w-full px-10">
-            <input type="text" id="user-in" class="bg-transparent border-none text-8xl font-black text-center outline-none w-full placeholder-white/5 uppercase" placeholder="NAME" onkeypress="if(event.key==='Enter')OS.validate()">
+            <input type="text" id="user-in" class="bg-transparent border-none text-8xl font-black text-center outline-none w-full placeholder-white/5 uppercase" placeholder="ENTER NAME" onkeypress="if(event.key==='Enter')OS.validate()">
         </div>
     </div>
 
     <aside id="settings-panel">
-        <h2 class="text-xl font-black italic mb-8 text-blue-500">SYSTEM</h2>
+        <h2 class="text-xl font-black italic mb-8 text-blue-500">SYSTEM CORE</h2>
         <input type="text" id="cloak-name" class="setting-input" placeholder="Permanent Tab Title">
         <input type="text" id="cloak-icon" class="setting-input" placeholder="Permanent Favicon URL">
         
-        <div class="flex justify-between items-center p-4 bg-white/5 rounded-xl mb-6" onclick="OS.toggleOpt()">
-            <span class="text-[10px] font-black uppercase tracking-widest">Optimization</span>
+        <div class="setting-item flex justify-between items-center p-4 bg-white/5 rounded-xl mb-6" onclick="OS.toggleOpt()">
+            <span class="text-[10px] font-black uppercase tracking-widest">Low Graphics Mode</span>
             <div id="opt-status" class="text-[10px] font-black text-rose-500">OFF</div>
         </div>
 
-        <p class="text-[9px] font-black uppercase tracking-widest text-white/20 mb-3">Themes</p>
+        <p class="text-[9px] font-black uppercase tracking-widest text-white/20 mb-3">Accent Theme</p>
         <div class="grid grid-cols-4 gap-2 mb-8">
-            <div class="h-8 rounded bg-blue-600" onclick="OS.setTheme('#3b82f6')"></div>
-            <div class="h-8 rounded bg-rose-600" onclick="OS.setTheme('#e11d48')"></div>
-            <div class="h-8 rounded bg-emerald-600" onclick="OS.setTheme('#059669')"></div>
-            <div class="h-8 rounded bg-purple-600" onclick="OS.setTheme('#9333ea')"></div>
+            <div class="h-8 rounded bg-blue-600 setting-item" onclick="OS.setTheme('#3b82f6')"></div>
+            <div class="h-8 rounded bg-rose-600 setting-item" onclick="OS.setTheme('#e11d48')"></div>
+            <div class="h-8 rounded bg-emerald-600 setting-item" onclick="OS.setTheme('#059669')"></div>
+            <div class="h-8 rounded bg-purple-600 setting-item" onclick="OS.setTheme('#9333ea')"></div>
         </div>
-        <button class="w-full py-4 bg-white text-black rounded-xl font-black text-[10px] uppercase" onclick="OS.saveSettings()">Apply & Save</button>
+        <button class="w-full py-4 bg-white text-black rounded-xl font-black text-[10px] uppercase hover:bg-gray-200" onclick="OS.saveSettings()">SAVE CONFIGURATION</button>
     </aside>
 
     <div id="search-layer" class="layer" onclick="OS.closeAll()">
@@ -133,7 +131,7 @@
 
     <div id="term-layer" class="layer" onclick="OS.closeAll()">
         <div class="layer-content w-full max-w-2xl bg-black border border-white/10 rounded-3xl overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
-            <div id="term-out" class="p-6 h-64 font-mono text-blue-400 text-xs overflow-y-auto">Nebula Kernel v12.1. Type 'help' for commands.</div>
+            <div id="term-out" class="p-6 h-64 font-mono text-blue-400 text-[11px] overflow-y-auto leading-relaxed">Nebula Terminal v12.2. Type 'help' for global commands.</div>
             <div class="p-4 bg-[#050505] flex gap-3 border-t border-white/5">
                 <span class="text-blue-500 font-bold">$</span>
                 <input type="text" id="term-in" class="bg-transparent border-none outline-none text-white font-mono w-full" onkeypress="OS.handleTerm(event)">
@@ -141,15 +139,15 @@
         </div>
     </div>
 
-    <main id="desktop" class="absolute inset-0 flex items-center justify-center opacity-0 scale-110 pointer-events-none transition-all duration-1000">
+    <main id="desktop" class="absolute inset-0 flex items-center justify-center opacity-0 scale-110 pointer-events-none">
         <h1 class="hero" id="hero-title">NEBULA</h1>
     </main>
 
     <div id="dock-wrap" class="fixed bottom-[-100px] left-1/2 -translate-x-1/2 z-[1000] transition-all duration-700">
         <div class="flex gap-4 p-3 bg-white/5 border border-white/10 rounded-[28px] backdrop-blur-3xl">
-            <div class="btn w-[52px] h-[52px] bg-[#0a0a0a] rounded-xl flex items-center justify-center text-lg" onclick="OS.closeAll()">🏠</div>
-            <div class="btn w-[52px] h-[52px] bg-[#0a0a0a] rounded-xl flex items-center justify-center text-lg" onclick="OS.openLayer('search-layer')">🔍</div>
-            <div class="btn w-[52px] h-[52px] bg-[#0a0a0a] rounded-xl flex items-center justify-center text-lg" onclick="OS.openSettings()">⚙️</div>
+            <div class="btn w-[50px] h-[50px] bg-[#0a0a0a] rounded-xl flex items-center justify-center text-lg" onclick="OS.closeAll()">🏠</div>
+            <div class="btn w-[50px] h-[50px] bg-[#0a0a0a] rounded-xl flex items-center justify-center text-lg" onclick="OS.openLayer('search-layer')">🔍</div>
+            <div class="btn w-[50px] h-[50px] bg-[#0a0a0a] rounded-xl flex items-center justify-center text-lg" onclick="OS.openSettings()">⚙️</div>
         </div>
     </div>
 
@@ -165,14 +163,14 @@
                 this.setupMouse();
                 this.setupStars();
                 this.setupRightClick();
-                this.loadCloak();
+                this.loadSettings();
                 
                 window.onkeydown = (e) => {
                     if(e.altKey && e.key === 't') { e.preventDefault(); this.openLayer('term-layer'); }
                     if(e.key === 'Escape') this.closeAll();
                 };
 
-                // Persistent Tab Management
+                // Permanent Cloak Loop
                 setInterval(() => {
                     const savedN = localStorage.getItem('neb-cloak-n');
                     const savedI = localStorage.getItem('neb-cloak-i');
@@ -183,14 +181,16 @@
                         document.title = "NEBULA OS";
                         document.getElementById('os-favicon').href = "https://cdn-icons-png.flaticon.com/512/606/606547.png";
                     }
-                }, 500);
+                }, 400);
             }
 
-            loadCloak() {
+            loadSettings() {
                 const n = localStorage.getItem('neb-cloak-n');
                 const i = localStorage.getItem('neb-cloak-i');
+                const t = localStorage.getItem('neb-theme');
                 if(n) document.getElementById('cloak-name').value = n;
                 if(i) document.getElementById('cloak-icon').value = i;
+                if(t) this.setTheme(t);
             }
 
             setupRightClick() {
@@ -208,7 +208,7 @@
                     this.m.x = e.clientX; this.m.y = e.clientY;
                     document.documentElement.style.setProperty('--m-x', `${this.m.x}px`);
                     document.documentElement.style.setProperty('--m-y', `${this.m.y}px`);
-                    if(e.target.closest('.btn, .menu-item, .setting-input')) document.body.classList.add('hover-state');
+                    if(e.target.closest('.btn, .menu-item, .setting-item, .setting-input')) document.body.classList.add('hover-state');
                     else document.body.classList.remove('hover-state');
                 };
                 const lerp = () => {
@@ -230,7 +230,7 @@
                     document.getElementById('desktop').style.opacity = '1';
                     document.getElementById('desktop').style.transform = 'scale(1)';
                     document.getElementById('dock-wrap').style.bottom = '40px';
-                }, 1000);
+                }, 800);
             }
 
             openLayer(id) {
@@ -247,8 +247,9 @@
 
             toggleOpt() {
                 this.isOpt = !this.isOpt;
-                document.getElementById('opt-status').innerText = this.isOpt ? "ON" : "OFF";
-                document.getElementById('opt-status').style.color = this.isOpt ? "#10b981" : "#f43f5e";
+                const status = document.getElementById('opt-status');
+                status.innerText = this.isOpt ? "ON" : "OFF";
+                status.style.color = this.isOpt ? "#10b981" : "#f43f5e";
             }
 
             saveSettings() {
@@ -259,20 +260,32 @@
                 this.closeAll();
             }
 
-            setTheme(c) { document.documentElement.style.setProperty('--theme-main', c); }
+            setTheme(c) { 
+                document.documentElement.style.setProperty('--theme-main', c); 
+                localStorage.setItem('neb-theme', c);
+            }
 
             handleTerm(e) {
                 if(e.key === 'Enter') {
                     const cmd = e.target.value.toLowerCase().trim();
                     const out = document.getElementById('term-out');
-                    if(cmd === 'help') out.innerHTML += "<br>Commands: help, clear, theme [color], cloak [name], exit";
+                    const parts = cmd.split(' ');
+
+                    if(cmd === 'help') out.innerHTML += "<br>-- COMMANDS --<br>help, clear, neofetch, theme [hex], cloak [name] [url], exit";
                     else if(cmd === 'clear') out.innerHTML = "Terminal Cleared.";
+                    else if(cmd === 'neofetch') out.innerHTML += "<br>OS: Nebula v12.2<br>Shell: MonoBash<br>Graphics: WebGL v2<br>Status: System Stable";
                     else if(cmd.startsWith('theme ')) {
-                        this.setTheme(cmd.split(' ')[1]);
-                        out.innerHTML += "<br>Theme updated.";
+                        this.setTheme(parts[1]);
+                        out.innerHTML += `<br>System accent updated to ${parts[1]}.`;
+                    }
+                    else if(cmd.startsWith('cloak ')) {
+                        if(parts[1]) localStorage.setItem('neb-cloak-n', parts[1]);
+                        if(parts[2]) localStorage.setItem('neb-cloak-i', parts[2]);
+                        out.innerHTML += "<br>Tab cloak parameters updated.";
                     }
                     else if(cmd === 'exit') this.closeAll();
-                    else out.innerHTML += `<br>Unknown command: ${cmd}`;
+                    else out.innerHTML += `<br>'${cmd}' is not recognized.`;
+                    
                     e.target.value = "";
                     out.scrollTop = out.scrollHeight;
                 }
@@ -299,10 +312,10 @@
                 const c = document.getElementById('stars'); const ctx = c.getContext('2d');
                 let pts = []; const res = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
                 window.onresize = res; res();
-                for(let i=0; i<150; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*1.5});
+                for(let i=0; i<180; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*1.8});
                 const draw = () => {
                     ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle = '#fff';
-                    const speed = this.isOpt ? 0.05 : 0.25;
+                    const speed = this.isOpt ? 0.05 : 0.2;
                     pts.forEach(p => { 
                         ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); 
                         p.y += speed; if(p.y > c.height) p.y = 0; 
