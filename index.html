@@ -3,402 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA OS | QUANTUM v19.0</title>
+    <title>NEBULA | P*XIESS EDITION</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     
     <style>
         :root { 
-            --nebula-blue: #00d2ff; 
-            --nebula-glow: rgba(0, 210, 255, 0.5);
-            --transition-speed: 0.6s;
-            --ease: cubic-bezier(0.2, 1, 0.3, 1);
+            --accent: #00d2ff; 
+            --glow: rgba(0, 210, 255, 0.6);
+            --bg: #000000;
+            --panel: rgba(10, 10, 10, 0.95);
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* --- THE CORE FOUNDATION --- */
+        /* --- GLOBAL TRANSITIONS & RESET --- */
         * { 
             margin: 0; padding: 0; box-sizing: border-box; 
             font-style: normal !important; 
-            user-select: none; -webkit-user-drag: none;
-            transition: all var(--transition-speed) var(--ease);
+            cursor: none !important; /* Hide real mouse for the dot */
+            transition: var(--transition);
         }
 
         body { 
-            background: #000; color: #fff; 
+            background: var(--bg); color: #fff; 
             font-family: 'Inter', sans-serif; 
             overflow: hidden; height: 100vh;
-            perspective: 1200px;
         }
 
-        /* --- HIGH FIDELITY MOUSE HALO --- */
-        #cursor-halo { 
-            position: fixed; width: 45px; height: 45px; 
-            border: 2px solid var(--nebula-blue); border-radius: 50%; 
-            z-index: 9999999; pointer-events: none; 
+        /* --- THE DOT CURSOR --- */
+        #dot-cursor {
+            position: fixed; width: 6px; height: 6px; 
+            background: var(--accent); border-radius: 50%;
+            z-index: 10000000; pointer-events: none;
+            box-shadow: 0 0 12px var(--accent), 0 0 20px var(--accent);
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 20px var(--nebula-glow), inset 0 0 10px var(--nebula-glow);
-            transition: width 0.3s, height 0.3s, transform 0.08s ease-out;
-            mix-blend-mode: screen;
+            transition: transform 0.05s linear, width 0.3s, height 0.3s;
         }
-        body:active #cursor-halo { width: 30px; height: 30px; border-width: 4px; }
 
-        /* --- BOOT ARCHITECTURE --- */
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes starScroll { from { transform: translateY(0); } to { transform: translateY(-1000px); } }
+
+        .anim-fade { animation: fadeIn 0.6s var(--transition); }
+        .anim-slide { animation: slideUp 0.5s var(--transition); }
+
+        /* --- BOOT SYSTEM --- */
         #boot-portal { 
             position: fixed; inset: 0; background: #000; z-index: 999999; 
             display: flex; align-items: center; justify-content: center; 
         }
-        .boot-frame { 
-            width: 650px; background: #050505; border: 1px solid #1a1a1a; 
-            padding: 80px; border-radius: 40px; text-align: center;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+        .boot-box { 
+            width: 450px; padding: 60px; text-align: center;
+            background: var(--panel); border: 1px solid #1a1a1a; border-radius: 30px;
         }
-        .boot-frame:hover { border-color: var(--nebula-blue); }
-        
-        #boot-progress-container { margin-top: 40px; display: none; }
-        .rail { width: 100%; height: 2px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
-        .fill { width: 0%; height: 100%; background: var(--nebula-blue); box-shadow: 0 0 20px var(--nebula-blue); }
+        .rail { width: 100%; height: 2px; background: #111; margin-top: 30px; border-radius: 2px; overflow: hidden; }
+        .fill { width: 0%; height: 100%; background: var(--accent); box-shadow: 0 0 15px var(--accent); }
 
-        /* --- THE MATRIX (GAMES A-Z) --- */
-        .matrix-grid { 
+        /* --- MAIN UI SCALING --- */
+        #nebula-main-text { 
+            font-size: 12vw; /* Reduced size */
+            font-weight: 900; letter-spacing: -0.05em;
+            filter: drop-shadow(0 0 50px var(--glow));
+        }
+
+        /* --- DOCK SCALING --- */
+        #dock { 
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
+            display: flex; gap: 12px; background: rgba(255,255,255,0.05);
+            padding: 10px; border-radius: 20px; backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1); z-index: 1000;
+        }
+        .dock-btn { 
+            width: 45px; height: 45px; /* Smaller buttons */
+            background: #0a0a0a; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; border: 1px solid #222;
+        }
+        .dock-btn:hover { background: var(--accent); color: #000; transform: translateY(-5px); }
+
+        /* --- SMALL SQUARE GAMES GRID --- */
+        .game-matrix { 
             display: grid; 
-            grid-template-cols: repeat(auto-fill, minmax(180px, 1fr)); 
-            gap: 25px; padding: 40px; 
+            grid-template-cols: repeat(auto-fill, minmax(100px, 1fr)); /* Small icons */
+            gap: 12px; padding: 20px;
         }
-        .matrix-card { 
-            aspect-ratio: 1; background: #080808; border-radius: 25px; 
-            overflow: hidden; position: relative; border: 1px solid #151515;
-            cursor: pointer; transform-style: preserve-3d;
+        .game-square { 
+            aspect-ratio: 1/1; background: #080808; border-radius: 12px; 
+            overflow: hidden; border: 1px solid #1a1a1a; position: relative;
         }
-        .matrix-card:hover { 
-            transform: translateY(-15px) rotateX(5deg);
-            outline: 3px solid #fff;
-            box-shadow: 0 30px 60px rgba(0, 210, 255, 0.3);
-        }
-        .matrix-card img { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; transition: 1s; }
-        .matrix-card:hover img { opacity: 1; transform: scale(1.1); }
-        
-        .matrix-info { 
-            position: absolute; bottom: 0; width: 100%; 
-            background: linear-gradient(transparent, #000 80%); 
-            padding: 30px 15px 15px; font-size: 11px; font-weight: 900; 
-            letter-spacing: 1px; text-transform: uppercase;
+        .game-square:hover { outline: 2px solid var(--accent); transform: scale(1.05); z-index: 10; }
+        .game-square img { width: 100%; height: 100%; object-fit: cover; }
+        .game-name { 
+            position: absolute; bottom: 0; width: 100%; font-size: 8px; 
+            background: rgba(0,0,0,0.8); padding: 4px; text-align: center; font-weight: 900;
         }
 
-        /* --- SYSTEM LAYERS --- */
-        .nebula-panel { 
+        /* --- LAYERS --- */
+        .neb-layer { 
             position: fixed; inset: 0; background: rgba(0,0,0,0.98); 
-            z-index: 500000; display: none; opacity: 0; 
-            align-items: center; justify-content: center; 
-            backdrop-filter: blur(40px);
+            z-index: 5000; display: none; opacity: 0; 
+            align-items: center; justify-content: center; backdrop-filter: blur(30px);
         }
-        .nebula-panel.active { display: flex; opacity: 1; }
+        .neb-layer.active { display: flex; opacity: 1; }
 
-        /* --- THE DOCK --- */
-        #system-dock { 
-            position: fixed; bottom: -150px; left: 50%; transform: translateX(-50%); 
-            z-index: 800000; display: flex; gap: 20px; 
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-            padding: 12px 30px; border-radius: 35px; backdrop-filter: blur(20px);
+        /* --- P*XIESS SEARCH --- */
+        #pxiess-bar {
+            width: 600px; padding: 25px; background: #0a0a0a; border-radius: 50px;
+            border: 1px solid #222; text-align: center; font-size: 20px;
+            outline: none; font-weight: 900;
         }
-        .dock-icon { 
-            width: 55px; height: 55px; background: #0a0a0a; border-radius: 18px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 22px; border: 1px solid #1a1a1a; cursor: pointer;
-        }
-        .dock-icon:hover { 
-            transform: translateY(-10px) scale(1.2); 
-            border-color: var(--nebula-blue);
-            box-shadow: 0 10px 30px var(--nebula-glow);
-        }
+        #pxiess-bar:focus { border-color: var(--accent); box-shadow: 0 0 30px var(--glow); }
 
-        /* --- WORKSPACE / HUD --- */
-        #workspace-layer { position: fixed; inset: 0; z-index: 100000; display: none; background: #000; }
-        #workspace-layer iframe { width: 100%; height: 100%; border: none; }
-        
-        #hud-nav { 
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%); 
-            z-index: 200000; display: flex; gap: 40px; 
-            background: #050505; border: 1px solid #222;
-            padding: 15px 60px; border-radius: 0 0 30px 30px;
-        }
-        #hud-nav.active { top: 0; }
+        /* --- IFRAME WORKSPACE --- */
+        #workspace { position: fixed; inset: 0; z-index: 4000; display: none; background: #000; }
+        #workspace iframe { width: 100%; height: 100%; border: none; }
 
-        /* --- CONTEXT MENU --- */
-        #nebula-menu { 
-            position: fixed; z-index: 99999999; background: #080808; 
-            border: 1px solid #222; border-radius: 15px; padding: 10px; 
-            width: 250px; opacity: 0; transform: scale(0.9); pointer-events: none;
+        #hud { 
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 30px; background: #050505; padding: 12px 40px;
+            border-radius: 50px; border: 1px solid #222; z-index: 6000; opacity: 0; pointer-events: none;
         }
-        #nebula-menu.active { opacity: 1; transform: scale(1); pointer-events: all; }
-        .menu-item { 
-            padding: 14px; font-size: 11px; font-weight: 900; border-radius: 10px; 
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .menu-item:hover { background: var(--nebula-blue); color: #000; }
-
-        /* --- TERMINAL (ALT+T) --- */
-        #terminal-box { 
-            width: 800px; height: 500px; background: #000; 
-            border: 1px solid #1a1a1a; border-radius: 20px; padding: 30px; 
-            font-family: 'JetBrains Mono', monospace; box-shadow: 0 50px 100px rgba(0,0,0,0.9);
-        }
+        #hud.visible { opacity: 1; pointer-events: all; }
     </style>
 </head>
-<body oncontextmenu="OS.openCtx(event)">
+<body oncontextmenu="Core.openCtx(event)">
 
-    <canvas id="star-canvas" class="fixed inset-0 -z-10"></canvas>
-    <div id="cursor-halo"></div>
+    <div id="dot-cursor"></div>
+    <canvas id="stars" class="fixed inset-0 -z-10"></canvas>
 
-    <div id="nebula-menu">
-        <div class="menu-item" onclick="OS.home()"><span>RETURN HOME</span><span>🏠</span></div>
-        <div class="menu-item" onclick="OS.openPanel('archive-panel')"><span>GAME ARCHIVE</span><span>🎮</span></div>
-        <div class="menu-item" onclick="OS.openPanel('proxy-panel')"><span>PROXY SEARCH</span><span>🔍</span></div>
-        <div class="menu-item" onclick="OS.openPanel('settings-panel')"><span>SYSTEM SETTINGS</span><span>⚙️</span></div>
-        <hr class="my-2 border-white/5">
-        <div class="menu-item text-red-500" onclick="location.reload()"><span>HARD REBOOT</span><span>🔄</span></div>
+    <div id="ctx" class="fixed z-[100000] bg-[#0a0a0a] border border-[#222] p-2 rounded-xl w-48 opacity-0 pointer-events-none scale-95 transition-all">
+        <div class="p-3 hover:bg-cyan-500 hover:text-black rounded-lg text-[10px] font-black cursor-pointer flex justify-between" onclick="Core.home()">DASHBOARD <span>🏠</span></div>
+        <div class="p-3 hover:bg-cyan-500 hover:text-black rounded-lg text-[10px] font-black cursor-pointer flex justify-between" onclick="Core.open('games')">GAMES <span>🎮</span></div>
+        <div class="p-3 hover:bg-cyan-500 hover:text-black rounded-lg text-[10px] font-black cursor-pointer flex justify-between" onclick="Core.open('pxiess')">P*XIESS <span>🔍</span></div>
     </div>
 
     <div id="boot-portal">
-        <div class="boot-frame">
-            <h1 class="text-7xl font-black italic tracking-tighter mb-2">NEBULA</h1>
-            <p class="text-[10px] font-black text-white/20 mb-12 tracking-[8px]">QUANTUM CORE v19.0</p>
-            
-            <input type="text" id="user-id" placeholder="IDENTIFY..." class="bg-transparent border-b-2 border-white/10 w-full p-5 outline-none mb-10 text-3xl font-black uppercase text-center focus:border-cyan-400 transition-all">
-            
-            <button id="boot-btn" onclick="OS.startBootSequence()" class="w-full py-6 bg-white text-black font-black rounded-2xl hover:bg-cyan-400 transition-all uppercase tracking-widest text-lg">Initialize Session</button>
-            
-            <div id="boot-progress-container">
-                <div class="flex justify-between text-[10px] font-black text-cyan-400 mb-3 uppercase italic">
-                    <span id="boot-text">Loading System...</span>
-                    <span id="boot-pct">0%</span>
-                </div>
-                <div class="rail"><div id="boot-fill" class="fill"></div></div>
+        <div class="boot-box anim-fade">
+            <h1 class="text-5xl font-black italic tracking-tighter mb-2">NEBULA</h1>
+            <p class="text-[9px] font-black text-white/20 tracking-[10px] mb-10">CORE V20.0</p>
+            <input type="text" id="user-in" placeholder="SYSTEM ID..." class="bg-transparent border-b border-white/10 w-full p-3 outline-none mb-8 text-xl font-black text-center uppercase focus:border-cyan-500">
+            <button onclick="Core.boot()" class="w-full py-4 bg-white text-black font-black rounded-xl hover:bg-cyan-500 transition-all">INITIALIZE</button>
+            <div id="load-wrap" class="hidden">
+                <div class="rail"><div id="fill" class="fill"></div></div>
+                <p id="status" class="text-[8px] font-black text-cyan-500 mt-4 tracking-widest uppercase">Syncing Protocols...</p>
             </div>
         </div>
     </div>
 
-    <nav id="hud-nav">
-        <button class="text-[11px] font-black hover:text-cyan-400 tracking-widest" onclick="OS.home()">EXIT_WORKSPACE</button>
-        <div class="w-[1px] h-4 bg-white/10 mx-2"></div>
-        <button class="text-[11px] font-black hover:text-cyan-400 tracking-widest" onclick="OS.openPanel('archive-panel')">ARCHIVE</button>
-        <button class="text-[11px] font-black hover:text-cyan-400 tracking-widest" onclick="OS.openPanel('proxy-panel')">SEARCH</button>
-    </nav>
-
-    <main id="desktop" class="absolute inset-0 flex items-center justify-center opacity-0 scale-90 pointer-events-none">
-        <h1 class="text-[22vw] font-black text-white/95 italic tracking-tighter" style="filter: drop-shadow(0 0 100px var(--nebula-glow))">NEBULA</h1>
+    <main id="desktop" class="absolute inset-0 flex items-center justify-center opacity-0 scale-95 transition-all duration-1000">
+        <h1 id="nebula-main-text" class="italic">NEBULA</h1>
     </main>
 
-    <div id="archive-panel" class="nebula-panel" onclick="OS.closePanels()">
-        <div class="w-[94%] h-[88vh] overflow-y-auto bg-[#050505]/95 p-12 rounded-[50px] border border-white/10" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-end mb-12 px-6">
-                <div>
-                    <h2 class="text-6xl font-black italic tracking-tighter">THE MATRIX</h2>
-                    <p class="text-[10px] font-black text-cyan-400 mt-2">VERIFIED A-Z ENTRIES</p>
-                </div>
-                <input type="text" placeholder="FILTER ARCHIVE..." class="bg-[#0a0a0a] border border-white/10 p-5 rounded-2xl outline-none text-[10px] font-black w-80 focus:border-white">
+    <div id="pxiess-layer" class="neb-layer" onclick="Core.close()">
+        <div class="text-center anim-slide" onclick="event.stopPropagation()">
+            <h1 class="text-8xl font-black mb-10 tracking-tighter">P*XIESS</h1>
+            <input type="text" id="pxiess-bar" placeholder="SEARCH THE VOID..." onkeypress="if(event.key==='Enter')Core.launch(this.value)">
+        </div>
+    </div>
+
+    <div id="games-layer" class="neb-layer" onclick="Core.close()">
+        <div class="w-[80%] h-[70vh] bg-[#050505] border border-white/10 rounded-[30px] overflow-hidden anim-slide" onclick="event.stopPropagation()">
+            <div class="p-6 border-b border-white/5 flex justify-between items-center">
+                <span class="font-black italic text-xl">GAME ARCHIVE</span>
+                <span class="text-[10px] font-black opacity-40">A-Z DATABASE</span>
             </div>
-            <div class="matrix-grid" id="matrix-inject"></div>
-        </div>
-    </div>
-
-    <div id="proxy-panel" class="nebula-panel" onclick="OS.closePanels()">
-        <div class="text-center" onclick="event.stopPropagation()">
-            <h1 class="text-[12vw] font-black leading-[0.85] mb-12">NEBU<br>PR*XY</h1>
-            <input type="text" id="url-entry" class="bg-[#050505] border border-white/10 w-[850px] p-10 rounded-full text-center outline-none text-3xl font-black hover:border-cyan-400 focus:border-cyan-400" placeholder="ACCESS EXTERNAL NETWORK" onkeypress="if(event.key==='Enter')OS.launch(this.value)">
-        </div>
-    </div>
-
-    <div id="settings-panel" class="nebula-panel" onclick="OS.closePanels()">
-        <div class="boot-frame" onclick="event.stopPropagation()">
-            <h2 class="text-3xl font-black mb-10 italic">CORE_SYSTEM_CFG</h2>
-            <div class="space-y-4">
-                <div class="p-6 bg-[#0a0a0a] rounded-3xl border border-white/5 flex justify-between items-center">
-                    <span class="text-xs font-black uppercase">Background Engine</span>
-                    <span class="text-cyan-400 text-xs font-black">STABLE (60FPS)</span>
+            <div class="game-matrix" id="game-inject">
                 </div>
-                <div class="p-6 bg-[#0a0a0a] rounded-3xl border border-white/5 flex justify-between items-center">
-                    <span class="text-xs font-black uppercase">Security Protocol</span>
-                    <span class="text-cyan-400 text-xs font-black">BYPASSED</span>
-                </div>
-                <button class="w-full py-6 bg-white text-black font-black rounded-2xl mt-8" onclick="OS.closePanels()">APPLY PROTOCOLS</button>
-            </div>
         </div>
     </div>
 
-    <div id="terminal-panel" class="nebula-panel" onclick="OS.closePanels()">
-        <div id="terminal-box" onclick="event.stopPropagation()">
-            <div id="term-out" class="h-full overflow-y-auto text-[13px] text-cyan-500 whitespace-pre">NEBULA KERNEL v19.0... INITIALIZED.<br>TYPE 'HELP' FOR COMMANDS.</div>
-            <div class="flex mt-4">
-                <span class="text-cyan-500 font-bold mr-2">></span>
-                <input type="text" id="term-in" class="bg-transparent border-none outline-none text-white w-full" onkeypress="OS.handleTerm(event)">
-            </div>
-        </div>
+    <div id="hud">
+        <button class="text-[10px] font-black hover:text-cyan-500" onclick="Core.home()">EXIT</button>
+        <button class="text-[10px] font-black hover:text-cyan-500" onclick="Core.open('games')">GAMES</button>
+        <button class="text-[10px] font-black hover:text-cyan-500" onclick="Core.open('pxiess')">P*XIESS</button>
     </div>
 
-    <div id="workspace-layer"><iframe id="main-frame" src=""></iframe></div>
+    <div id="workspace"><iframe id="view"></iframe></div>
 
-    <div id="system-dock">
-        <div class="dock-icon" onclick="OS.home()">🏠</div>
-        <div class="dock-icon" onclick="OS.openPanel('proxy-panel')">🔍</div>
-        <div class="dock-icon" onclick="OS.openPanel('archive-panel')">🎮</div>
-        <div class="dock-icon" onclick="OS.openPanel('settings-panel')">⚙️</div>
+    <div id="dock" class="opacity-0 translate-y-20 transition-all duration-1000">
+        <div class="dock-btn" onclick="Core.home()">🏠</div>
+        <div class="dock-btn" onclick="Core.open('pxiess')">🔍</div>
+        <div class="dock-btn" onclick="Core.open('games')">🎮</div>
+        <div class="dock-btn" onclick="location.reload()">🔄</div>
     </div>
 
     <script>
-        // --- DATASET: 30+ GAMES A-Z ---
-        const GAME_DB = [
-            { n: "1v1.LOL", i: "https://images.crazygames.com/1v1-lol/20220913134354/1v1-lol-cover", u: "https://1v1.lol" },
-            { n: "Basketball Stars", i: "https://images.crazygames.com/basketball-stars/20201026111306/basketball-stars-cover", u: "https://html5games.com/game/Basketball-Stars" },
-            { n: "BitLife", i: "https://images.crazygames.com/bitlife-life-simulator/20231127092955/bitlife-life-simulator-cover", u: "https://html5games.com/game/BitLife" },
-            { n: "Cookie Clicker", i: "https://images.crazygames.com/cookie-clicker/20201026111306/cookie-clicker-cover", u: "https://orteil.dashnet.org/cookieclicker/" },
-            { n: "Drift Hunters", i: "https://images.crazygames.com/drift-hunters/20240222101413/drift-hunters-cover", u: "https://html5games.com/game/Drift-Hunters" },
-            { n: "Friday Night Funkin", i: "https://images.crazygames.com/friday-night-funkin/20210512163457/friday-night-funkin-cover", u: "https://html5games.com/game/Friday-Night-Funkin" },
-            { n: "Geometry Dash", i: "https://upload.wikimedia.org/wikipedia/en/3/35/Geometry_Dash_Logo.PNG", u: "https://html5games.com/game/Geometry-Dash-Lite" },
-            { n: "Moto X3M", i: "https://images.crazygames.com/moto-x3m/20201026111306/moto-x3m-cover", u: "https://html5games.com/game/Moto-X3M" },
-            { n: "OvO", i: "https://images.crazygames.com/ovo/20201026111306/ovo-cover", u: "https://html5games.com/game/Ovo" },
-            { n: "Paper.io 2", i: "https://images.crazygames.com/paper-io-2/20201026111306/paper-io-2-cover", u: "https://paper-io.com" },
-            { n: "Rooftop Snipers", i: "https://images.crazygames.com/rooftop-snipers/20201026111306/rooftop-snipers-cover", u: "https://html5games.com/game/Rooftop-Snipers" },
-            { n: "Slope", i: "https://images.crazygames.com/slope/20201026111306/slope-cover", u: "https://html5games.com/game/Slope" },
-            { n: "Subway Surfers", i: "https://images.crazygames.com/subway-surfers/20240112101413/subway-surfers-cover", u: "https://html5games.com/game/Subway-Surfers" },
-            { n: "Tunnel Rush", i: "https://images.crazygames.com/tunnel-rush/20201026111306/tunnel-rush-cover", u: "https://html5games.com/game/Tunnel-Rush" },
-            { n: "Vex 7", i: "https://images.crazygames.com/vex-7/20221017101413/vex-7-cover", u: "https://html5games.com/game/Vex-7" },
-            { n: "Zombs Royale", i: "https://images.crazygames.com/zombs-royale-io/20201026111306/zombs-royale-io-cover", u: "https://zombsroyale.io" }
+        // Massive Data Set for Squares
+        const DB = [
+            { n: "1v1.LOL", i: "https://images.crazygames.com/1v1-lol/20220913134354/1v1-lol-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=120&h=120&fit=crop", u: "https://1v1.lol" },
+            { n: "Slope", i: "https://images.crazygames.com/slope/20201026111306/slope-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=120&h=120&fit=crop", u: "https://html5games.com/game/Slope" },
+            { n: "OvO", i: "https://images.crazygames.com/ovo/20201026111306/ovo-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=120&h=120&fit=crop", u: "https://html5games.com/game/Ovo" },
+            { n: "BitLife", i: "https://images.crazygames.com/bitlife-life-simulator/20231127092955/bitlife-life-simulator-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=120&h=120&fit=crop", u: "https://html5games.com/game/BitLife" },
+            { n: "Moto X3M", i: "https://images.crazygames.com/moto-x3m/20201026111306/moto-x3m-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=120&h=120&fit=crop", u: "https://html5games.com/game/Moto-X3M" },
+            { n: "Vex 7", i: "https://images.crazygames.com/vex-7/20221017101413/vex-7-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=120&h=120&fit=crop", u: "https://html5games.com/game/Vex-7" },
+            { n: "Retro Bowl", i: "https://images.crazygames.com/retro-bowl/20220204111306/retro-bowl-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=120&h=120&fit=crop", u: "https://html5games.com/game/Retro-Bowl" },
+            { n: "Tunnel Rush", i: "https://images.crazygames.com/tunnel-rush/20201026111306/tunnel-rush-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=120&h=120&fit=crop", u: "https://html5games.com/game/Tunnel-Rush" },
+            { n: "Geometry Dash", i: "https://images.crazygames.com/geometry-dash-online/20201026111306/geometry-dash-online-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=120&h=120&fit=crop", u: "https://html5games.com/game/Geometry-Dash-Lite" },
+            { n: "Subway Surfers", i: "https://images.crazygames.com/subway-surfers/20240112101413/subway-surfers-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=120&h=120&fit=crop", u: "https://html5games.com/game/Subway-Surfers" },
+            { n: "Basket Stars", i: "https://images.crazygames.com/basketball-stars/20201026111306/basketball-stars-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=120&h=120&fit=crop", u: "https://html5games.com/game/Basketball-Stars" },
+            { n: "Paper.io 2", i: "https://images.crazygames.com/paper-io-2/20201026111306/paper-io-2-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=120&h=120&fit=crop", u: "https://paper-io.com" }
         ];
 
-        const OS = {
-            m: { x: 0, y: 0, sx: 0, sy: 0 },
-
+        const Core = {
             init() {
-                // Smoothing Mouse Tracker
+                // Precision Dot Cursor Logic
+                const dot = document.getElementById('dot-cursor');
                 window.addEventListener('mousemove', (e) => {
-                    this.m.x = e.clientX;
-                    this.m.y = e.clientY;
+                    dot.style.left = e.clientX + 'px';
+                    dot.style.top = e.clientY + 'px';
                 });
 
-                const smoothLoop = () => {
-                    this.m.sx += (this.m.x - this.m.sx) * 0.15;
-                    this.m.sy += (this.m.y - this.m.sy) * 0.15;
-                    const h = document.getElementById('cursor-halo');
-                    h.style.left = this.m.sx + 'px';
-                    h.style.top = this.m.sy + 'px';
-                    requestAnimationFrame(smoothLoop);
-                };
-                smoothLoop();
+                window.addEventListener('mousedown', () => { dot.style.transform = 'translate(-50%, -50%) scale(2)'; dot.style.background = '#fff'; });
+                window.addEventListener('mouseup', () => { dot.style.transform = 'translate(-50%, -50%) scale(1)'; dot.style.background = 'var(--accent)'; });
 
-                // Keybinds
-                window.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape') this.closePanels();
-                    if (e.altKey && e.key === 't') { e.preventDefault(); this.openPanel('terminal-panel'); }
-                });
-
-                this.renderStars();
-                this.injectGames();
-            },
-
-            startBootSequence() {
-                const id = document.getElementById('user-id').value;
-                if(!id) return alert("System ID Required");
-                
-                document.getElementById('boot-btn').style.display = 'none';
-                document.getElementById('boot-progress-container').style.display = 'block';
-                
-                let p = 0;
-                const fill = document.getElementById('boot-fill');
-                const pct = document.getElementById('boot-pct');
-                const txt = document.getElementById('boot-text');
-
-                const iv = setInterval(() => {
-                    p += Math.random() * 5;
-                    if(p >= 100) {
-                        p = 100;
-                        clearInterval(iv);
-                        this.launchDesktop();
-                    }
-                    fill.style.width = p + '%';
-                    pct.innerText = Math.floor(p) + '%';
-                    if(p > 30) txt.innerText = "VERIFYING PROXY...";
-                    if(p > 70) txt.innerText = "DECRYPTING ARCHIVE...";
-                }, 40);
-            },
-
-            launchDesktop() {
-                const bp = document.getElementById('boot-portal');
-                bp.style.opacity = '0';
-                setTimeout(() => {
-                    bp.style.display = 'none';
-                    document.getElementById('desktop').style.opacity = '1';
-                    document.getElementById('desktop').style.transform = 'scale(1)';
-                    document.getElementById('system-dock').style.bottom = '40px';
-                }, 800);
-            },
-
-            injectGames() {
-                const matrix = document.getElementById('matrix-inject');
-                GAME_DB.forEach(g => {
-                    const card = document.createElement('div');
-                    card.className = "matrix-card";
-                    card.innerHTML = `<img src="${g.i}"><div class="matrix-info">${g.n}</div>`;
-                    card.onclick = () => this.launch(g.u);
-                    matrix.appendChild(card);
-                });
-            },
-
-            launch(u) {
-                if(!u) return;
-                let target = u.includes('.') ? (u.startsWith('http') ? u : 'https://' + u) : 'https://www.google.com/search?q=' + encodeURIComponent(u);
-                document.getElementById('main-frame').src = target;
-                document.getElementById('workspace-layer').style.display = 'block';
-                document.getElementById('hud-nav').classList.add('active');
-                document.getElementById('system-dock').style.bottom = '-150px';
-                this.closePanels();
-            },
-
-            home() {
-                document.getElementById('workspace-layer').style.display = 'none';
-                document.getElementById('main-frame').src = "";
-                document.getElementById('hud-nav').classList.remove('active');
-                document.getElementById('system-dock').style.bottom = '40px';
-            },
-
-            openPanel(id) {
-                this.closePanels();
-                const p = document.getElementById(id);
-                p.style.display = 'flex';
-                setTimeout(() => p.classList.add('active'), 10);
-            },
-
-            closePanels() {
-                document.getElementById('nebula-menu').classList.remove('active');
-                document.querySelectorAll('.nebula-panel').forEach(p => {
-                    p.classList.remove('active');
-                    setTimeout(() => { if(!p.classList.contains('active')) p.style.display = 'none'; }, 600);
-                });
-            },
-
-            openCtx(e) {
-                e.preventDefault();
-                const m = document.getElementById('nebula-menu');
-                m.style.left = e.clientX + 'px';
-                m.style.top = e.clientY + 'px';
-                m.classList.add('active');
-            },
-
-            handleTerm(e) {
-                if(e.key === 'Enter') {
-                    const out = document.getElementById('term-out');
-                    out.innerHTML += `<br>> ${e.target.value}`;
-                    e.target.value = "";
-                }
-            },
-
-            renderStars() {
-                const c = document.getElementById('star-canvas');
+                // Starfield Engine
+                const c = document.getElementById('stars');
                 const ctx = c.getContext('2d');
                 let s = [];
-                const res = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
-                window.onresize = res; res();
+                const resize = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
+                window.onresize = resize; resize();
 
-                for(let i=0; i<200; i++) s.push({x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*1.8, v: Math.random()*0.4});
+                for(let i=0; i<150; i++) s.push({x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*1.2, v: Math.random()*0.3});
                 const draw = () => {
                     ctx.clearRect(0,0,c.width,c.height);
                     ctx.fillStyle = "#fff";
@@ -409,10 +235,91 @@
                     requestAnimationFrame(draw);
                 };
                 draw();
+
+                // Inject Games
+                const matrix = document.getElementById('game-inject');
+                DB.forEach(game => {
+                    const div = document.createElement('div');
+                    div.className = "game-square anim-fade";
+                    div.innerHTML = `<img src="${game.i}"><div class="game-name">${game.n}</div>`;
+                    div.onclick = () => this.launch(game.u);
+                    matrix.appendChild(div);
+                });
+            },
+
+            boot() {
+                if(!document.getElementById('user-in').value) return;
+                document.getElementById('load-wrap').classList.remove('hidden');
+                let p = 0;
+                const fill = document.getElementById('fill');
+                const status = document.getElementById('status');
+                
+                const iv = setInterval(() => {
+                    p += Math.random() * 8;
+                    if(p >= 100) {
+                        p = 100; clearInterval(iv);
+                        this.enter();
+                    }
+                    fill.style.width = p + '%';
+                    if(p > 40) status.innerText = "LINKING P*XIESS DATABASE...";
+                    if(p > 80) status.innerText = "AUTHORIZING ACCESS...";
+                }, 50);
+            },
+
+            enter() {
+                document.getElementById('boot-portal').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('boot-portal').style.display = 'none';
+                    document.getElementById('desktop').style.opacity = '1';
+                    document.getElementById('desktop').style.transform = 'scale(1)';
+                    document.getElementById('dock').style.opacity = '1';
+                    document.getElementById('dock').style.transform = 'translateX(-50%) translateY(0)';
+                }, 600);
+            },
+
+            open(type) {
+                this.close();
+                const layer = document.getElementById(type + '-layer');
+                layer.style.display = 'flex';
+                setTimeout(() => layer.classList.add('active'), 10);
+            },
+
+            close() {
+                document.querySelectorAll('.neb-layer').forEach(l => {
+                    l.classList.remove('active');
+                    setTimeout(() => { if(!l.classList.contains('active')) l.style.display = 'none'; }, 400);
+                });
+                document.getElementById('ctx').style.opacity = '0';
+                document.getElementById('ctx').style.pointerEvents = 'none';
+            },
+
+            launch(url) {
+                if(!url) return;
+                let t = url.includes('.') ? (url.startsWith('http') ? url : 'https://' + url) : 'https://www.google.com/search?q=' + encodeURIComponent(url);
+                document.getElementById('view').src = t;
+                document.getElementById('workspace').style.display = 'block';
+                document.getElementById('hud').classList.add('visible');
+                this.close();
+            },
+
+            home() {
+                document.getElementById('workspace').style.display = 'none';
+                document.getElementById('view').src = "";
+                document.getElementById('hud').classList.remove('visible');
+            },
+
+            openCtx(e) {
+                e.preventDefault();
+                const ctx = document.getElementById('ctx');
+                ctx.style.left = e.clientX + 'px';
+                ctx.style.top = e.clientY + 'px';
+                ctx.style.opacity = '1';
+                ctx.style.pointerEvents = 'all';
+                ctx.style.transform = 'scale(1)';
             }
         };
 
-        window.onload = () => OS.init();
+        window.onload = () => Core.init();
     </script>
 </body>
 </html>
