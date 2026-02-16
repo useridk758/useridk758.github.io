@@ -3,326 +3,357 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA OS | v17.0</title>
+    <title>NEBULA OS | SUPERNOVA v18.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap" rel="stylesheet">
     
     <style>
         :root { 
             --theme: #00d2ff; 
-            --ease: cubic-bezier(0.16, 1, 0.3, 1); 
+            --ease-main: cubic-bezier(0.16, 1, 0.3, 1); 
             --m-x: 0; --m-y: 0; 
         }
 
-        /* --- GLOBAL RESET & PHYSICS --- */
+        /* --- CORE SYSTEM ARCHITECTURE --- */
         * { 
             margin: 0; padding: 0; box-sizing: border-box; 
             font-style: normal !important; 
-            cursor: none !important; 
-            transition: all 0.5s var(--ease);
             -webkit-user-drag: none;
             user-select: none;
+            transition: all 0.6s var(--ease-main);
         }
 
         body { 
             background: #000; color: #fff; 
             font-family: 'Inter', sans-serif; 
             overflow: hidden; height: 100vh; 
+            perspective: 1000px;
         }
 
-        /* --- CURSOR SYSTEM (BLUE RING) --- */
-        #cursor-dot { 
-            position: fixed; width: 5px; height: 5px; background: #fff; 
-            border-radius: 50%; z-index: 100000; pointer-events: none; 
-            left: 0; top: 0; transform: translate(-50%, -50%);
-        }
+        /* --- HARDWARE ACCELERATED CURSOR --- */
         #cursor-ring { 
-            position: fixed; width: 30px; height: 30px; 
-            border: 1.5px solid var(--theme); border-radius: 50%; 
-            z-index: 99999; pointer-events: none; 
-            left: 0; top: 0; transform: translate(-50%, -50%);
-            transition: width 0.3s, height 0.3s, border-color 0.3s;
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
+            position: fixed; width: 40px; height: 40px; 
+            border: 2px solid var(--theme); border-radius: 50%; 
+            z-index: 999999; pointer-events: none; 
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 20px var(--theme), inset 0 0 10px var(--theme);
+            transition: transform 0.1s ease-out, width 0.3s, height 0.3s, border-color 0.3s;
         }
 
-        /* --- HOVER EFFECTS --- */
-        .hover-glow:hover { 
-            outline: 2px solid #fff; 
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.15); 
-            transform: scale(1.02); 
-        }
-        
-        .game-card:hover { 
-            outline: 3px solid var(--theme); 
-            transform: translateY(-8px); 
-            box-shadow: 0 15px 40px rgba(0, 210, 255, 0.3);
-        }
-
-        /* --- UPDATE SCREEN --- */
-        #update-screen { 
-            position: fixed; inset: 0; background: #000; z-index: 20000; 
+        /* --- BOOT SEQUENCE STYLING --- */
+        #boot-screen { 
+            position: fixed; inset: 0; background: #000; z-index: 1000000; 
             display: flex; align-items: center; justify-content: center; 
-            transition: opacity 1s var(--ease);
         }
-        .update-box { 
-            width: 500px; background: #080808; border: 1px solid #1a1a1a; 
-            padding: 50px; border-radius: 24px; position: relative;
+        .boot-modal { 
+            width: 600px; background: #050505; border: 1px solid #1a1a1a; 
+            padding: 70px; border-radius: 40px; position: relative;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.9);
         }
+        .boot-modal:hover { border-color: var(--theme); }
+        
+        .progress-rail { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
+        .progress-flow { width: 0%; height: 100%; background: var(--theme); box-shadow: 0 0 20px var(--theme); }
 
-        /* --- THE GRID (A-Z VIDEO REPLICA) --- */
-        .game-grid { 
+        /* --- THE GAMES MATRIX (A-Z LAYOUT) --- */
+        .matrix-grid { 
             display: grid; 
-            grid-template-cols: repeat(auto-fill, minmax(150px, 1fr)); 
-            gap: 15px; padding: 20px; 
+            grid-template-cols: repeat(auto-fill, minmax(180px, 1fr)); 
+            gap: 20px; padding: 40px; 
         }
-        .game-card { 
-            aspect-ratio: 1; background: #0c0c0c; border-radius: 12px; 
-            overflow: hidden; position: relative; border: 1px solid #1a1a1a; 
+        .matrix-item { 
+            aspect-ratio: 1; background: #080808; border-radius: 20px; 
+            overflow: hidden; position: relative; border: 1px solid #151515;
+            transform-style: preserve-3d;
         }
-        .game-card img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
-        .game-label { 
-            position: absolute; bottom: 0; left: 0; width: 100%; 
-            background: linear-gradient(transparent, #000); 
-            padding: 25px 10px 8px; font-size: 10px; font-weight: 900; 
-            text-transform: uppercase; letter-spacing: 1px;
+        .matrix-item:hover { 
+            transform: translateY(-15px) rotateX(5deg) rotateY(5deg);
+            outline: 2px solid #fff;
+            box-shadow: 0 30px 60px rgba(0, 210, 255, 0.25);
+        }
+        .matrix-item img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: 0.8s; }
+        .matrix-item:hover img { opacity: 1; transform: scale(1.1); }
+        
+        .matrix-label { 
+            position: absolute; bottom: 0; width: 100%; 
+            background: linear-gradient(transparent, #000 80%); 
+            padding: 30px 15px 10px; font-size: 11px; font-weight: 900; 
+            letter-spacing: 1px; text-transform: uppercase;
         }
 
-        /* --- LAYERS & HUD --- */
-        .layer { 
+        /* --- HUD & NAVIGATION --- */
+        #top-hud { 
+            position: fixed; top: -150px; left: 50%; transform: translateX(-50%); 
+            z-index: 500000; display: flex; gap: 40px; 
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(25px); 
+            padding: 20px 60px; border-radius: 0 0 30px 30px; 
+            border: 1px solid #222; border-top: none;
+        }
+        #top-hud.active { top: 0; }
+        .hud-link { font-size: 10px; font-weight: 900; letter-spacing: 3px; color: #666; }
+        .hud-link:hover { color: var(--theme); text-shadow: 0 0 10px var(--theme); }
+
+        /* --- LAYERS --- */
+        .nebula-layer { 
             position: fixed; inset: 0; background: rgba(0,0,0,0.98); 
-            z-index: 10000; display: none; opacity: 0; 
+            z-index: 100000; display: none; opacity: 0; 
             align-items: center; justify-content: center; 
-            backdrop-filter: blur(40px);
         }
-        .layer.active { display: flex; opacity: 1; }
+        .nebula-layer.active { display: flex; opacity: 1; }
 
-        #hud { 
-            position: fixed; top: -120px; left: 50%; transform: translateX(-50%); 
-            z-index: 15000; display: flex; gap: 30px; 
-            background: rgba(5,5,5,0.9); border: 1px solid #222; 
-            padding: 15px 50px; border-radius: 0 0 25px 25px; 
+        /* --- CONTEXT MENU --- */
+        #nebula-ctx { 
+            position: fixed; z-index: 2000000; background: #050505; 
+            border: 1px solid #222; border-radius: 15px; padding: 10px; 
+            width: 240px; opacity: 0; transform: scale(0.9); pointer-events: none;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
-        #hud.active { top: 0; }
+        #nebula-ctx.active { opacity: 1; transform: scale(1); pointer-events: all; }
+        .ctx-row { 
+            padding: 14px; font-size: 11px; font-weight: 900; border-radius: 10px; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .ctx-row:hover { background: var(--theme); color: #000; }
 
-        /* --- RIGHT CLICK --- */
-        #ctx { 
-            position: fixed; z-index: 110000; background: #0a0a0a; 
-            border: 1px solid #222; border-radius: 12px; padding: 8px; 
-            width: 200px; opacity: 0; transform: scale(0.9); pointer-events: none; 
-        }
-        #ctx.active { opacity: 1; transform: scale(1); pointer-events: all; }
-        .ctx-item { 
-            padding: 12px; font-size: 11px; font-weight: 900; 
-            border-radius: 8px; display: flex; justify-content: space-between; 
-        }
-        .ctx-item:hover { background: var(--theme); color: #000; }
+        /* --- IFRAME WORKSPACE --- */
+        #engine-room { position: fixed; inset: 0; z-index: 50000; display: none; background: #000; }
+        #engine-room iframe { width: 100%; height: 100%; border: none; }
 
-        /* --- WORKSPACE --- */
-        #workspace { position: fixed; inset: 0; z-index: 5000; display: none; background: #000; }
-        #workspace iframe { width: 100%; height: 100%; border: none; }
-
-        /* --- HERO TEXT --- */
-        .hero { 
-            font-size: 18vw; font-weight: 900; 
-            background: linear-gradient(to bottom, #fff 30%, #444 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 60px rgba(0, 210, 255, 0.2));
-        }
+        /* --- TRANSITION CLASSES --- */
+        .fade-out { opacity: 0 !important; pointer-events: none !important; }
+        .scale-in { transform: scale(1) !important; opacity: 1 !important; }
     </style>
 </head>
-<body oncontextmenu="OS.showCtx(event)">
+<body oncontextmenu="Nebula.openCtx(event)">
 
-    <canvas id="stars" class="fixed inset-0 -z-10"></canvas>
-    <div id="cursor-dot"></div>
+    <canvas id="starfield" class="fixed inset-0 -z-10"></canvas>
     <div id="cursor-ring"></div>
 
-    <div id="ctx">
-        <div class="ctx-item" onclick="OS.goHome()"><span>DASHBOARD</span><span>🏠</span></div>
-        <div class="ctx-item" onclick="OS.openLayer('games-layer')"><span>GAMES ARCHIVE</span><span>🎮</span></div>
-        <div class="ctx-item" onclick="OS.openLayer('search-layer')"><span>NEBU SEARCH</span><span>🔍</span></div>
-        <div class="ctx-item" onclick="OS.openLayer('settings-layer')"><span>SYSTEM SETTINGS</span><span>⚙️</span></div>
+    <div id="nebula-ctx">
+        <div class="ctx-row" onclick="Nebula.goHome()"><span>DASHBOARD</span><span>🏠</span></div>
+        <div class="ctx-row" onclick="Nebula.openLayer('archive-layer')"><span>GAMES ARCHIVE</span><span>🎮</span></div>
+        <div class="ctx-row" onclick="Nebula.openLayer('proxy-layer')"><span>NEBU SEARCH</span><span>🔍</span></div>
+        <div class="ctx-row" onclick="Nebula.openLayer('sys-layer')"><span>SYSTEM SETTINGS</span><span>⚙️</span></div>
+        <hr class="my-2 border-white/5">
+        <div class="ctx-row" onclick="location.reload()"><span>REBOOT</span><span>🔄</span></div>
     </div>
 
-    <div id="update-screen">
-        <div class="update-box hover-glow">
-            <h1 class="text-4xl font-black italic mb-2">NEBULA_OS</h1>
-            <p class="text-[10px] text-white/40 font-black mb-8">VERSION 17.0.2 - CORE STABLE</p>
-            <input type="text" id="name-in" placeholder="IDENTIFY..." class="bg-transparent border-b-2 border-white/10 w-full p-3 outline-none mb-10 text-2xl font-black uppercase tracking-widest focus:border-cyan-400" onkeypress="if(event.key==='Enter')OS.runBoot()">
+    <div id="boot-screen">
+        <div class="boot-modal">
+            <h1 class="text-6xl font-black italic tracking-tighter mb-2">NEBULA</h1>
+            <p class="text-[10px] font-black text-white/20 mb-10 tracking-[5px]">STABLE KERNEL v18.0.4</p>
             
-            <div id="boot-box" class="hidden">
-                <div class="flex justify-between text-[9px] font-black text-cyan-400 mb-2 uppercase">
+            <input type="text" id="id-input" placeholder="ENTER SYSTEM ID..." class="bg-transparent border-b-2 border-white/10 w-full p-4 outline-none mb-12 text-2xl font-black uppercase focus:border-cyan-400 transition-all">
+            
+            <div id="boot-loader" class="hidden">
+                <div class="flex justify-between text-[10px] font-black text-cyan-400 mb-3 uppercase italic">
                     <span id="boot-status">Initializing...</span>
                     <span id="boot-pct">0%</span>
                 </div>
-                <div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                    <div id="boot-bar" class="w-0 h-full bg-cyan-400 shadow-[0_0_20px_#00d2ff]"></div>
-                </div>
+                <div class="progress-rail"><div id="boot-bar" class="progress-flow"></div></div>
             </div>
+
+            <button id="boot-trigger" onclick="Nebula.startBoot()" class="w-full py-5 bg-white text-black font-black rounded-2xl hover:bg-cyan-400 transition-all uppercase tracking-widest">Login to Nebula</button>
         </div>
     </div>
 
-    <div id="hud">
-        <button class="text-[10px] font-black tracking-tighter hover:text-cyan-400" onclick="OS.goHome()">EXIT WORKSPACE</button>
-        <div class="w-[1px] h-4 bg-white/10"></div>
-        <button class="text-[10px] font-black tracking-tighter hover:text-cyan-400" onclick="OS.openLayer('games-layer')">GAMES</button>
-        <button class="text-[10px] font-black tracking-tighter hover:text-cyan-400" onclick="OS.openLayer('search-layer')">PROXY</button>
-    </div>
+    <nav id="top-hud">
+        <button class="hud-link" onclick="Nebula.goHome()">CLOSE WORKSPACE</button>
+        <button class="hud-link" onclick="Nebula.openLayer('archive-layer')">ARCHIVE</button>
+        <button class="hud-link" onclick="Nebula.openLayer('proxy-layer')">PROXY</button>
+    </nav>
 
-    <main id="desktop" class="absolute inset-0 flex items-center justify-center opacity-0 scale-90">
-        <h1 class="hero">NEBULA</h1>
+    <main id="desktop" class="absolute inset-0 flex items-center justify-center opacity-0 scale-90 pointer-events-none">
+        <h1 class="text-[18vw] font-black text-white tracking-tighter" style="filter: drop-shadow(0 0 80px rgba(0,210,255,0.3))">NEBULA</h1>
     </main>
 
-    <div id="games-layer" class="layer" onclick="OS.closeAll()">
-        <div class="w-[90%] h-[85vh] overflow-y-auto bg-[#050505]/80 p-8 rounded-[40px] border border-white/5" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center mb-10 px-4">
-                <h2 class="text-3xl font-black italic tracking-tighter">ARCHIVE_V2</h2>
-                <input type="text" placeholder="FILTER A-Z..." class="bg-[#111] border border-white/5 p-3 rounded-xl outline-none text-[10px] font-black w-64">
+    <div id="archive-layer" class="nebula-layer" onclick="Nebula.closeAll()">
+        <div class="w-[92%] h-[85vh] overflow-y-auto bg-[#050505]/90 p-12 rounded-[50px] border border-white/10 shadow-2xl" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-end mb-12 px-6">
+                <div>
+                    <h2 class="text-5xl font-black italic tracking-tighter">ARCHIVE</h2>
+                    <p class="text-[10px] font-black text-cyan-400 mt-2">ENCRYPTED GAME DATABASE A-Z</p>
+                </div>
+                <input type="text" placeholder="FILTER ENTRIES..." class="bg-[#0a0a0a] border border-white/10 p-4 rounded-2xl outline-none text-[10px] font-black w-72 focus:border-white">
             </div>
-            <div class="game-grid" id="grid"></div>
+            <div class="matrix-grid" id="matrix">
+                </div>
         </div>
     </div>
 
-    <div id="search-layer" class="layer" onclick="OS.closeAll()">
+    <div id="proxy-layer" class="nebula-layer" onclick="Nebula.closeAll()">
         <div class="text-center" onclick="event.stopPropagation()">
-            <h1 style="font-size: 160px; font-weight: 900; line-height: 0.8; margin-bottom: 50px; color: white;">NEBU<br>PR*XY</h1>
-            <input type="text" id="q-in" class="bg-[#080808] border border-[#1a1a1a] w-[700px] p-8 rounded-full text-center outline-none text-2xl font-black hover-glow" placeholder="SEARCH WITH FREEDOM" onkeypress="if(event.key==='Enter')OS.launch(this.value)">
+            <h1 style="font-size: 160px; font-weight: 900; line-height: 0.8; color: white; margin-bottom: 60px;">NEBU<br>PR*XY</h1>
+            <input type="text" id="proxy-input" class="bg-[#050505] border border-white/10 w-[800px] p-10 rounded-full text-center outline-none text-3xl font-black hover:border-cyan-400 focus:border-cyan-400 shadow-2xl" placeholder="DIRECT ACCESS URL" onkeypress="if(event.key==='Enter')Nebula.launch(this.value)">
         </div>
     </div>
 
-    <div id="settings-layer" class="layer" onclick="OS.closeAll()">
-        <div class="update-box" onclick="event.stopPropagation()">
-            <h2 class="text-2xl font-black mb-8">SYSTEM CORE</h2>
-            <div class="space-y-4">
-                <button class="w-full p-5 bg-[#111] rounded-2xl text-[11px] font-black text-left border border-white/5 hover:border-cyan-400">RESTORE FACTORY DEFAULTS</button>
-                <button class="w-full p-5 bg-[#111] rounded-2xl text-[11px] font-black text-left border border-white/5 hover:border-cyan-400">CHANGE GLOBAL THEME</button>
-                <button class="w-full p-5 bg-white text-black rounded-2xl text-[11px] font-black" onclick="OS.closeAll()">APPLY CHANGES</button>
+    <div id="sys-layer" class="nebula-layer" onclick="Nebula.closeAll()">
+        <div class="boot-modal" onclick="event.stopPropagation()">
+            <h2 class="text-3xl font-black mb-10 italic">SYSTEM CONFIG</h2>
+            <div class="grid gap-4">
+                <div class="p-6 bg-[#0a0a0a] rounded-3xl border border-white/5 flex justify-between items-center">
+                    <span class="text-xs font-black uppercase">Starfield Density</span>
+                    <input type="range" class="accent-cyan-400">
+                </div>
+                <div class="p-6 bg-[#0a0a0a] rounded-3xl border border-white/5 flex justify-between items-center">
+                    <span class="text-xs font-black uppercase">Hardware Acceleration</span>
+                    <div class="w-12 h-6 bg-cyan-400 rounded-full p-1"><div class="w-4 h-4 bg-black rounded-full ml-auto"></div></div>
+                </div>
+                <button class="w-full py-5 bg-white text-black font-black rounded-2xl mt-6" onclick="Nebula.closeAll()">SAVE CHANGES</button>
             </div>
         </div>
     </div>
 
-    <div id="term-layer" class="layer" onclick="OS.closeAll()">
-        <div class="w-full max-w-3xl bg-black border border-white/10 rounded-3xl p-8" onclick="event.stopPropagation()">
-            <div id="out" class="h-80 font-mono text-[12px] text-cyan-500 overflow-y-auto mb-6">NEBULA_KERNEL_V17... LOADED.</div>
-            <div class="flex items-center">
-                <span class="text-cyan-500 mr-4 font-black">></span>
-                <input type="text" id="t-in" class="bg-transparent border-none outline-none font-mono text-white w-full text-lg" onkeypress="OS.handleTerm(event)">
-            </div>
-        </div>
-    </div>
+    <div id="engine-room"><iframe id="view-port" src=""></iframe></div>
 
-    <div id="workspace"><iframe id="frame" src=""></iframe></div>
-
-    <div id="dock" class="fixed bottom-[-120px] left-1/2 -translate-x-1/2 z-[8000]">
-        <div class="flex gap-6 p-3 bg-white/5 border border-white/10 rounded-[30px] backdrop-blur-3xl shadow-2xl">
-            <div class="game-card w-14 h-14 bg-[#0a0a0a] flex items-center justify-center text-2xl" onclick="OS.goHome()">🏠</div>
-            <div class="game-card w-14 h-14 bg-[#0a0a0a] flex items-center justify-center text-2xl" onclick="OS.openLayer('search-layer')">🔍</div>
-            <div class="game-card w-14 h-14 bg-[#0a0a0a] flex items-center justify-center text-2xl" onclick="OS.openLayer('games-layer')">🎮</div>
-            <div class="game-card w-14 h-14 bg-[#0a0a0a] flex items-center justify-center text-2xl" onclick="OS.openLayer('settings-layer')">⚙️</div>
+    <div id="dock" class="fixed bottom-[-150px] left-1/2 -translate-x-1/2 z-[400000]">
+        <div class="flex gap-6 p-4 bg-white/5 border border-white/10 rounded-[35px] backdrop-blur-3xl shadow-2xl">
+            <div class="matrix-item w-16 h-16 bg-[#0a0a0a] flex items-center justify-center text-3xl" onclick="Nebula.goHome()">🏠</div>
+            <div class="matrix-item w-16 h-16 bg-[#0a0a0a] flex items-center justify-center text-3xl" onclick="Nebula.openLayer('proxy-layer')">🔍</div>
+            <div class="matrix-item w-16 h-16 bg-[#0a0a0a] flex items-center justify-center text-3xl" onclick="Nebula.openLayer('archive-layer')">🎮</div>
+            <div class="matrix-item w-16 h-16 bg-[#0a0a0a] flex items-center justify-center text-3xl" onclick="Nebula.openLayer('sys-layer')">⚙️</div>
         </div>
     </div>
 
     <script>
-        // --- GAME ARCHIVE DATA (A-Z) ---
-        const ARCHIVE = [
-            { n: "OVO", i: "https://images.crazygames.com/ovo/20201026111306/ovo-cover", u: "https://html5games.com/game/Ovo" },
-            { n: "OVO 2", i: "https://images.crazygames.com/ovo-2-dimensions/20231019101413/ovo-2-dimensions-cover", u: "https://html5games.com/game/Ovo-2" },
-            { n: "SLOPE", i: "https://images.crazygames.com/slope/20201026111306/slope-cover", u: "https://html5games.com/game/Slope" },
-            { n: "1V1.LOL", i: "https://images.crazygames.com/1v1-lol/20220913134354/1v1-lol-cover", u: "https://1v1.lol" },
-            { n: "DRIFT HUNTERS", i: "https://images.crazygames.com/drift-hunters/20240222101413/drift-hunters-cover", u: "https://html5games.com/game/Drift-Hunters" },
-            { n: "VEX 7", i: "https://images.crazygames.com/vex-7/20221017101413/vex-7-cover", u: "https://html5games.com/game/Vex-7" },
-            { n: "GEOMETRY DASH", i: "https://upload.wikimedia.org/wikipedia/en/3/35/Geometry_Dash_Logo.PNG", u: "https://html5games.com/game/Geometry-Dash-Lite" },
-            { n: "BITLIFE", i: "https://images.crazygames.com/bitlife-life-simulator/20231127092955/bitlife-life-simulator-cover", u: "https://html5games.com/game/BitLife" },
-            { n: "FNF", i: "https://images.crazygames.com/friday-night-funkin/20210512163457/friday-night-funkin-cover", u: "https://html5games.com/game/Friday-Night-Funkin" },
-            { n: "BASKETBALL STARS", i: "https://images.crazygames.com/basketball-stars/20201026111306/basketball-stars-cover", u: "https://html5games.com/game/Basketball-Stars" },
-            { n: "SUBWAY SURFERS", i: "https://images.crazygames.com/subway-surfers/20240112101413/subway-surfers-cover", u: "https://html5games.com/game/Subway-Surfers" },
-            { n: "DOOM", i: "https://upload.wikimedia.org/wikipedia/en/5/57/Doom_cover_art.jpg", u: "https://dos.zone/doom-dec-1993/" }
+        // --- MASSIVE DATASET: GAMES A-Z ---
+        const GAMES_LIST = [
+            { n: "1v1.LOL", i: "https://images.crazygames.com/1v1-lol/20220913134354/1v1-lol-cover", u: "https://1v1.lol" },
+            { n: "Amaze", i: "https://images.crazygames.com/amaze/20201026111306/amaze-cover", u: "https://html5games.com/game/Amaze" },
+            { n: "Basketball Stars", i: "https://images.crazygames.com/basketball-stars/20201026111306/basketball-stars-cover", u: "https://html5games.com/game/Basketball-Stars" },
+            { n: "BitLife", i: "https://images.crazygames.com/bitlife-life-simulator/20231127092955/bitlife-life-simulator-cover", u: "https://html5games.com/game/BitLife" },
+            { n: "Cookie Clicker", i: "https://images.crazygames.com/cookie-clicker/20201026111306/cookie-clicker-cover", u: "https://orteil.dashnet.org/cookieclicker/" },
+            { n: "Drift Hunters", i: "https://images.crazygames.com/drift-hunters/20240222101413/drift-hunters-cover", u: "https://html5games.com/game/Drift-Hunters" },
+            { n: "Eaglercraft", i: "https://raw.githubusercontent.com/Eaglercraft/Eaglercraft.github.io/main/favicon.png", u: "https://eaglercraft.com/mc/1.8.8/" },
+            { n: "Friday Night Funkin", i: "https://images.crazygames.com/friday-night-funkin/20210512163457/friday-night-funkin-cover", u: "https://html5games.com/game/Friday-Night-Funkin" },
+            { n: "Geometry Dash", i: "https://upload.wikimedia.org/wikipedia/en/3/35/Geometry_Dash_Logo.PNG", u: "https://html5games.com/game/Geometry-Dash-Lite" },
+            { n: "Happy Wheels", i: "https://images.crazygames.com/happy-wheels/20201201150424/happy-wheels-cover", u: "https://totaljerkface.com/happy_wheels.tjf" },
+            { n: "Idol Defense", i: "https://images.crazygames.com/idol-defense/20201026111306/idol-defense-cover", u: "https://html5games.com/game/Idol-Defense" },
+            { n: "Jetpack Joyride", i: "https://images.crazygames.com/jetpack-joyride/20231201101413/jetpack-joyride-cover", u: "https://html5games.com/game/Jetpack-Joyride" },
+            { n: "Krunker.io", i: "https://images.crazygames.com/krunker-io/20201026111306/krunker-io-cover", u: "https://krunker.io" },
+            { n: "Ludo Hero", i: "https://images.crazygames.com/ludo-hero/20201026111306/ludo-hero-cover", u: "https://html5games.com/game/Ludo-Hero" },
+            { n: "Moto X3M", i: "https://images.crazygames.com/moto-x3m/20201026111306/moto-x3m-cover", u: "https://html5games.com/game/Moto-X3M" },
+            { n: "OvO", i: "https://images.crazygames.com/ovo/20201026111306/ovo-cover", u: "https://html5games.com/game/Ovo" },
+            { n: "Paper.io 2", i: "https://images.crazygames.com/paper-io-2/20201026111306/paper-io-2-cover", u: "https://paper-io.com" },
+            { n: "Quake", i: "https://upload.wikimedia.org/wikipedia/en/2/25/Quake_Source_Cover_Art.jpg", u: "https://www.netquake.io/" },
+            { n: "Rooftop Snipers", i: "https://images.crazygames.com/rooftop-snipers/20201026111306/rooftop-snipers-cover", u: "https://html5games.com/game/Rooftop-Snipers" },
+            { n: "Slope", i: "https://images.crazygames.com/slope/20201026111306/slope-cover", u: "https://html5games.com/game/Slope" },
+            { n: "Tunnel Rush", i: "https://images.crazygames.com/tunnel-rush/20201026111306/tunnel-rush-cover", u: "https://html5games.com/game/Tunnel-Rush" },
+            { n: "Vex 7", i: "https://images.crazygames.com/vex-7/20221017101413/vex-7-cover", u: "https://html5games.com/game/Vex-7" },
+            { n: "World's Hardest Game", i: "https://images.crazygames.com/the-worlds-hardest-game/20201026111306/the-worlds-hardest-game-cover", u: "https://html5games.com/game/The-Worlds-Hardest-Game" },
+            { n: "X-Trial Racing", i: "https://images.crazygames.com/x-trial-racing/20201026111306/x-trial-racing-cover", u: "https://html5games.com/game/X-Trial-Racing" },
+            { n: "YoHoHo.io", i: "https://images.crazygames.com/yohoho-io/20201026111306/yohoho-io-cover", u: "https://yohoho.io" },
+            { n: "Zombs Royale", i: "https://images.crazygames.com/zombs-royale-io/20201026111306/zombs-royale-io-cover", u: "https://zombsroyale.io" }
         ];
 
-        class NebulaOS {
-            constructor() { 
-                this.init(); 
-                this.cursor = { x: 0, y: 0, rx: 0, ry: 0 };
+        class NebulaCore {
+            constructor() {
+                this.init();
+                this.cursor = { x: 0, y: 0, sx: 0, sy: 0 };
             }
 
             init() {
-                // Mouse Logic
+                // Tracking Real Mouse
                 window.onmousemove = (e) => {
                     this.cursor.x = e.clientX;
                     this.cursor.y = e.clientY;
-                    document.getElementById('cursor-dot').style.left = e.clientX + 'px';
-                    document.getElementById('cursor-dot').style.top = e.clientY + 'px';
                 };
 
-                const smoothCursor = () => {
-                    this.cursor.rx += (this.cursor.x - this.cursor.rx) * 0.15;
-                    this.cursor.ry += (this.cursor.y - this.cursor.ry) * 0.15;
+                // Smoothing Loop for Custom Ring
+                const tick = () => {
+                    this.cursor.sx += (this.cursor.x - this.cursor.sx) * 0.15;
+                    this.cursor.sy += (this.cursor.y - this.cursor.sy) * 0.15;
                     const ring = document.getElementById('cursor-ring');
-                    ring.style.left = this.cursor.rx + 'px';
-                    ring.style.top = this.cursor.ry + 'px';
-                    requestAnimationFrame(smoothCursor);
+                    ring.style.left = this.cursor.sx + 'px';
+                    ring.style.top = this.cursor.sy + 'px';
+                    requestAnimationFrame(tick);
                 };
-                smoothCursor();
+                tick();
 
-                // Global Commands
+                // Global Keybinds
                 window.onkeydown = (e) => {
-                    if(e.altKey && e.key === 't') { e.preventDefault(); this.openLayer('term-layer'); }
-                    if(e.key === 'Escape') this.closeAll();
+                    if (e.key === 'Escape') this.closeAll();
+                    if (e.altKey && e.key === 't') {
+                        e.preventDefault();
+                        alert("Terminal logic activated. Enter code in Proxy for now.");
+                    }
                 };
 
-                this.setupStars();
-                this.populateArchive();
+                this.renderStars();
+                this.buildArchive();
             }
 
-            runBoot() {
-                document.getElementById('boot-box').classList.remove('hidden');
+            startBoot() {
+                const name = document.getElementById('id-input').value;
+                if(!name) return alert("System ID Required");
+                
+                document.getElementById('boot-trigger').classList.add('fade-out');
+                document.getElementById('boot-loader').classList.remove('hidden');
+                
                 let p = 0;
                 const status = document.getElementById('boot-status');
+                const bar = document.getElementById('boot-bar');
+                const pct = document.getElementById('boot-pct');
+
                 const iv = setInterval(() => {
-                    p += Math.random() * 3;
-                    if(p >= 100) { p = 100; clearInterval(iv); this.launchDesktop(); }
-                    document.getElementById('boot-bar').style.width = p + '%';
-                    document.getElementById('boot-pct').innerText = Math.floor(p) + '%';
-                    if(p > 30) status.innerText = "LINKING PROXY NODES...";
-                    if(p > 70) status.innerText = "AUTHENTICATING ENCRYPTION...";
+                    p += Math.random() * 4;
+                    if(p >= 100) {
+                        p = 100;
+                        clearInterval(iv);
+                        this.enterOS();
+                    }
+                    bar.style.width = p + '%';
+                    pct.innerText = Math.floor(p) + '%';
+                    if(p > 20) status.innerText = "LINKING PROXY...";
+                    if(p > 50) status.innerText = "MOUNTING GAMES...";
+                    if(p > 85) status.innerText = "BYPASSING PROTOCOLS...";
                 }, 40);
             }
 
-            launchDesktop() {
-                document.getElementById('update-screen').style.opacity = '0';
+            enterOS() {
+                const boot = document.getElementById('boot-screen');
+                boot.style.opacity = '0';
                 setTimeout(() => {
-                    document.getElementById('update-screen').style.display = 'none';
-                    document.getElementById('desktop').style.opacity = '1';
-                    document.getElementById('desktop').style.transform = 'scale(1)';
-                    document.getElementById('dock').style.bottom = '30px';
+                    boot.style.display = 'none';
+                    document.getElementById('desktop').classList.add('scale-in');
+                    document.getElementById('dock').style.bottom = '40px';
                 }, 800);
             }
 
-            populateArchive() {
-                const g = document.getElementById('grid');
-                ARCHIVE.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = "game-card hover-glow";
-                    card.innerHTML = `<img src="${item.i}"><div class="game-label">${item.n}</div>`;
-                    card.onclick = () => this.launch(item.u);
-                    g.appendChild(card);
+            buildArchive() {
+                const matrix = document.getElementById('matrix');
+                GAMES_LIST.forEach(game => {
+                    const el = document.createElement('div');
+                    el.className = "matrix-item";
+                    el.innerHTML = `
+                        <img src="${game.i}">
+                        <div class="matrix-label">${game.n}</div>
+                    `;
+                    el.onclick = () => this.launch(game.u);
+                    matrix.appendChild(el);
                 });
             }
 
             launch(url) {
                 if(!url) return;
                 let target = url.includes('.') ? (url.startsWith('http') ? url : 'https://' + url) : 'https://www.google.com/search?q=' + encodeURIComponent(url);
-                document.getElementById('frame').src = target;
-                document.getElementById('workspace').style.display = 'block';
-                document.getElementById('hud').classList.add('active');
-                document.getElementById('dock').style.bottom = '-120px';
+                
+                const vp = document.getElementById('view-port');
+                const er = document.getElementById('engine-room');
+                
+                vp.src = target;
+                er.style.display = 'block';
+                document.getElementById('top-hud').classList.add('active');
+                document.getElementById('dock').style.bottom = '-150px';
                 this.closeAll();
             }
 
             goHome() {
-                document.getElementById('workspace').style.display = 'none';
-                document.getElementById('frame').src = "";
-                document.getElementById('hud').classList.remove('active');
-                document.getElementById('dock').style.bottom = '30px';
+                document.getElementById('engine-room').style.display = 'none';
+                document.getElementById('view-port').src = "";
+                document.getElementById('top-hud').classList.remove('active');
+                document.getElementById('dock').style.bottom = '40px';
             }
 
             openLayer(id) {
@@ -333,49 +364,54 @@
             }
 
             closeAll() {
-                document.getElementById('ctx').classList.remove('active');
-                document.querySelectorAll('.layer').forEach(l => {
+                document.getElementById('nebula-ctx').classList.remove('active');
+                document.querySelectorAll('.nebula-layer').forEach(l => {
                     l.classList.remove('active');
-                    setTimeout(() => { if(!l.classList.contains('active')) l.style.display = 'none'; }, 500);
+                    setTimeout(() => { if(!l.classList.contains('active')) l.style.display = 'none'; }, 600);
                 });
             }
 
-            showCtx(e) {
+            openCtx(e) {
                 e.preventDefault();
-                const c = document.getElementById('ctx');
-                c.style.left = e.clientX + 'px';
-                c.style.top = e.clientY + 'px';
-                c.classList.add('active');
+                const ctx = document.getElementById('nebula-ctx');
+                ctx.style.left = e.clientX + 'px';
+                ctx.style.top = e.clientY + 'px';
+                ctx.classList.add('active');
             }
 
-            handleTerm(e) {
-                if(e.key === 'Enter') {
-                    const cmd = e.target.value.toLowerCase();
-                    const out = document.getElementById('out');
-                    if(cmd === 'help') out.innerHTML += "<br>> THEME [HEX], CLEAR, REBOOT, EXIT";
-                    else if(cmd.startsWith('theme ')) document.documentElement.style.setProperty('--theme', cmd.split(' ')[1]);
-                    else if(cmd === 'clear') out.innerHTML = "> TERMINAL WIPED.";
-                    else if(cmd === 'reboot') location.reload();
-                    else out.innerHTML += `<br>> UNKNOWN CMD: ${cmd}`;
-                    e.target.value = "";
-                }
-            }
-
-            setupStars() {
-                const c = document.getElementById('stars'); const ctx = c.getContext('2d');
-                let pts = []; const res = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
+            renderStars() {
+                const c = document.getElementById('starfield');
+                const ctx = c.getContext('2d');
+                let stars = [];
+                const res = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
                 window.onresize = res; res();
-                for(let i=0; i<150; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*1.5});
-                const draw = () => {
-                    ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle = '#fff';
-                    pts.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); p.y += 0.15; if(p.y > c.height) p.y = 0; });
-                    requestAnimationFrame(draw);
+
+                for(let i=0; i<200; i++) {
+                    stars.push({
+                        x: Math.random() * c.width,
+                        y: Math.random() * c.height,
+                        s: Math.random() * 2,
+                        v: Math.random() * 0.5 + 0.1
+                    });
+                }
+
+                const anim = () => {
+                    ctx.clearRect(0,0,c.width,c.height);
+                    ctx.fillStyle = '#fff';
+                    stars.forEach(s => {
+                        ctx.beginPath();
+                        ctx.arc(s.x, s.y, s.s, 0, Math.PI*2);
+                        ctx.fill();
+                        s.y += s.v;
+                        if(s.y > c.height) s.y = 0;
+                    });
+                    requestAnimationFrame(anim);
                 };
-                draw();
+                anim();
             }
         }
 
-        const OS = new NebulaOS();
+        const Nebula = new NebulaCore();
     </script>
 </body>
 </html>
