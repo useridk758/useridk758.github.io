@@ -6,197 +6,202 @@
     <title id="os-title">NEBULA OS</title>
     <link id="os-favicon" rel="icon" href="https://cdn-icons-png.flaticon.com/512/606/606547.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap" rel="stylesheet">
     
     <style>
-        :root { --theme-main: #3b82f6; --ease: cubic-bezier(0.16, 1, 0.3, 1); --m-x: 0px; --m-y: 0px; --r-x: 0px; --r-y: 0px; }
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; user-select: none; font-style: normal !important; }
+        :root { --theme-main: #3b82f6; --ease: cubic-bezier(0.2, 1, 0.2, 1); --m-x: 0; --m-y: 0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; font-style: normal !important; transition: all 0.5s var(--ease); }
         body { background: #000; color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
+        /* --- LOADING / UPDATE SCREEN --- */
+        #update-screen { display: none; opacity: 0; transform: scale(1.1); }
+        .progress-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-top: 20px; }
+        .progress-fill { width: 0%; height: 100%; background: var(--theme-main); }
+
+        /* --- HUD (TOP MENU) --- */
+        #hud { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); z-index: 6000; background: rgba(10,10,10,0.8); backdrop-filter: blur(20px); padding: 10px 30px; border-radius: 0 0 20px 20px; border: 1px solid rgba(255,255,255,0.1); border-top: none; display: flex; gap: 40px; }
+        #hud.active { top: 0; }
+        .hud-btn { font-size: 10px; font-weight: 900; letter-spacing: 2px; color: #fff; opacity: 0.5; }
+        .hud-btn:hover { opacity: 1; color: var(--theme-main); }
+
+        /* --- GAMES GRID --- */
+        .game-card { width: 100%; aspect-ratio: 1; background: #111; border-radius: 15px; overflow: hidden; border: 1px solid #222; position: relative; }
+        .game-card:hover { transform: translateY(-10px); border-color: var(--theme-main); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .game-card img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
+
         /* --- UI ELEMENTS --- */
-        .btn, .shortcut, .ctx-item { transition: all 0.3s var(--ease); border: 1px solid rgba(255,255,255,0.08); }
-        .btn:hover { transform: translateY(-5px) scale(1.1); border-color: var(--theme-main); background: rgba(255,255,255,0.1); }
-        
-        #workspace { position: fixed; inset: 0; z-index: 5000; display: none; background: #000; }
-        #workspace iframe { width: 100%; height: 100%; border: none; }
-        #workspace.active { display: block; }
-
-        /* --- LOGIN & UPDATE BOX --- */
-        #gate { background: #000; z-index: 10001; }
-        .update-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; width: 300px; margin-top: 40px; text-align: left; }
-
-        /* --- NEBU PR*XY (MASSIVE WHITE) --- */
-        .layer { position: fixed; inset: 0; z-index: 9000; display: none; align-items: center; justify-content: center; opacity: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(50px); transition: 0.4s var(--ease); }
+        .layer { position: fixed; inset: 0; z-index: 9000; display: none; align-items: center; justify-content: center; opacity: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(60px); }
         .layer.active { display: flex; opacity: 1; }
-        .proxy-header { font-size: 100px; font-weight: 900; color: #fff; letter-spacing: -2px; line-height: 0.8; margin-bottom: 40px; text-transform: uppercase; }
+        .hero { font-size: 15vw; font-weight: 900; text-transform: uppercase; text-align: center; line-height: 0.9; background: linear-gradient(180deg, #fff 40%, #333 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 50px rgba(59,130,246,0.3)); }
         
-        #search-field { background: #111; border: 1px solid #222; width: 100%; max-width: 600px; padding: 22px 40px; border-radius: 100px; font-size: 18px; font-weight: 700; color: #fff; outline: none; text-align: center; }
-
-        /* --- SETTINGS & DOCK --- */
-        #settings-panel { position: fixed; right: -400px; top: 0; width: 300px; height: 100vh; background: #080808; border-left: 1px solid #222; padding: 60px 25px; z-index: 10000; transition: right 0.5s var(--ease); }
-        #settings-panel.active { right: 0; }
-
-        #ctx { position: fixed; z-index: 11000; background: #0a0a0a; border: 1px solid #222; width: 170px; border-radius: 8px; padding: 6px; opacity: 0; pointer-events: none; transform: scale(0.9); transition: 0.2s; }
-        #ctx.active { opacity: 1; pointer-events: all; transform: scale(1); }
-        .ctx-item { padding: 10px; font-size: 10px; font-weight: 900; border-radius: 5px; display: flex; justify-content: space-between; margin-bottom: 2px; }
-        .ctx-item:hover { background: var(--theme-main); }
-
-        #c-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 12000; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); }
-        #c-ring { position: fixed; top: 0; left: 0; width: 35px; height: 35px; border: 1.5px solid var(--theme-main); border-radius: 50%; z-index: 11999; pointer-events: none; transform: translate3d(calc(var(--r-x) - 15px), calc(var(--r-y) - 15px), 0); mix-blend-mode: difference; }
+        #workspace { position: fixed; inset: 0; z-index: 5000; display: none; }
+        #workspace iframe { width: 100%; height: 100%; border: none; }
+        
+        #c-dot { position: fixed; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10000; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); transition: none; }
     </style>
 </head>
 <body>
 
     <canvas id="stars" class="fixed inset-0 -z-10"></canvas>
-    <div id="c-dot"></div><div id="c-ring"></div>
+    <div id="c-dot"></div>
 
-    <div id="ctx">
-        <div class="ctx-item" onclick="OS.goHome()"><span>DASHBOARD</span><span>🏠</span></div>
-        <div class="ctx-item" onclick="OS.openLayer('search-layer')"><span>SEARCH</span><span>🔍</span></div>
-        <div class="ctx-item" onclick="OS.openSettings()"><span>SYSTEM SETTINGS</span><span>⚙️</span></div>
-        <div class="ctx-item text-rose-500" onclick="location.reload()"><span>HARD REBOOT</span><span>🔄</span></div>
+    <div id="hud">
+        <button class="hud-btn" onclick="OS.goHome()">EXIT WORKSPACE</button>
+        <button class="hud-btn" onclick="OS.openLayer('search-layer')">NEW SEARCH</button>
+        <button class="hud-btn" onclick="OS.openLayer('games-layer')">GAMES LIBRARY</button>
     </div>
 
-    <div id="gate" class="fixed inset-0 flex flex-col items-center justify-center">
-        <input type="text" id="user-in" class="bg-transparent border-none text-8xl font-black text-center outline-none w-full placeholder-white/5" placeholder="NAME" onkeypress="if(event.key==='Enter')OS.validate()">
-        <div class="update-box">
-            <p class="text-[9px] font-black text-blue-500 mb-2">NEBULA_CORE_UPDATE_V14.0</p>
-            <p class="text-[10px] text-white/40 font-bold leading-tight">Checking kernel integrity... OK<br>Initializing Proxies... OK<br>Loading Games Database... OK</p>
+    <div id="gate" class="fixed inset-0 flex items-center justify-center z-[10000] bg-black">
+        <input type="text" id="user-in" class="bg-transparent border-none text-8xl font-black text-center outline-none w-full placeholder-white/5" placeholder="NAME" onkeypress="if(event.key==='Enter')OS.startUpdate()">
+    </div>
+
+    <div id="update-screen" class="fixed inset-0 flex flex-col items-center justify-center z-[10000] bg-black px-20">
+        <div class="w-full max-w-3xl">
+            <h2 class="text-4xl font-black mb-2">NEBULA_OS CORE</h2>
+            <p id="update-status" class="text-blue-500 font-bold tracking-widest text-xs uppercase">Initializing Kernel...</p>
+            <div class="progress-bar"><div id="p-fill" class="progress-fill"></div></div>
+            <div class="mt-10 grid grid-cols-2 gap-10 text-[10px] text-white/20 font-black uppercase">
+                <div>Memory: 64GB Virtual<br>GPU: WebGL_Accelerated<br>Location: <span id="loc">Detecting...</span></div>
+                <div class="text-right">Security: Proxy_Active<br>Encryption: AES_256<br>Status: Deployment</div>
+            </div>
         </div>
     </div>
+
+    <main id="desktop" class="absolute inset-0 flex items-center justify-center opacity-0 scale-90 pointer-events-none">
+        <h1 class="hero">NEBULA</h1>
+    </main>
 
     <div id="workspace"><iframe id="browser-frame" src=""></iframe></div>
 
-    <aside id="settings-panel">
-        <h2 class="text-xl font-black mb-10 text-blue-500">SYSTEM CONTROL</h2>
-        <button class="w-full bg-[#111] p-4 rounded-xl text-[10px] font-black mb-4 text-left" onclick="OS.changeName()">CHANGE SYSTEM NAME</button>
-        <button class="w-full bg-[#111] p-4 rounded-xl text-[10px] font-black mb-10 text-left" onclick="OS.toggleOpt()">OPTIMIZATION: <span id="opt-stat">OFF</span></button>
-        
-        <p class="text-[9px] font-black text-white/20 mb-4 uppercase">Themes</p>
-        <div class="grid grid-cols-4 gap-2 mb-10">
-            <div class="h-8 rounded bg-blue-600" onclick="OS.setTheme('#3b82f6')"></div>
-            <div class="h-8 rounded bg-rose-600" onclick="OS.setTheme('#e11d48')"></div>
-            <div class="h-8 rounded bg-emerald-600" onclick="OS.setTheme('#059669')"></div>
-            <div class="h-8 rounded bg-amber-500" onclick="OS.setTheme('#f59e0b')"></div>
+    <div id="games-layer" class="layer" onclick="OS.closeAll()">
+        <div class="w-full max-w-5xl px-10" onclick="event.stopPropagation()">
+            <h2 class="text-center text-4xl font-black mb-12 tracking-tighter">GAMES_ARCHIVE</h2>
+            <div class="grid grid-cols-4 gap-6 overflow-y-auto max-h-[70vh] pr-4" id="games-grid">
+                </div>
         </div>
-        <input type="text" id="cloak-name" class="bg-[#111] p-4 rounded-xl w-full mb-4 text-[10px] font-bold outline-none" placeholder="TAB CLOAK NAME">
-        <button class="w-full py-4 bg-white text-black rounded-xl font-black text-[10px]" onclick="OS.saveSettings()">APPLY PERMANENTLY</button>
-    </aside>
+    </div>
 
     <div id="search-layer" class="layer" onclick="OS.closeAll()">
         <div class="w-full max-w-4xl text-center" onclick="event.stopPropagation()">
-            <h1 class="proxy-header">NEBU<br>PR*XY</h1>
-            <input type="text" id="search-field" placeholder="Search the web..." onkeypress="if(event.key==='Enter')OS.runSearch()">
-            <div class="flex justify-center gap-6 mt-12" id="shortcuts">
-                <div class="w-14 h-14 bg-white rounded-2xl overflow-hidden" onclick="OS.runSearch('https://youtube.com')"><img src="https://upload.wikimedia.org/wikipedia/commons/6/62/YouTube_social_white_square_%282024%29.svg" class="w-full h-full object-cover"></div>
-                <div class="w-14 h-14 bg-white rounded-2xl overflow-hidden" onclick="OS.runSearch('https://tiktok.com')"><img src="https://pbs.twimg.com/profile_images/1879333037005053953/e1dnDyxK_400x400.jpg" class="w-full h-full object-cover"></div>
-                <div class="w-14 h-14 bg-white rounded-2xl overflow-hidden" onclick="OS.runSearch('https://discord.com')"><img src="https://images-eds-ssl.xboxlive.com/image?url=4rt9.lXDC4H_93laV1_eHHFT949fUipzkiFOBH3fAiZZUCdYojwUyX2aTonS1aIwMrx6NUIsHfUHSLzjGJFxxsG72wAo9EWJR4yQWyJJaDaK1XdUso6cUMpI9hAdPUU_FNs11cY1X284vsHrnWtRw7oqRpN1m9YAg21d_aNKnIo-&format=source" class="w-full h-full object-cover"></div>
-                <div class="w-14 h-14 flex items-center justify-center bg-[#111] border border-white/10 rounded-2xl text-2xl font-black" onclick="OS.addShortcut()">+</div>
-            </div>
+            <h1 style="font-size: 120px; color: white; font-weight: 900; line-height: 0.8; margin-bottom: 50px;">NEBU<br>PR*XY</h1>
+            <input type="text" id="search-field" class="bg-[#111] border border-[#222] w-full max-w-2xl p-6 rounded-full text-center outline-none text-xl font-bold" placeholder="SEARCH THE VOID" onkeypress="if(event.key==='Enter')OS.runSearch()">
         </div>
     </div>
 
-    <div id="term-layer" class="layer" onclick="OS.closeAll()">
-        <div class="w-full max-w-2xl bg-black border border-white/10 rounded-3xl overflow-hidden" onclick="event.stopPropagation()">
-            <div id="term-out" class="p-8 h-80 font-mono text-blue-400 text-[11px] overflow-y-auto">Nebula Kernel v14.0. Type 'help' for global access.</div>
-            <div class="p-4 bg-[#050505] flex border-t border-white/5">
-                <span class="text-blue-500 mr-3">$</span>
-                <input type="text" id="term-in" class="bg-transparent outline-none text-white font-mono w-full" onkeypress="OS.handleTerm(event)">
-            </div>
-        </div>
-    </div>
-
-    <div id="dock-wrap" class="fixed bottom-[-100px] left-1/2 -translate-x-1/2 z-[10000] transition-all duration-700">
-        <div class="flex gap-4 p-2 bg-white/5 border border-white/10 rounded-[20px] backdrop-blur-3xl">
-            <div class="btn w-[40px] h-[40px] bg-[#0a0a0a] rounded-lg flex items-center justify-center text-sm" onclick="OS.goHome()">🏠</div>
-            <div class="btn w-[40px] h-[40px] bg-[#0a0a0a] rounded-lg flex items-center justify-center text-sm" onclick="OS.openLayer('search-layer')">🔍</div>
-            <div class="btn w-[40px] h-[40px] bg-[#0a0a0a] rounded-lg flex items-center justify-center text-sm" onclick="OS.runSearch('https://html5games.com')">🎮</div>
-            <div class="btn w-[40px] h-[40px] bg-[#0a0a0a] rounded-lg flex items-center justify-center text-sm" onclick="OS.openSettings()">⚙️</div>
+    <div id="dock-wrap" class="fixed bottom-[-100px] left-1/2 -translate-x-1/2 z-[5500]">
+        <div class="flex gap-4 p-2 bg-white/5 border border-white/10 rounded-[22px] backdrop-blur-3xl">
+            <div class="w-[42px] h-[42px] bg-[#0a0a0a] rounded-xl flex items-center justify-center text-sm" onclick="OS.goHome()">🏠</div>
+            <div class="w-[42px] h-[42px] bg-[#0a0a0a] rounded-xl flex items-center justify-center text-sm" onclick="OS.openLayer('search-layer')">🔍</div>
+            <div class="w-[42px] h-[42px] bg-[#0a0a0a] rounded-xl flex items-center justify-center text-sm" onclick="OS.openLayer('games-layer')">🎮</div>
+            <div class="w-[42px] h-[42px] bg-[#0a0a0a] rounded-xl flex items-center justify-center text-sm" onclick="OS.openLayer('settings-layer')">⚙️</div>
         </div>
     </div>
 
     <script>
+        const GAMES = [
+            { n: "A-DRIFT", u: "https://html5games.com/game/Drift-Hunters", i: "https://images.crazygames.com/drift-hunters/20240222101413/drift-hunters-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=1200" },
+            { n: "B-BASKET", u: "https://html5games.com/game/Basketball-Stars", i: "https://play-lh.googleusercontent.com/9783D-wI30mC-Q5v-f2X9-qA7W6mG7-hGvYhM_6V6O-t1S9_J8_G_8" },
+            { n: "C-CROSSY", u: "https://crossyroad.com", i: "https://images.crazygames.com/crossy-road/20201026111306/crossy-road-cover?auto=format,compress&q=75&cs=strip&ch=DPR&w=1200" },
+            { n: "D-DOOM", u: "https://dos.zone/doom-dec-1993/", i: "https://upload.wikimedia.org/wikipedia/en/5/57/Doom_cover_art.jpg" }
+        ];
+
         class NebulaOS {
-            constructor() { this.m = {x:0, y:0, rx:0, ry:0}; this.isOpt = false; this.init(); }
+            constructor() { this.init(); }
 
             init() {
-                this.setupMouse(); this.setupStars(); this.setupContext();
-                window.onkeydown = (e) => { 
-                    if(e.altKey && e.key === 't') { e.preventDefault(); this.openLayer('term-layer'); }
-                    if(e.key === 'Escape') this.closeAll();
+                window.onmousemove = (e) => {
+                    document.documentElement.style.setProperty('--m-x', `${e.clientX}px`);
+                    document.documentElement.style.setProperty('--m-y', `${e.clientY}px`);
                 };
-                setInterval(() => {
-                    const n = localStorage.getItem('neb-n');
-                    if (document.hidden && n) document.title = n;
-                    else document.title = "NEBULA OS";
+                this.setupStars();
+                this.loadGames();
+            }
+
+            startUpdate() {
+                const name = document.getElementById('user-in').value || "USER";
+                document.getElementById('gate').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('gate').style.display = 'none';
+                    const screen = document.getElementById('update-screen');
+                    screen.style.display = 'flex';
+                    setTimeout(() => screen.style.opacity = '1', 10);
+                    
+                    let p = 0;
+                    const interval = setInterval(() => {
+                        p += Math.random() * 5;
+                        if(p >= 100) {
+                            p = 100; clearInterval(interval);
+                            this.finishBoot();
+                        }
+                        document.getElementById('p-fill').style.width = p + '%';
+                        document.getElementById('update-status').innerText = p < 30 ? "MOUNTING DRIVES..." : p < 70 ? "OPTIMIZING PROXY NODES..." : "READY TO LAUNCH";
+                    }, 100);
+                }, 800);
+            }
+
+            finishBoot() {
+                setTimeout(() => {
+                    document.getElementById('update-screen').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('update-screen').style.display = 'none';
+                        document.getElementById('desktop').style.opacity = '1';
+                        document.getElementById('desktop').style.transform = 'scale(1)';
+                        document.getElementById('dock-wrap').style.bottom = '30px';
+                    }, 800);
                 }, 500);
             }
 
-            setupContext() {
-                window.oncontextmenu = (e) => { e.preventDefault(); const c = document.getElementById('ctx'); c.style.left = `${e.clientX}px`; c.style.top = `${e.clientY}px`; c.classList.add('active'); };
-                window.onclick = () => document.getElementById('ctx').classList.remove('active');
+            loadGames() {
+                const grid = document.getElementById('games-grid');
+                GAMES.forEach(g => {
+                    const div = document.createElement('div');
+                    div.className = "game-card";
+                    div.innerHTML = `<img src="${g.i}"><div class="absolute inset-0 flex items-center justify-center font-black text-xs">${g.n}</div>`;
+                    div.onclick = () => this.runSearch(g.u);
+                    grid.appendChild(div);
+                });
             }
-
-            setupMouse() {
-                window.onmousemove = (e) => { this.m.x = e.clientX; this.m.y = e.clientY; document.documentElement.style.setProperty('--m-x', `${this.m.x}px`); document.documentElement.style.setProperty('--m-y', `${this.m.y}px`); };
-                const lerp = () => { this.m.rx += (this.m.x - this.m.rx)*0.1; this.m.ry += (this.m.y - this.m.ry)*0.1; document.documentElement.style.setProperty('--r-x', `${this.m.rx}px`); document.documentElement.style.setProperty('--r-y', `${this.m.ry}px`); requestAnimationFrame(lerp); };
-                lerp();
-            }
-
-            validate() {
-                const n = document.getElementById('user-in').value || "NEBULA";
-                document.getElementById('gate').style.opacity = '0';
-                setTimeout(() => { document.getElementById('gate').style.display = 'none'; document.getElementById('dock-wrap').style.bottom = '30px'; }, 800);
-            }
-
-            openLayer(id) { this.closeAll(); const el = document.getElementById(id); el.style.display = 'flex'; setTimeout(() => el.classList.add('active'), 10); }
-            openSettings() { this.closeAll(); document.getElementById('settings-panel').classList.add('active'); }
-            
-            setTheme(c) { document.documentElement.style.setProperty('--theme-main', c); }
-            toggleOpt() { this.isOpt = !this.isOpt; document.getElementById('opt-stat').innerText = this.isOpt ? "ON" : "OFF"; }
-            changeName() { const n = prompt("ENTER NEW USERNAME:"); if(n) document.getElementById('user-in').value = n; }
 
             runSearch(url) {
                 let v = url || document.getElementById('search-field').value;
                 if(!v) return;
                 v = v.includes('.') ? (v.startsWith('http') ? v : 'https://' + v) : 'https://www.google.com/search?q=' + encodeURIComponent(v);
                 document.getElementById('browser-frame').src = v;
-                document.getElementById('workspace').classList.add('active');
+                document.getElementById('workspace').style.display = 'block';
+                document.getElementById('dock-wrap').style.bottom = '-100px';
+                document.getElementById('hud').classList.add('active');
                 this.closeAll();
             }
 
-            goHome() { document.getElementById('workspace').classList.remove('active'); document.getElementById('browser-frame').src = ""; this.closeAll(); }
-
-            handleTerm(e) {
-                if(e.key === 'Enter') {
-                    const cmd = e.target.value.toLowerCase().trim();
-                    const out = document.getElementById('term-out');
-                    if(cmd === 'help') out.innerHTML += "<br>THEME [HEX], CLOAK [NAME], CLEAR, NEOFETCH, EXIT";
-                    else if(cmd.startsWith('theme ')) this.setTheme(cmd.split(' ')[1]);
-                    else if(cmd.startsWith('cloak ')) localStorage.setItem('neb-n', cmd.split(' ')[1]);
-                    else if(cmd === 'clear') out.innerHTML = "CLEARED.";
-                    else if(cmd === 'neofetch') out.innerHTML += "<br>NEBULA TITAN v14.0<br>KERNEL: STABLE";
-                    else if(cmd === 'exit') this.closeAll();
-                    e.target.value = ""; out.scrollTop = out.scrollHeight;
-                }
+            goHome() {
+                document.getElementById('workspace').style.display = 'none';
+                document.getElementById('browser-frame').src = "";
+                document.getElementById('dock-wrap').style.bottom = '30px';
+                document.getElementById('hud').classList.remove('active');
             }
 
-            saveSettings() { const n = document.getElementById('cloak-name').value; if(n) localStorage.setItem('neb-n', n); this.closeAll(); }
+            openLayer(id) {
+                this.closeAll();
+                const el = document.getElementById(id);
+                el.style.display = 'flex';
+                setTimeout(() => el.classList.add('active'), 10);
+            }
 
             closeAll() {
-                document.querySelectorAll('.layer').forEach(l => { l.classList.remove('active'); setTimeout(() => { if(!l.classList.contains('active')) l.style.display='none'; }, 400); });
-                document.getElementById('settings-panel').classList.remove('active');
+                document.querySelectorAll('.layer').forEach(l => {
+                    l.classList.remove('active');
+                    setTimeout(() => { if(!l.classList.contains('active')) l.style.display = 'none'; }, 500);
+                });
             }
 
             setupStars() {
                 const c = document.getElementById('stars'); const ctx = c.getContext('2d');
                 let pts = []; const res = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
                 window.onresize = res; res();
-                for(let i=0; i<100; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*1.5});
+                for(let i=0; i<150; i++) pts.push({x: Math.random()*c.width, y: Math.random()*c.height, s: Math.random()*2});
                 const draw = () => {
                     ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle = '#fff';
-                    const speed = this.isOpt ? 0.05 : 0.15;
-                    pts.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); p.y += speed; if(p.y > c.height) p.y = 0; });
+                    pts.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); p.y += 0.15; if(p.y > c.height) p.y = 0; });
                     requestAnimationFrame(draw);
                 };
                 draw();
