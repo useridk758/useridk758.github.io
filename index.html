@@ -28,34 +28,32 @@
         .layer { 
             position: fixed; inset: 0; z-index: 8000; display: none; 
             align-items: center; justify-content: center; opacity: 0; 
-            background: rgba(0,0,0,0.4); backdrop-filter: blur(0px);
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(0px);
             transition: opacity 0.5s var(--ease), backdrop-filter 0.5s var(--ease);
         }
-        .layer.active { display: flex; opacity: 1; backdrop-filter: blur(35px); }
-        .search-container { transform: scale(0.9); transition: 0.6s var(--ease); }
-        .layer.active .search-container { transform: scale(1); }
+        .layer.active { display: flex; opacity: 1; backdrop-filter: blur(40px); }
 
-        /* --- HERO & TEXT --- */
+        /* --- HERO --- */
         .hero { 
             font-size: clamp(3rem, 15vw, 18vh); font-weight: 900; font-style: italic;
-            text-transform: uppercase; text-align: center; line-height: 1.4;
+            text-transform: uppercase; text-align: center; line-height: 1.1; padding-bottom: 20px;
             background: linear-gradient(180deg, #fff 20%, #444 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 0 30px var(--theme-main));
         }
 
-        /* --- CONTEXT MENU (Compact & Bold) --- */
+        /* --- CONTEXT MENU --- */
         #context-menu {
-            position: fixed; z-index: 10001; width: 170px; background: rgba(10,10,10,0.9); 
+            position: fixed; z-index: 10001; width: 160px; background: rgba(10,10,10,0.95); 
             backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 10px; padding: 5px; pointer-events: none; opacity: 0; transform: scale(0.95);
+            border-radius: 8px; padding: 4px; pointer-events: none; opacity: 0; transform: scale(0.9);
         }
         #context-menu.active { opacity: 1; transform: scale(1); pointer-events: all; }
         .menu-item { 
-            padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; 
-            align-items: center; font-size: 11px; font-weight: 700; color: #eee;
+            padding: 10px 12px; border-radius: 6px; display: flex; justify-content: space-between; 
+            align-items: center; font-size: 10px; font-weight: 900; color: #fff; text-transform: uppercase;
         }
-        .menu-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .menu-item:hover { background: var(--theme-main); }
 
         /* --- SETTINGS --- */
         #settings-panel { 
@@ -65,14 +63,12 @@
         }
         #settings-panel.active { right: 0; }
         .setting-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; font-size: 11px; width: 100%; color: #fff; outline: none; margin-bottom: 12px; }
-
-        /* --- HOVER PHYSICS --- */
-        .btn { transition: 0.3s var(--ease); }
-        .btn:hover { transform: translateY(-8px) scale(1.1); border-color: var(--theme-main); box-shadow: 0 10px 30px -5px var(--theme-main); }
+        .setting-input:focus { border-color: var(--theme-main); background: rgba(255,255,255,0.08); }
 
         /* --- CURSOR --- */
         #c-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10005; pointer-events: none; transform: translate3d(var(--m-x), var(--m-y), 0); }
         #c-ring { position: fixed; top: 0; left: 0; width: 35px; height: 35px; border: 1.5px solid var(--theme-main); border-radius: 50%; z-index: 10004; pointer-events: none; transform: translate3d(calc(var(--r-x) - 15px), calc(var(--r-y) - 15px), 0); mix-blend-mode: difference; }
+        .hover-state #c-ring { width: 50px; height: 50px; border-color: #fff; }
     </style>
 </head>
 <body>
@@ -86,7 +82,7 @@
         <div class="menu-item hoverable" onclick="OS.toggleLayer('search-layer', event)"><span>SEARCH</span><span>🔍</span></div>
         <div class="menu-item hoverable" onclick="OS.toggleSettings(event)"><span>SETTINGS</span><span>⚙️</span></div>
         <div class="border-t border-white/5 my-2"></div>
-        <div class="menu-item text-rose-400 hoverable" onclick="location.reload()"><span>REBOOT</span><span>🔄</span></div>
+        <div class="menu-item text-rose-500 hoverable" onclick="location.reload()"><span>REBOOT</span><span>🔄</span></div>
     </div>
 
     <div id="gate" class="fixed inset-0 bg-black z-[10000] flex items-center justify-center transition-opacity duration-1000">
@@ -94,15 +90,11 @@
     </div>
 
     <aside id="settings-panel">
-        <h2 class="text-xl font-black italic mb-8 tracking-tighter">OS PREFERENCES</h2>
-        
-        <label class="text-[9px] uppercase tracking-widest text-white/30 mb-2 block font-bold">Cloak Title</label>
-        <input type="text" id="cloak-name" class="setting-input hoverable" placeholder="My Drive" onkeypress="if(event.key==='Enter')OS.saveSettings()">
-        
-        <label class="text-[9px] uppercase tracking-widest text-white/30 mb-2 block font-bold">Cloak Favicon</label>
-        <input type="text" id="cloak-icon" class="setting-input hoverable" placeholder="URL to .ico/.png" onkeypress="if(event.key==='Enter')OS.saveSettings()">
+        <h2 class="text-xl font-black italic mb-8 tracking-tighter">PREFERENCES</h2>
+        <input type="text" id="cloak-name" class="setting-input hoverable" placeholder="Cloak Title" onkeypress="if(event.key==='Enter')OS.saveSettings()">
+        <input type="text" id="cloak-icon" class="setting-input hoverable" placeholder="Favicon URL" onkeypress="if(event.key==='Enter')OS.saveSettings()">
 
-        <p class="text-[9px] uppercase tracking-widest text-white/30 mt-6 mb-4 font-bold">Accent Theme</p>
+        <p class="text-[9px] font-black uppercase tracking-widest text-white/30 mt-6 mb-4">Themes</p>
         <div class="grid grid-cols-4 gap-2 mb-8">
             <div class="h-8 rounded bg-blue-600 hoverable" onclick="OS.setTheme('#3b82f6')"></div>
             <div class="h-8 rounded bg-rose-600 hoverable" onclick="OS.setTheme('#e11d48')"></div>
@@ -110,19 +102,18 @@
             <div class="h-8 rounded bg-orange-500 hoverable" onclick="OS.setTheme('#f97316')"></div>
         </div>
 
-        <button class="w-full py-4 bg-white text-black rounded-xl font-black text-[10px] uppercase tracking-widest hoverable" onclick="OS.saveSettings()">Save & Close</button>
+        <button class="w-full py-4 bg-white text-black rounded-xl font-black text-[10px] uppercase tracking-widest hoverable" onclick="OS.saveSettings()">Apply & Close</button>
     </aside>
 
     <div id="search-layer" class="layer" onclick="OS.closeAll()">
-        <div class="search-container w-full max-w-4xl text-center px-10" onclick="event.stopPropagation()">
+        <div class="w-full max-w-4xl text-center px-10" onclick="event.stopPropagation()">
             <input type="text" id="search-field" class="bg-transparent border-none border-b-4 border-white/10 w-full text-8xl font-black text-center outline-none py-10 hoverable focus:border-white transition-all uppercase" placeholder="SEARCH" onkeypress="if(event.key==='Enter')OS.runSearch()">
-            <p class="text-[11px] font-black tracking-[1.5em] text-white/20 mt-10">IMP PROXY ENGINE v2</p>
         </div>
     </div>
 
     <div id="term-layer" class="layer" onclick="OS.closeAll()">
-        <div class="w-full max-w-2xl bg-black/95 border border-white/10 rounded-3xl overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
-            <div id="term-out" class="p-6 h-64 font-mono text-blue-400 text-xs leading-relaxed">System Ready. Shortcut: Alt+T.</div>
+        <div class="w-full max-w-2xl bg-black border border-white/10 rounded-3xl overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
+            <div id="term-out" class="p-6 h-64 font-mono text-blue-400 text-xs">Kernel v11.7.</div>
             <div class="p-4 bg-black flex gap-3 border-t border-white/5">
                 <span class="text-blue-500 font-bold">$</span>
                 <input type="text" id="term-in" class="bg-transparent border-none outline-none text-white font-mono w-full" onkeypress="OS.handleTerm(event)">
@@ -158,30 +149,24 @@
                 this.setupRightClick();
                 this.setupCloak();
                 window.onkeydown = (e) => {
-                    if(e.altKey && e.key === 't') { e.preventDefault(); this.toggleLayer('term-layer', e); }
+                    if(e.altKey && e.key === 't') { e.preventDefault(); e.stopImmediatePropagation(); this.toggleLayer('term-layer'); }
                     if(e.key === 'Escape') this.closeAll();
                 };
             }
 
             setupCloak() {
-                window.addEventListener('blur', () => {
-                    document.title = this.savedTitle;
-                    document.getElementById('os-favicon').href = this.savedIcon;
-                });
-                window.addEventListener('focus', () => {
-                    document.title = "NEBULA OS";
-                    document.getElementById('os-favicon').href = "https://cdn-icons-png.flaticon.com/512/606/606547.png";
-                });
+                window.onblur = () => { document.title = this.savedTitle; document.getElementById('os-favicon').href = this.savedIcon; };
+                window.onfocus = () => { document.title = "NEBULA OS"; document.getElementById('os-favicon').href = "https://cdn-icons-png.flaticon.com/512/606/606547.png"; };
             }
 
             setupRightClick() {
-                window.addEventListener('contextmenu', (e) => {
+                window.oncontextmenu = (e) => {
                     e.preventDefault();
                     const m = document.getElementById('context-menu');
                     m.style.left = `${e.clientX}px`; m.style.top = `${e.clientY}px`;
                     m.classList.add('active');
-                });
-                window.addEventListener('click', () => document.getElementById('context-menu').classList.remove('active'));
+                };
+                window.onclick = () => document.getElementById('context-menu').classList.remove('active');
             }
 
             setupMouse() {
@@ -217,7 +202,7 @@
             }
 
             toggleLayer(id, e) {
-                if(e) e.stopPropagation();
+                if(e) { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); }
                 const el = document.getElementById(id);
                 if(el.classList.contains('active')) {
                     this.closeAll();
@@ -229,7 +214,7 @@
             }
 
             toggleSettings(e) {
-                if(e) e.stopPropagation();
+                if(e) { e.preventDefault(); e.stopPropagation(); }
                 document.getElementById('settings-panel').classList.toggle('active');
             }
 
@@ -247,7 +232,6 @@
                 if(e.key === 'Enter') {
                     const c = e.target.value.toLowerCase();
                     if(c === 'exit') this.closeAll();
-                    if(c === 'clear') document.getElementById('term-out').innerHTML = "";
                     e.target.value = "";
                 }
             }
