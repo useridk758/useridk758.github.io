@@ -5,74 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEBULA | P*XIESS</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --accent: #00d2ff; --bg: #000; }
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+        :root { 
+            --accent: #00d2ff; 
+            --bg: #000000;
+            --card: #0c0c0c;
+        }
+
+        /* --- CRITICAL MOUSE FIX --- */
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            /* Fallback: If dot fails, you'll still see a normal cursor */
+            cursor: auto; 
+        }
+
+        /* Hide the real cursor only if the custom dot is active */
+        body.custom-cursor-active * {
+            cursor: none !important;
+        }
         
         #dot {
-            position: fixed; width: 6px; height: 6px; background: var(--accent);
-            border-radius: 50%; z-index: 100000; pointer-events: none;
-            box-shadow: 0 0 12px var(--accent); transform: translate(-50%, -50%);
+            position: fixed; 
+            width: 10px; 
+            height: 10px; 
+            background: var(--accent);
+            border-radius: 50%; 
+            /* Max Z-Index to stay on top of EVERYTHING */
+            z-index: 2147483647; 
+            pointer-events: none;
+            box-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent);
+            transform: translate(-50%, -50%);
+            display: none; /* Hidden until movement detected */
+            border: 1px solid white;
         }
 
         body { 
-            background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; 
+            background: var(--bg); color: #fff; 
+            font-family: 'Inter', sans-serif; 
             overflow: hidden; height: 100vh;
         }
 
-        /* --- COMPACT GRID --- */
-        .g-container { width: 95%; max-width: 1200px; height: 85vh; overflow-y: auto; padding: 20px; }
-        .g-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); 
-            gap: 8px; /* Super tight squares */
-        }
-        
-        .g-card { 
-            aspect-ratio: 1/1; background: #0a0a0a; border: 1px solid #151515; 
-            position: relative; overflow: hidden; transition: all 0.2s ease;
-        }
-        
-        .g-card:hover { 
-            border-color: var(--accent); transform: scale(1.1); z-index: 50; 
-            box-shadow: 0 0 20px rgba(0,210,255,0.4); 
-        }
-
-        /* Title only shows on hover */
-        .g-label { 
-            position: absolute; bottom: 0; width: 100%; background: rgba(0,210,255,0.9);
-            color: #000; font-size: 8px; font-weight: 900; text-align: center;
-            padding: 2px 0; opacity: 0; text-transform: uppercase; transition: 0.1s;
-        }
-        .g-card:hover .g-label { opacity: 1; }
-
-        .g-img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); opacity: 0.5; }
-        .g-card:hover .g-img { filter: grayscale(0%); opacity: 1; }
-
-        /* --- LAYERS & DOCK --- */
+        /* --- UI COMPONENTS --- */
         .layer { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
-            z-index: 5000; display: none; opacity: 0; align-items: center; justify-content: center; 
-            backdrop-filter: blur(10px); transition: 0.3s;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.98); 
+            z-index: 5000; display: none; opacity: 0; 
+            align-items: center; justify-content: center; backdrop-filter: blur(25px);
+            transition: all 0.3s ease;
         }
         .layer.active { display: flex; opacity: 1; }
 
         #dock { 
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
-            display: flex; gap: 8px; background: #080808; padding: 6px;
-            border-radius: 12px; border: 1px solid #111; z-index: 10000;
-        }
-        .dock-btn { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 14px; border-radius: 8px; border: 1px solid #222; }
-        .dock-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
-
-        #hud {
-            position: fixed; top: 0; width: 100%; display: flex; justify-content: center; gap: 40px;
-            background: rgba(0,0,0,0.8); padding: 8px; border-bottom: 1px solid #222; z-index: 20000;
-            display: none;
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
+            display: flex; gap: 10px; background: rgba(15,15,15,0.9);
+            padding: 10px; border-radius: 18px; border: 1px solid #333; 
+            z-index: 10000;
         }
         
-        #workspace { position: fixed; inset: 0; z-index: 4000; display: none; background: #000; }
-        iframe { width: 100%; height: 100%; border: none; padding-top: 35px; }
+        .dock-btn { 
+            width: 44px; height: 44px; background: #111; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 20px;
+        }
+
+        /* --- GRID --- */
+        .g-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; width: 90%; max-width: 1200px; }
+        .g-card { background: #080808; border: 1px solid #222; border-radius: 12px; overflow: hidden; }
+        .g-card:hover { border-color: var(--accent); }
+        .g-img { width: 100%; aspect-ratio: 1; object-fit: cover; background: #111; }
+
+        #workspace { position: fixed; inset: 0; z-index: 4000; display: none; }
+        iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body>
@@ -80,99 +83,100 @@
     <div id="dot"></div>
 
     <div id="boot" class="fixed inset-0 bg-black z-[100000] flex items-center justify-center">
-        <div class="w-64 text-center">
-            <h1 class="text-4xl font-black italic mb-6 tracking-tighter text-white">NEBULA</h1>
-            <input type="text" id="uid" placeholder="ID..." class="w-full bg-[#080808] border border-[#222] p-3 rounded-lg mb-3 text-center text-xs font-bold text-white outline-none focus:border-[#00d2ff]">
-            <button onclick="OS.boot()" class="w-full py-3 bg-white text-black font-black rounded-lg text-xs hover:bg-[#00d2ff]">INIT</button>
+        <div class="text-center">
+            <h1 class="text-6xl font-black italic mb-6">NEBULA</h1>
+            <input type="text" id="uid" placeholder="ACCESS KEY..." class="bg-[#111] border border-[#222] p-4 rounded-xl mb-4 text-center outline-none focus:border-[#00d2ff]">
+            <br>
+            <button onclick="OS.boot()" class="px-10 py-4 bg-white text-black font-bold rounded-xl hover:bg-[#00d2ff]">LOGIN</button>
         </div>
     </div>
 
-    <div id="games-layer" class="layer active" style="display:flex; opacity:1;">
-        <div class="g-container">
-            <div class="g-grid" id="g-inject"></div>
-        </div>
+    <div id="games-layer" class="layer" onclick="OS.close()">
+        <div class="g-grid" id="g-inject" onclick="event.stopPropagation()"></div>
     </div>
 
-    <div id="hud">
-        <button onclick="OS.home()" class="text-[9px] font-black tracking-widest text-white/50 hover:text-white">EXIT_SESSION</button>
-        <button onclick="OS.open('games')" class="text-[9px] font-black tracking-widest text-white/50 hover:text-white">MATRIX</button>
+    <div id="dock" style="display:none;">
+        <div class="dock-btn" onclick="OS.home()">🏠</div>
+        <div class="dock-btn" onclick="OS.open('games')">🎮</div>
     </div>
 
     <div id="workspace"><iframe id="view"></iframe></div>
 
-    <div id="dock">
-        <div class="dock-btn" onclick="OS.home()">🏠</div>
-        <div class="dock-btn" onclick="OS.open('games')">🎮</div>
-        <div class="dock-btn" onclick="location.reload()">⚙️</div>
-    </div>
-
     <script>
-        const ASSET_ROOT = "https://raw.githack.com/gn-math/assets/main/";
-        
+        const ASSET_PATH = "https://cdn.jsdelivr.net/gh/gn-math/assets@main/";
         const LIBRARY = [
+            { n: "Om Nom Run", p: "https://play.famobi.com/om-nom-run", ext: true },
             { n: "FNAF 1", p: "fnaf/1/index.html" },
-            { n: "FNAF 2", p: "fnaf/2/index.html" },
             { n: "Ultrakill", p: "ports/ultrakill/index.html" },
-            { n: "Bendy", p: "ports/bendy/index.html" },
-            { n: "Undertale", p: "ports/undertale/index.html" },
-            { n: "Buckshot", p: "ports/buckshot/index.html" },
-            { n: "Baldi", p: "ports/baldi/index.html" },
-            { n: "Minecraft", p: "eagler/1.8/index.html" },
-            { n: "Retro Bowl", p: "games/retrobowl/index.html" },
-            { n: "Slope", p: "games/slope/index.html" },
-            { n: "1v1 LOL", p: "games/1v1lol/index.html" },
-            { n: "Subway Surf", p: "games/subwaysurfers/index.html" },
-            { n: "Bitlife", p: "games/bitlife/index.html" },
-            { n: "Cookie", p: "games/cookieclicker/index.html" },
-            { n: "Vex 7", p: "games/vex7/index.html" },
-            { n: "Tunnel", p: "games/tunnelrush/index.html" }
+            { n: "Minecraft", p: "eagler/1.8/index.html" }
         ];
 
         const OS = {
-            init() {
+            initMouse() {
                 const dot = document.getElementById('dot');
-                document.addEventListener('mousemove', e => {
+                
+                window.addEventListener('mousemove', e => {
+                    // Show dot and hide real cursor once mouse moves
+                    dot.style.display = 'block';
+                    document.body.classList.add('custom-cursor-active');
+                    
+                    // Direct positioning for speed
                     dot.style.left = e.clientX + 'px';
                     dot.style.top = e.clientY + 'px';
                 });
 
-                const grid = document.getElementById('g-inject');
-                LIBRARY.forEach(g => {
-                    const card = document.createElement('div');
-                    card.className = "g-card";
-                    card.innerHTML = `
-                        <img src="https://api.dicebear.com/7.x/identicon/svg?seed=${g.n}" class="g-img">
-                        <div class="g-label">${g.n}</div>
-                    `;
-                    card.onclick = () => this.launch(ASSET_ROOT + g.p);
-                    grid.appendChild(card);
+                // Fail-safe: if the mouse leaves the window, restore default
+                window.addEventListener('mouseout', () => {
+                    document.body.classList.remove('custom-cursor-active');
+                    dot.style.display = 'none';
                 });
             },
 
             boot() {
                 document.getElementById('boot').style.display = 'none';
-                this.init();
+                document.getElementById('dock').style.display = 'flex';
+                this.renderGames();
+            },
+
+            renderGames() {
+                const grid = document.getElementById('g-inject');
+                grid.innerHTML = '';
+                LIBRARY.forEach(g => {
+                    const card = document.createElement('div');
+                    card.className = "g-card";
+                    card.innerHTML = `<img src="https://api.dicebear.com/7.x/identicon/svg?seed=${g.n}" class="g-img"><div class="p-3 text-[10px] font-bold">${g.n}</div>`;
+                    card.onclick = () => this.launch(g.ext ? g.p : ASSET_PATH + g.p);
+                    grid.appendChild(card);
+                });
             },
 
             open(id) {
-                document.getElementById('games-layer').style.display = 'flex';
-                setTimeout(() => document.getElementById('games-layer').style.opacity = '1', 10);
+                const l = document.getElementById(id + '-layer');
+                l.style.display = 'flex';
+                setTimeout(() => l.classList.add('active'), 10);
+            },
+
+            close() {
+                document.querySelectorAll('.layer').forEach(l => {
+                    l.classList.remove('active');
+                    setTimeout(() => l.style.display = 'none', 300);
+                });
             },
 
             launch(url) {
                 document.getElementById('view').src = url;
                 document.getElementById('workspace').style.display = 'block';
-                document.getElementById('hud').style.display = 'flex';
-                document.getElementById('games-layer').style.display = 'none';
+                this.close();
             },
 
             home() {
                 document.getElementById('workspace').style.display = 'none';
                 document.getElementById('view').src = "";
-                document.getElementById('hud').style.display = 'none';
-                this.open('games');
             }
         };
+
+        // Run mouse init immediately
+        OS.initMouse();
     </script>
 </body>
 </html>
