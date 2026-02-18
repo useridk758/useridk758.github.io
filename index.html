@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | TITAN v35.0</title>
+    <title>NEBULA | TITAN v36.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     
@@ -58,24 +58,10 @@
         }
         .ui-layer.active { display: flex !important; opacity: 1; }
 
-        .settings-frame {
-            width: 950px; height: 650px; background: var(--panel);
-            border: 1px solid var(--border); border-radius: 28px;
-            display: flex; overflow: hidden;
-        }
-        .sidebar { width: 280px; background: rgba(255,255,255,0.02); border-right: 1px solid var(--border); padding: 50px 30px; }
-        .sidebar-btn { 
-            padding: 14px 20px; border-radius: 12px; font-size: 10px; font-weight: 900; 
-            text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 8px;
-            transition: 0.2s; text-align: left; width: 100%;
-        }
-        .sidebar-btn.active { background: var(--accent); color: #000; }
-        .content-area { flex: 1; padding: 60px; overflow-y: auto; display: none; }
-        .content-area.active { display: block; }
-
-        /* --- DASHBOARD --- */
-        #nebula-main { font-size: 13vw; font-weight: 900; font-style: italic; opacity: 0; transition: 1.5s var(--transition); z-index: 10; }
-        #nebula-main.active { opacity: 1; }
+        /* --- WORKSPACE --- */
+        #workspace { position: fixed; inset: 0; z-index: 100000; display: none; background: #000; }
+        #render-target { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        #render-target iframe { border: none; background: #000; }
 
         #dock {
             position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
@@ -83,15 +69,10 @@
             padding: 12px 20px; border-radius: 24px; border: 1px solid var(--border);
             z-index: 80000; opacity: 0; transition: 1s ease;
         }
-        .dock-btn { width: 56px; height: 56px; background: #000; border: 1px solid var(--border); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .dock-btn:hover { transform: scale(1.2) translateY(-10px); border-color: var(--accent); box-shadow: 0 10px 30px var(--accent); }
-
-        #workspace { position: fixed; inset: 0; z-index: 100000; display: none; background: #000; }
-        #render-target { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-        #render-target iframe { border: none; }
+        .dock-btn { width: 56px; height: 56px; background: #000; border: 1px solid var(--border); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: 0.3s; }
+        .dock-btn:hover { transform: scale(1.2) translateY(-10px); border-color: var(--accent); }
 
         .hover-effect { transition: 0.3s; }
-        .hover-effect:active { transform: scale(0.95); }
     </style>
 </head>
 <body oncontextmenu="return Core.showCtx(event)">
@@ -103,48 +84,14 @@
         <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg" class="windows-logo">
     </div>
 
-    <div id="ctx-menu">
-        <div class="ctx-item" onclick="location.reload()">Refresh System</div>
-        <div class="ctx-item" onclick="Core.openUI('settings')">Open Settings</div>
-        <div class="ctx-item" onclick="Core.openUI('games')">Launch Archive</div>
-        <div class="ctx-item" style="color: #ff4444;" onclick="Core.exitLayers()">Close All Layers</div>
-    </div>
-
     <div id="login-stage" class="fixed inset-0 bg-black z-[900000] flex flex-col items-center justify-center transition-opacity duration-1000">
         <h2 class="text-[10px] font-black tracking-[25px] opacity-20 mb-12 uppercase">Access Protocol</h2>
-        <input type="text" id="user-id" placeholder="ENTER SYSTEM ID" class="bg-transparent border-b-2 border-white/5 w-96 p-4 text-3xl font-black text-center outline-none focus:border-[#00d2ff] mb-12">
+        <input type="text" id="user-id" placeholder="ENTER SYSTEM ID" class="bg-transparent border-b-2 border-white/5 w-96 p-4 text-3xl font-black text-center outline-none focus:border-[#00d2ff] mb-12 uppercase">
         <button onclick="Core.boot()" class="hover-effect px-16 py-5 bg-white text-black font-black rounded-full text-[11px] uppercase tracking-widest">Initialize</button>
     </div>
 
     <div class="absolute inset-0 flex items-center justify-center">
-        <h1 id="nebula-main">NEBULA</h1>
-    </div>
-
-    <div id="settings-layer" class="ui-layer">
-        <div class="settings-frame">
-            <div class="sidebar flex flex-col">
-                <button class="sidebar-btn active" onclick="Core.tab('sys')">User Profile</button>
-                <button class="sidebar-btn" onclick="Core.tab('pxy')">Proxy Node</button>
-                <button class="sidebar-btn" onclick="Core.tab('abt')">System About</button>
-                <div class="mt-auto"><button onclick="Core.exitLayers()" class="sidebar-btn text-red-500">Exit</button></div>
-            </div>
-            <div id="tab-sys" class="content-area active">
-                <h2 class="text-4xl font-black italic mb-10 uppercase">Identity</h2>
-                <div class="p-6 bg-white/5 rounded-2xl border border-white/5">
-                    <p class="text-[10px] font-black opacity-30 mb-2 uppercase">Active Operator</p>
-                    <p id="stat-name" class="text-2xl font-black text-cyan-400">Guest</p>
-                </div>
-            </div>
-            <div id="tab-pxy" class="content-area">
-                <h2 class="text-4xl font-black italic mb-10 uppercase">Proxy Engine</h2>
-                <input type="text" id="proxy-input" placeholder="Enter URL (https://...)" class="w-full bg-black border border-white/10 p-5 rounded-2xl font-bold focus:border-[#00d2ff] outline-none mb-4">
-                <button onclick="Core.launch(document.getElementById('proxy-input').value, false)" class="w-full py-5 bg-white text-black font-black rounded-2xl text-[10px] uppercase">Initialize Tunnel</button>
-            </div>
-            <div id="tab-abt" class="content-area">
-                <h2 class="text-4xl font-black italic mb-10 uppercase">v35.0 Restore</h2>
-                <p class="opacity-50">Titan build protocols restored. Hotkeys active.</p>
-            </div>
-        </div>
+        <h1 id="nebula-main" class="text-[13vw] font-black italic opacity-0 transition-all duration-1000">NEBULA</h1>
     </div>
 
     <div id="games-layer" class="ui-layer flex-col pt-24 overflow-y-auto">
@@ -153,25 +100,17 @@
             <button onclick="Core.exitLayers()" class="hover-effect px-10 py-3 border border-white/10 rounded-full font-black text-[10px]">BACK_TO_CORE</button>
         </div>
         <div class="grid grid-cols-3 gap-8 w-[90%] max-w-6xl pb-20">
-            <div class="hover-effect game-card cursor-pointer" onclick="Core.launch('https://games.cdn.famobi.com/html5games/o/om-nom-run/v1240/?fg_domain=play.famobi.com&fg_aid=A1000-111&fg_uid=abe80572-560a-444d-baf7-2fa4a7b2c02f&fg_pid=e37ab3ce-88cd-4438-9b9c-a37df5d33736&fg_beat=255&locale=en', false)">
-                <img src="https://img.cdn.famobi.com/portal/html5games/images/tmp/120/OmNomRunTeaser.jpg?v=0.2-ecf77b68" class="w-full rounded-2xl mb-4">
-                <h3 class="font-black uppercase italic">Om Nom Run</h3>
+            <div class="hover-effect p-4 bg-white/5 rounded-3xl border border-white/5 cursor-pointer" 
+                 onclick="Core.launch('https://raw.githubusercontent.com/brourbeinsus/OvO/main/index.html', false)">
+                <img src="https://img.gamedistribution.com/1377b99c10284c229423118a941af3b1-512x512.jpeg" class="w-full rounded-2xl mb-4">
+                <h3 class="font-black uppercase italic">OvO (Source Code)</h3>
             </div>
-            <div class="hover-effect game-card cursor-pointer" onclick="Core.launch('https://games.cdn.famobi.com/html5games/m/moto-x3m-pool-party/v080/?fg_domain=play.famobi.com&fg_aid=A1000-1&fg_uid=b2102250-eb51-4704-9cab-ff296491cc68&fg_pid=4638e320-4444-4514-81c4-d80a8c662371&fg_beat=258&locale=en', false)">
+            
+            <div class="hover-effect p-4 bg-white/5 rounded-3xl border border-white/5 cursor-pointer" onclick="Core.launch('https://games.cdn.famobi.com/html5games/m/moto-x3m-pool-party/v080/?fg_domain=play.famobi.com&fg_aid=A1000-1&fg_uid=b2102250-eb51-4704-9cab-ff296491cc68&fg_pid=4638e320-4444-4514-81c4-d80a8c662371&fg_beat=258&locale=en', false)">
                 <img src="https://img.cdn.famobi.com/portal/html5games/images/tmp/120/MotoX3mPoolPartyTeaser.jpg?v=0.2-ecf77b68" class="w-full rounded-2xl mb-4">
                 <h3 class="font-black uppercase italic">Moto X3M</h3>
             </div>
-            <div class="hover-effect game-card cursor-pointer" onclick="Core.launch('<iframe src=\'https://html5.gamedistribution.com/1377b99c10284c229423118a941af3b1/?utm_source=example.com&utm_medium=ovo&utm_campaign=block-and-redirect\' width=\'800\' height=\'600\' scrolling=\'none\' frameborder=\'0\'></iframe>', true)">
-                <img src="https://img.gamedistribution.com/1377b99c10284c229423118a941af3b1-512x512.jpeg" class="w-full rounded-2xl mb-4">
-                <h3 class="font-black uppercase italic">OvO</h3>
-            </div>
         </div>
-    </div>
-
-    <div id="dock">
-        <button class="dock-btn" onclick="Core.exitLayers()">🏠</button>
-        <button class="dock-btn" onclick="Core.openUI('games')">🎮</button>
-        <button class="dock-btn" onclick="Core.openUI('settings')">⚙️</button>
     </div>
 
     <div id="workspace">
@@ -179,16 +118,25 @@
         <div id="render-target"></div>
     </div>
 
+    <div id="dock">
+        <button class="dock-btn" onclick="Core.exitLayers()">🏠</button>
+        <button class="dock-btn" onclick="Core.openUI('games')">🎮</button>
+    </div>
+
+    <div id="ctx-menu">
+        <div class="ctx-item" onclick="location.reload()">Refresh System</div>
+        <div class="ctx-item" onclick="Core.exitLayers()">Close All</div>
+    </div>
+
     <script>
         const Core = {
             boot() {
                 const name = document.getElementById('user-id').value;
                 if(!name) return;
-                document.getElementById('stat-name').innerText = name;
                 document.getElementById('login-stage').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('login-stage').style.display = 'none';
-                    document.getElementById('nebula-main').classList.add('active');
+                    document.getElementById('nebula-main').classList.add('opacity-100');
                     document.getElementById('dock').style.opacity = '1';
                     this.createStars();
                 }, 800);
@@ -198,10 +146,9 @@
                 for(let i=0; i<150; i++) {
                     const star = document.createElement('div');
                     star.className = 'star';
-                    star.style.width = star.style.height = Math.random()*3 + 'px';
+                    star.style.width = star.style.height = Math.random()*2 + 'px';
                     star.style.left = Math.random()*100 + '%';
                     star.style.top = Math.random()*100 + '%';
-                    star.style.animationDelay = Math.random()*3 + 's';
                     container.appendChild(star);
                 }
             },
@@ -214,43 +161,29 @@
                 return false;
             },
             openUI(id) {
-                this.exitLayers(true);
                 const l = document.getElementById(id + '-layer');
                 l.style.display = 'flex';
                 setTimeout(() => l.classList.add('active'), 50);
-                document.getElementById('dock').style.opacity = '0';
             },
-            exitLayers(switching = false) {
+            exitLayers() {
                 document.querySelectorAll('.ui-layer').forEach(l => {
                     l.classList.remove('active');
-                    setTimeout(() => { if(!l.classList.contains('active')) l.style.display = 'none'; }, 400);
+                    setTimeout(() => l.style.display = 'none', 400);
                 });
                 document.getElementById('workspace').style.display = 'none';
                 document.getElementById('render-target').innerHTML = '';
-                if(!switching) document.getElementById('dock').style.opacity = '1';
             },
-            tab(t) {
-                document.querySelectorAll('.content-area').forEach(c => c.classList.remove('active'));
-                document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
-                document.getElementById('tab-' + t).classList.add('active');
-                event.currentTarget.classList.add('active');
-            },
-            launch(content, isRaw) {
+            launch(url, isRaw) {
                 const target = document.getElementById('render-target');
-                target.innerHTML = isRaw ? content : `<iframe src="${content}" width="100%" height="100%"></iframe>`;
+                target.innerHTML = `<iframe src="${url}" width="100%" height="100%"></iframe>`;
                 document.getElementById('workspace').style.display = 'block';
-                document.getElementById('games-layer').classList.remove('active');
-                document.getElementById('settings-layer').classList.remove('active');
             }
         };
 
         window.onclick = () => document.getElementById('ctx-menu').style.display = 'none';
         
         window.addEventListener('keydown', e => {
-            if(e.altKey && e.key === 't') {
-                e.preventDefault();
-                Core.exitLayers();
-            }
+            if(e.altKey && e.key === 't') Core.exitLayers();
         });
 
         window.onload = () => {
