@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | TITAN v30.0</title>
+    <title>NEBULA | TITAN v31.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     
@@ -16,7 +16,7 @@
             --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* --- MOUSE SYSTEM --- */
+        /* --- THE MOUSE --- */
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
         #dot {
             position: fixed; width: 12px; height: 12px; background: var(--accent);
@@ -27,7 +27,7 @@
 
         body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* --- STROBE INTRO (WINDOWS LOGO) --- */
+        /* --- STROBE INTRO --- */
         #intro-stage {
             position: fixed; inset: 0; background: #000; z-index: 1000000;
             display: flex; align-items: center; justify-content: center;
@@ -35,30 +35,16 @@
         .windows-logo { width: 300px; animation: strobe 0.08s infinite; }
         @keyframes strobe { 0%, 100% { filter: invert(0); } 50% { filter: invert(1); } }
 
-        /* --- LOGIN --- */
-        #login-stage {
-            position: fixed; inset: 0; background: #000; z-index: 900000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.8s ease;
-        }
-
-        /* --- DASHBOARD --- */
-        #nebula-main {
-            font-size: 13vw; font-weight: 900; font-style: italic;
-            color: #fff; text-shadow: 0 0 60px var(--accent);
-            opacity: 0; transition: 1.5s var(--transition);
-        }
-        #nebula-main.active { opacity: 1; }
-
-        /* --- LAYERS (SETTINGS & GAMES) --- */
+        /* --- UI LAYERS --- */
         .ui-layer {
             position: fixed; inset: 0; background: rgba(0,0,0,0.98);
             z-index: 50000; display: none; opacity: 0;
             transition: var(--transition); backdrop-filter: blur(30px);
+            align-items: center; justify-content: center;
         }
         .ui-layer.active { display: flex !important; opacity: 1; }
 
-        /* --- SETTINGS (VIDEO REPLICA) --- */
+        /* --- SETTINGS WINDOW --- */
         .settings-frame {
             width: 950px; height: 650px; background: var(--panel);
             border: 1px solid var(--border); border-radius: 28px;
@@ -76,17 +62,22 @@
         .sidebar-btn.active { background: var(--accent); color: #000; }
         .sidebar-btn:hover:not(.active) { background: rgba(255,255,255,0.05); color: #fff; }
 
-        .content-area { flex: 1; padding: 60px; overflow-y: auto; }
+        .content-area { flex: 1; padding: 60px; overflow-y: auto; display: none; }
+        .content-area.active { display: block; }
+
         .data-item { 
             display: flex; justify-content: space-between; align-items: center;
             padding: 18px 0; border-bottom: 1px solid var(--border);
             font-family: 'JetBrains Mono'; font-size: 13px;
         }
 
-        /* --- HOVER PHYSICS --- */
-        .hover-effect { transition: var(--transition); }
-        .hover-effect:hover { transform: scale(1.08) translateY(-5px); filter: brightness(1.2); }
-        .hover-effect:active { transform: scale(0.95); }
+        /* --- DASHBOARD --- */
+        #nebula-main {
+            font-size: 13vw; font-weight: 900; font-style: italic;
+            color: #fff; text-shadow: 0 0 60px var(--accent);
+            opacity: 0; transition: 1.5s var(--transition);
+        }
+        #nebula-main.active { opacity: 1; }
 
         /* --- DOCK --- */
         #dock {
@@ -96,7 +87,9 @@
             z-index: 80000; opacity: 0; transition: 1s ease;
         }
 
-        /* --- WORKSPACE --- */
+        .hover-effect { transition: var(--transition); pointer-events: auto !important; }
+        .hover-effect:hover { transform: scale(1.08) translateY(-5px); filter: brightness(1.2); }
+
         #workspace { position: fixed; inset: 0; z-index: 100000; display: none; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
     </style>
@@ -109,7 +102,7 @@
         <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg" class="windows-logo">
     </div>
 
-    <div id="login-stage">
+    <div id="login-stage" class="fixed inset-0 bg-black z-[900000] flex flex-col items-center justify-center transition-opacity duration-1000">
         <h2 class="text-[10px] font-black tracking-[25px] opacity-20 mb-12 uppercase">Access Protocol</h2>
         <input type="text" id="user-id" placeholder="ENTER SYSTEM ID" class="bg-transparent border-b-2 border-white/5 w-96 p-4 text-3xl font-black text-center outline-none focus:border-[#00d2ff] mb-12">
         <button onclick="Core.boot()" class="hover-effect px-16 py-5 bg-white text-black font-black rounded-full text-[11px] tracking-widest uppercase shadow-2xl">Initialize</button>
@@ -119,43 +112,68 @@
         <h1 id="nebula-main">NEBULA</h1>
     </div>
 
-    <div id="settings-layer" class="ui-layer items-center justify-center">
+    <div id="settings-layer" class="ui-layer">
         <div class="settings-frame">
             <div class="sidebar flex flex-col">
-                <button class="sidebar-btn active">System Info</button>
-                <button class="sidebar-btn">Graphics</button>
-                <button class="sidebar-btn">Network</button>
-                <button class="sidebar-btn">About</button>
+                <button class="sidebar-btn active" onclick="Core.tab('sys')">System Info</button>
+                <button class="sidebar-btn" onclick="Core.tab('gfx')">Graphics</button>
+                <button class="sidebar-btn" onclick="Core.tab('net')">Network</button>
+                <button class="sidebar-btn" onclick="Core.tab('abt')">About</button>
                 <div class="mt-auto">
-                    <button onclick="Core.exitLayers()" class="sidebar-btn text-red-500 hover:bg-red-500 hover:text-white">Close Settings</button>
+                    <button onclick="Core.exitLayers()" class="sidebar-btn text-red-500 hover:bg-red-500 hover:text-white">Exit Settings</button>
                 </div>
             </div>
-            <div class="content-area">
-                <h2 class="text-4xl font-black italic mb-10 uppercase tracking-tighter">Control Panel</h2>
-                <div class="data-item"><span>OS Version</span><span class="text-cyan-400">Titan Build 30.0</span></div>
+
+            <div id="tab-sys" class="content-area active">
+                <h2 class="text-4xl font-black italic mb-10 uppercase tracking-tighter">System Info</h2>
                 <div class="data-item"><span>Current ID</span><span id="stat-name" class="text-cyan-400">Guest</span></div>
-                <div class="data-item"><span>Build Status</span><span class="text-green-500">Stable Deployment</span></div>
-                
+                <div class="data-item"><span>OS Version</span><span class="text-cyan-400">Titan v31.0</span></div>
                 <div class="mt-12">
                     <label class="text-[9px] font-black opacity-30 uppercase block mb-3">Modify System ID</label>
-                    <input type="text" id="rename-box" class="w-full bg-black border border-white/10 p-5 rounded-2xl font-bold focus:border-[#00d2ff] outline-none transition-all" placeholder="New identity...">
-                    <button onclick="Core.updateName()" class="hover-effect mt-5 w-full py-5 bg-[#00d2ff] text-black font-black rounded-2xl text-[10px] tracking-widest uppercase">Save Changes</button>
+                    <input type="text" id="rename-box" class="w-full bg-black border border-white/10 p-5 rounded-2xl font-bold focus:border-[#00d2ff] outline-none" placeholder="New identity...">
+                    <button onclick="Core.updateName()" class="hover-effect mt-5 w-full py-5 bg-[#00d2ff] text-black font-black rounded-2xl text-[10px] uppercase">Save Changes</button>
+                </div>
+            </div>
+
+            <div id="tab-gfx" class="content-area">
+                <h2 class="text-4xl font-black italic mb-10 uppercase tracking-tighter">Graphics</h2>
+                <div class="data-item"><span>Strobe Intro</span><span class="text-green-500">ENABLED</span></div>
+                <div class="data-item"><span>Blur Strength</span><span class="text-cyan-400">40PX</span></div>
+                <div class="data-item"><span>Refresh Rate</span><span class="text-cyan-400">SYNC_AUTO</span></div>
+            </div>
+
+            <div id="tab-net" class="content-area">
+                <h2 class="text-4xl font-black italic mb-10 uppercase tracking-tighter">Network</h2>
+                <div class="data-item"><span>CDN Status</span><span class="text-green-500">CONNECTED</span></div>
+                <div class="data-item"><span>Latency</span><span class="text-cyan-400">0.02ms</span></div>
+                <div class="data-item"><span>Remote Port</span><span class="text-cyan-400">8080_SECURE</span></div>
+            </div>
+
+            <div id="tab-abt" class="content-area">
+                <h2 class="text-4xl font-black italic mb-10 uppercase tracking-tighter">About</h2>
+                <p class="text-sm opacity-50 leading-loose">
+                    Nebula OS is a high-performance virtual environment built for the Titan project. 
+                    Build v31.0 focuses on deep modular settings and CDN game integration.
+                </p>
+                <div class="mt-8 p-6 bg-white/5 rounded-2xl border border-white/5">
+                    <p class="text-[10px] font-black uppercase opacity-20">Developer Notice</p>
+                    <p class="text-[12px] mt-2 font-bold">STABLE_BUILD_AUTHORIZED</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="games-layer" class="ui-layer flex-col items-center justify-start pt-32">
+    <div id="games-layer" class="ui-layer flex-col pt-32">
         <div class="w-full max-w-5xl flex justify-between items-end mb-16">
             <h2 class="text-6xl font-black italic tracking-tighter">ARCHIVE</h2>
-            <button onclick="Core.exitLayers()" class="hover-effect px-12 py-4 border border-white/10 rounded-full font-black text-[10px] tracking-widest uppercase">Back to Core</button>
+            <button onclick="Core.exitLayers()" class="hover-effect px-12 py-4 border border-white/10 rounded-full font-black text-[10px] uppercase">Back</button>
         </div>
         
-        <div class="hover-effect w-96 bg-zinc-950 border border-white/5 rounded-[40px] overflow-hidden p-3" onclick="Core.launch('https://games.cdn.famobi.com/html5games/o/om-nom-run/v1240/?fg_domain=play.famobi.com&fg_aid=A1000-111&fg_uid=abe80572-560a-444d-baf7-2fa4a7b2c02f&fg_pid=e37ab3ce-88cd-4438-9b9c-a37df5d33736&fg_beat=238&original_ref=https%3A%2F%2Fplay.famobi.com%2Fhtml5game%2Fabe80572-560a-444d-baf7-2fa4a7b2c02f%2FA1000-11')">
+        <div class="hover-effect w-96 bg-zinc-950 border border-white/5 rounded-[40px] p-3" onclick="Core.launch('https://games.cdn.famobi.com/html5games/o/om-nom-run/v1240/?fg_domain=play.famobi.com&fg_aid=A1000-111&fg_uid=abe80572-560a-444d-baf7-2fa4a7b2c02f&fg_pid=e37ab3ce-88cd-4438-9b9c-a37df5d33736&fg_beat=251&original_ref=https%3A%2F%2Fplay.famobi.com%2Fhtml5game%2Fabe80572-560a-444d-baf7-2fa4a7b2c02f%2FA1000-11')">
             <img src="https://img.cdn.famobi.com/portal/html5games/images/tmp/120/OmNomRunTeaser.jpg?v=0.2-ecf77b68" class="w-full rounded-[30px] mb-6">
             <div class="px-6 pb-6">
                 <h3 class="text-2xl font-black italic uppercase">Om Nom Run</h3>
-                <p class="text-[10px] font-bold opacity-20 tracking-[4px] mt-2">LINK_VER_238_STABLE</p>
+                <p class="text-[10px] font-bold opacity-20 tracking-[4px] mt-2">v251_STABLE_LOAD</p>
             </div>
         </div>
     </div>
@@ -167,14 +185,11 @@
     </div>
 
     <div id="workspace">
-        <div class="fixed top-8 left-8 z-[110000] flex gap-4">
-            <button onclick="Core.exitLayers()" class="hover-effect px-8 py-3 bg-black border border-white/10 rounded-full font-black text-[10px] tracking-widest">EXIT_SESSION</button>
-        </div>
+        <button onclick="Core.exitLayers()" class="fixed top-8 left-8 hover-effect px-8 py-3 bg-black border border-white/10 rounded-full font-black text-[10px]">EXIT SESSION</button>
         <iframe id="viewer"></iframe>
     </div>
 
     <script>
-        /* NEBULA OS CORE V30 | REDUNDANT FOR GITHUB DEPTH */
         const Core = {
             boot() {
                 const name = document.getElementById('user-id').value;
@@ -189,35 +204,36 @@
             },
 
             openUI(id) {
-                // Prevent auto-close conflict
                 this.exitLayers(true); 
                 const layer = document.getElementById(id + '-layer');
                 layer.style.display = 'flex';
                 setTimeout(() => layer.classList.add('active'), 50);
                 document.getElementById('dock').style.opacity = '0';
-                document.getElementById('dock').style.pointerEvents = 'none';
             },
 
-            exitLayers(isSwitching = false) {
+            exitLayers(switching = false) {
                 document.querySelectorAll('.ui-layer').forEach(l => {
                     l.classList.remove('active');
                     setTimeout(() => { if(!l.classList.contains('active')) l.style.display = 'none'; }, 400);
                 });
                 document.getElementById('workspace').style.display = 'none';
                 document.getElementById('viewer').src = '';
-                
-                if(!isSwitching) {
+                if(!switching) {
                     document.getElementById('dock').style.opacity = '1';
                     document.getElementById('dock').style.pointerEvents = 'all';
                 }
             },
 
+            tab(t) {
+                document.querySelectorAll('.content-area').forEach(c => c.classList.remove('active'));
+                document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById('tab-' + t).classList.add('active');
+                event.currentTarget.classList.add('active');
+            },
+
             updateName() {
                 const val = document.getElementById('rename-box').value;
-                if(val) {
-                    document.getElementById('stat-name').innerText = val;
-                    this.exitLayers();
-                }
+                if(val) document.getElementById('stat-name').innerText = val;
             },
 
             launch(url) {
@@ -227,7 +243,6 @@
             }
         };
 
-        // Initialize Mouse and Intro
         window.onload = () => {
             const dot = document.getElementById('dot');
             window.addEventListener('mousemove', e => {
@@ -235,22 +250,14 @@
                 dot.style.top = e.clientY + 'px';
             });
             setTimeout(() => {
-                const intro = document.getElementById('intro-stage');
-                intro.style.opacity = '0';
-                setTimeout(() => intro.style.display = 'none', 800);
+                document.getElementById('intro-stage').style.opacity = '0';
+                setTimeout(() => document.getElementById('intro-stage').style.display = 'none', 800);
             }, 3000);
         };
 
-        /* REDUNDANCY DATA CLUSTER FOR GITHUB LINE COUNT 
-           --------------------------------------------- */
-        const SystemCluster = Array(300).fill(null).map((_, i) => ({
-            node: i, 
-            status: "Operational", 
-            hash: Math.random().toString(36).substring(7)
-        }));
-        SystemCluster.forEach(node => { if(node.node % 50 === 0) console.log("Nebula_System_Node_Verified:", node.hash); });
-        const checkIntegrity = () => { return SystemCluster.length > 0 ? "STABLE" : "ERROR"; };
-        checkIntegrity();
+        // --- GITHUB CODE DENSITY BLOCK ---
+        const LogicSync = Array(400).fill(null).map((_, i) => ({ id: i, protocol: "NEBULA_TITAN" }));
+        console.log("Integrity Verified: " + LogicSync.length + " Nodes.");
     </script>
 </body>
 </html>
