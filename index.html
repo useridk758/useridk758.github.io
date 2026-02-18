@@ -3,100 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | TITAN v34.0</title>
+    <title>NEBULA | TITAN v35.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     
     <style>
-        :root { 
-            --accent: #00d2ff; 
-            --bg: #000000;
-            --panel: #050505;
-            --border: rgba(255,255,255,0.1);
-            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        /* --- MOUSE ENGINE --- */
+        :root { --accent: #00d2ff; --bg: #000000; --panel: #050505; --border: rgba(255,255,255,0.1); --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+        
+        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
+
+        /* --- STARS EFFECT --- */
+        #stars-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+        /* --- CURSOR --- */
         #dot {
             position: fixed; width: 12px; height: 12px; background: var(--accent);
             border-radius: 50%; z-index: 9999999; pointer-events: none;
             box-shadow: 0 0 25px var(--accent); transform: translate(-50%, -50%);
-            transition: width 0.1s, height 0.1s;
         }
 
-        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
+        /* --- RIGHT CLICK MENU --- */
+        #context-menu {
+            position: fixed; width: 200px; background: rgba(10,10,10,0.9);
+            border: 1px solid var(--border); border-radius: 12px; padding: 8px;
+            backdrop-filter: blur(20px); z-index: 999999; display: none;
+        }
+        .menu-item { padding: 10px 15px; font-size: 11px; font-weight: 700; border-radius: 6px; transition: 0.2s; }
+        .menu-item:hover { background: var(--accent); color: #000; }
 
         /* --- UI LAYERS --- */
         .ui-layer {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.98);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
             z-index: 50000; display: none; opacity: 0;
-            transition: var(--transition); backdrop-filter: blur(30px);
+            transition: var(--transition); backdrop-filter: blur(40px);
             align-items: center; justify-content: center;
         }
         .ui-layer.active { display: flex !important; opacity: 1; }
 
-        .hover-effect { transition: var(--transition); pointer-events: auto !important; }
-        .hover-effect:hover { transform: scale(1.05) translateY(-5px); filter: brightness(1.2); }
+        /* --- SETTINGS --- */
+        .settings-frame { width: 950px; height: 650px; background: var(--panel); border: 1px solid var(--border); border-radius: 30px; display: flex; overflow: hidden; }
+        .sidebar { width: 280px; background: rgba(255,255,255,0.02); border-right: 1px solid var(--border); padding: 50px 30px; }
+        .sidebar-btn { padding: 14px 20px; border-radius: 12px; font-size: 10px; font-weight: 900; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 8px; width: 100%; text-align: left; }
+        .sidebar-btn.active { background: var(--accent); color: #000; }
+        .content-area { flex: 1; padding: 60px; display: none; }
+        .content-area.active { display: block; }
 
-        /* --- GAME ARCHIVE --- */
+        /* --- GAME GRID --- */
         .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; width: 90%; max-width: 1100px; }
-        .game-card { background: #080808; border: 1px solid var(--border); border-radius: 30px; padding: 12px; }
+        .game-card { background: #080808; border: 1px solid var(--border); border-radius: 30px; padding: 12px; transition: 0.3s; }
+        .game-card:hover { transform: scale(1.05); border-color: var(--accent); }
         .game-thumb { width: 100%; aspect-ratio: 16/10; object-fit: cover; border-radius: 22px; margin-bottom: 15px; }
 
-        /* --- WORKSPACE RENDERER --- */
+        /* --- DOCK --- */
+        #dock { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; background: rgba(10,10,10,0.8); padding: 12px 20px; border-radius: 24px; border: 1px solid var(--border); z-index: 80000; transition: 1s ease; }
+
         #workspace { position: fixed; inset: 0; z-index: 100000; display: none; background: #000; }
-        #render-target { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-        
-        /* This ensures your 800x600 embed stays centered and clean */
-        #render-target iframe { border: none; box-shadow: 0 0 50px rgba(0, 210, 255, 0.2); }
-
-        #nebula-main { font-size: 13vw; font-weight: 900; font-style: italic; opacity: 0; transition: 1.5s var(--transition); }
-        #nebula-main.active { opacity: 1; }
-
-        #dock {
-            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 15px; background: rgba(10,10,10,0.8);
-            padding: 12px 20px; border-radius: 24px; border: 1px solid var(--border);
-            z-index: 80000; opacity: 0; transition: 1s ease;
-        }
+        iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
+    <canvas id="stars-canvas"></canvas>
     <div id="dot"></div>
 
-    <div class="absolute inset-0 flex items-center justify-center">
-        <h1 id="nebula-main">NEBULA</h1>
+    <div id="context-menu">
+        <div class="menu-item" onclick="Core.openUI('settings')">Settings</div>
+        <div class="menu-item" onclick="Core.openUI('games')">Games</div>
+        <div class="menu-item" onclick="location.reload()">Reload OS</div>
+    </div>
+
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <h1 id="nebula-main" class="text-[13vw] font-black italic opacity-10">NEBULA</h1>
+    </div>
+
+    <div id="settings-layer" class="ui-layer">
+        <div class="settings-frame">
+            <div class="sidebar flex flex-col">
+                <button class="sidebar-btn active" onclick="Core.tab('sys')">System</button>
+                <button class="sidebar-btn" onclick="Core.tab('proxy')">Proxy Setup</button>
+                <div class="mt-auto"><button onclick="Core.exitLayers()" class="sidebar-btn text-red-500">Close</button></div>
+            </div>
+            <div id="tab-sys" class="content-area active">
+                <h2 class="text-4xl font-black italic mb-6 uppercase">System Info</h2>
+                <div class="p-6 bg-white/5 rounded-2xl border border-white/5">
+                    <p class="text-[10px] opacity-30 uppercase font-black">Build Version</p>
+                    <p class="text-xl font-bold">TITAN_V35_STABLE</p>
+                </div>
+            </div>
+            <div id="tab-proxy" class="content-area">
+                <h2 class="text-4xl font-black italic mb-6 uppercase">Proxy Console</h2>
+                <input type="text" id="proxy-input" placeholder="https://secure-gate.io/proxy?url=" class="w-full bg-black border border-white/10 p-5 rounded-2xl font-bold focus:border-[#00d2ff] outline-none mb-4">
+                <p class="text-[10px] opacity-30 font-bold uppercase tracking-widest">Routing through encrypted tunnel v2.1</p>
+            </div>
+        </div>
     </div>
 
     <div id="games-layer" class="ui-layer flex-col pt-24 overflow-y-auto">
         <div class="w-full max-w-6xl flex justify-between items-end mb-12 px-10">
             <h2 class="text-6xl font-black italic tracking-tighter">ARCHIVE</h2>
-            <button onclick="Core.exitLayers()" class="hover-effect px-12 py-4 border border-white/10 rounded-full font-black text-[10px] uppercase">Back</button>
+            <button onclick="Core.exitLayers()" class="px-12 py-4 border border-white/10 rounded-full font-black text-[10px] uppercase">Back</button>
         </div>
-        
         <div class="game-grid">
-            <div class="hover-effect game-card" onclick="Core.launch('https://games.cdn.famobi.com/html5games/o/om-nom-run/v1240/?fg_domain=play.famobi.com&fg_aid=A1000-111&fg_uid=abe80572-560a-444d-baf7-2fa4a7b2c02f&fg_pid=e37ab3ce-88cd-4438-9b9c-a37df5d33736&fg_beat=255&locale=en', false)">
+            <div class="game-card" onclick="Core.launch('https://games.cdn.famobi.com/html5games/o/om-nom-run/v1240/?fg_domain=play.famobi.com&fg_aid=A1000-111&fg_uid=abe80572-560a-444d-baf7-2fa4a7b2c02f&fg_pid=e37ab3ce-88cd-4438-9b9c-a37df5d33736&fg_beat=255&locale=en')">
                 <img src="https://img.cdn.famobi.com/portal/html5games/images/tmp/120/OmNomRunTeaser.jpg?v=0.2-ecf77b68" class="game-thumb">
-                <h3 class="text-lg font-black italic uppercase px-2">Om Nom Run</h3>
+                <h3 class="text-lg font-black italic uppercase">Om Nom Run</h3>
             </div>
-
-            <div class="hover-effect game-card" onclick="Core.launch('<iframe src=\'https://html5.gamedistribution.com/1377b99c10284c229423118a941af3b1/?gd_sdk_referrer_url=https://www.example.com/games/ovo\' width=\'800\' height=\'600\' scrolling=\'none\' frameborder=\'0\'></iframe>', true)">
+            <div class="game-card" onclick="Core.launch('https://games.cdn.famobi.com/html5games/m/moto-x3m-pool-party/v080/?fg_domain=play.famobi.com&fg_aid=A1000-1&fg_uid=b2102250-eb51-4704-9cab-ff296491cc68&fg_pid=4638e320-4444-4514-81c4-d80a8c662371&fg_beat=258&locale=en')">
+                <img src="https://img.cdn.famobi.com/portal/html5games/images/tmp/120/MotoX3mPoolPartyTeaser.jpg?v=0.2-ecf77b68" class="game-thumb">
+                <h3 class="text-lg font-black italic uppercase">Moto X3M Pool</h3>
+            </div>
+            <div class="game-card" onclick="Core.launch('https://html5.gamedistribution.com/1377b99c10284c229423118a941af3b1/?utm_source=example.com&utm_medium=ovo&utm_campaign=block-and-redirect')">
                 <img src="https://img.gamedistribution.com/1377b99c10284c229423118a941af3b1-512x512.jpeg" class="game-thumb">
-                <h3 class="text-lg font-black italic uppercase px-2">OvO</h3>
+                <h3 class="text-lg font-black italic uppercase">OvO</h3>
             </div>
         </div>
     </div>
 
     <div id="dock">
-        <button class="hover-effect w-14 h-14 bg-black rounded-2xl border border-white/10 flex items-center justify-center text-2xl" onclick="Core.exitLayers()">🏠</button>
-        <button class="hover-effect w-14 h-14 bg-black rounded-2xl border border-white/10 flex items-center justify-center text-2xl" onclick="Core.openUI('games')">🎮</button>
+        <button class="w-14 h-14 bg-black rounded-2xl border border-white/10 flex items-center justify-center text-2xl" onclick="Core.exitLayers()">🏠</button>
+        <button class="w-14 h-14 bg-black rounded-2xl border border-white/10 flex items-center justify-center text-2xl" onclick="Core.openUI('games')">🎮</button>
+        <button class="w-14 h-14 bg-black rounded-2xl border border-white/10 flex items-center justify-center text-2xl" onclick="Core.openUI('settings')">⚙️</button>
     </div>
 
     <div id="workspace">
-        <button onclick="Core.exitLayers()" class="fixed top-8 left-8 hover-effect px-8 py-3 bg-black border border-white/10 rounded-full font-black text-[10px] z-[110000]">EXIT_SESSION</button>
-        <div id="render-target"></div>
+        <button onclick="Core.exitLayers()" class="fixed top-8 left-8 px-8 py-3 bg-black border border-white/10 rounded-full font-black text-[10px] z-[110000]">EXIT_SESSION</button>
+        <iframe id="viewer"></iframe>
     </div>
 
     <script>
@@ -109,36 +141,61 @@
                 document.getElementById('dock').style.opacity = '0';
             },
             exitLayers(switching = false) {
-                document.querySelectorAll('.ui-layer').forEach(l => {
-                    l.classList.remove('active');
-                    setTimeout(() => { if(!l.classList.contains('active')) l.style.display = 'none'; }, 400);
-                });
+                document.querySelectorAll('.ui-layer').forEach(l => { l.classList.remove('active'); setTimeout(() => { if(!l.classList.contains('active')) l.style.display = 'none'; }, 400); });
                 document.getElementById('workspace').style.display = 'none';
-                document.getElementById('render-target').innerHTML = ''; // Clear embed
+                document.getElementById('viewer').src = '';
                 if(!switching) document.getElementById('dock').style.opacity = '1';
+                document.getElementById('context-menu').style.display = 'none';
             },
-            launch(content, isRawEmbed) {
-                const target = document.getElementById('render-target');
-                if(isRawEmbed) {
-                    // Inject your exact <iframe> code
-                    target.innerHTML = content;
-                } else {
-                    // Standard URL launch
-                    target.innerHTML = `<iframe src="${content}" width="100%" height="100%"></iframe>`;
-                }
+            tab(t) {
+                document.querySelectorAll('.content-area').forEach(c => c.classList.remove('active'));
+                document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById('tab-' + t).classList.add('active');
+                event.currentTarget.classList.add('active');
+            },
+            launch(url) {
+                document.getElementById('viewer').src = url;
                 document.getElementById('workspace').style.display = 'block';
                 document.getElementById('games-layer').classList.remove('active');
             }
         };
 
+        // --- STARS ENGINE ---
+        const canvas = document.getElementById('stars-canvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+        function initStars() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            stars = Array(200).fill(0).map(() => ({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 2, speed: Math.random() * 0.5 }));
+        }
+        function animate() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            ctx.fillStyle = '#fff';
+            stars.forEach(s => { s.y += s.speed; if(s.y > canvas.height) s.y = 0; ctx.fillRect(s.x, s.y, s.size, s.size); });
+            requestAnimationFrame(animate);
+        }
+
         window.onload = () => {
+            initStars(); animate();
             const dot = document.getElementById('dot');
             window.addEventListener('mousemove', e => {
-                dot.style.left = e.clientX + 'px';
-                dot.style.top = e.clientY + 'px';
+                dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px';
             });
-            document.getElementById('nebula-main').classList.add('active');
-            document.getElementById('dock').style.opacity = '1';
+
+            // Alt+T Logic
+            window.addEventListener('keydown', e => {
+                if(e.altKey && e.key === 't') { Core.openUI('settings'); Core.tab('proxy'); }
+            });
+
+            // Right Click Logic
+            window.addEventListener('contextmenu', e => {
+                const menu = document.getElementById('context-menu');
+                menu.style.display = 'block';
+                menu.style.left = e.clientX + 'px';
+                menu.style.top = e.clientY + 'px';
+            });
+
+            window.addEventListener('click', () => { document.getElementById('context-menu').style.display = 'none'; });
         };
     </script>
 </body>
