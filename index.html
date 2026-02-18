@@ -8,144 +8,226 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     
     <style>
-        :root { --accent: #00d2ff; --bg: #000000; --panel: #050505; --border: rgba(255,255,255,0.1); --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        :root { 
+            --accent: #00d2ff; 
+            --bg: #000000;
+            --panel: #050505;
+            --border: rgba(255,255,255,0.1);
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* --- MOUSE ENGINE --- */
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
-        
-        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
-
-        /* --- STARS EFFECT --- */
-        #stars-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-
-        /* --- CURSOR --- */
         #dot {
             position: fixed; width: 12px; height: 12px; background: var(--accent);
             border-radius: 50%; z-index: 9999999; pointer-events: none;
             box-shadow: 0 0 25px var(--accent); transform: translate(-50%, -50%);
+            transition: width 0.1s, height 0.1s;
         }
 
-        /* --- RIGHT CLICK MENU --- */
-        #context-menu {
-            position: fixed; width: 200px; background: rgba(10,10,10,0.9);
-            border: 1px solid var(--border); border-radius: 12px; padding: 8px;
-            backdrop-filter: blur(20px); z-index: 999999; display: none;
+        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
+
+        /* --- STAR FIELD --- */
+        #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; animation: twinkle 3s infinite; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
+
+        /* --- STROBE INTRO --- */
+        #intro-stage {
+            position: fixed; inset: 0; background: #000; z-index: 1000000;
+            display: flex; align-items: center; justify-content: center;
         }
-        .menu-item { padding: 10px 15px; font-size: 11px; font-weight: 700; border-radius: 6px; transition: 0.2s; }
-        .menu-item:hover { background: var(--accent); color: #000; }
+        .windows-logo { width: 300px; animation: strobe 0.08s infinite; }
+        @keyframes strobe { 0%, 100% { filter: invert(0); } 50% { filter: invert(1); } }
+
+        /* --- RIGHT CLICK MENU --- */
+        #ctx-menu {
+            position: fixed; background: rgba(10,10,10,0.95); border: 1px solid var(--border);
+            border-radius: 12px; padding: 8px; z-index: 999999; display: none;
+            backdrop-filter: blur(10px); min-width: 180px;
+        }
+        .ctx-item { padding: 10px 15px; font-size: 11px; font-weight: 700; border-radius: 6px; transition: 0.2s; }
+        .ctx-item:hover { background: var(--accent); color: #000; }
 
         /* --- UI LAYERS --- */
         .ui-layer {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
             z-index: 50000; display: none; opacity: 0;
             transition: var(--transition); backdrop-filter: blur(40px);
             align-items: center; justify-content: center;
         }
         .ui-layer.active { display: flex !important; opacity: 1; }
 
-        /* --- SETTINGS --- */
-        .settings-frame { width: 950px; height: 650px; background: var(--panel); border: 1px solid var(--border); border-radius: 30px; display: flex; overflow: hidden; }
+        .settings-frame {
+            width: 950px; height: 650px; background: var(--panel);
+            border: 1px solid var(--border); border-radius: 28px;
+            display: flex; overflow: hidden;
+        }
         .sidebar { width: 280px; background: rgba(255,255,255,0.02); border-right: 1px solid var(--border); padding: 50px 30px; }
-        .sidebar-btn { padding: 14px 20px; border-radius: 12px; font-size: 10px; font-weight: 900; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 8px; width: 100%; text-align: left; }
+        .sidebar-btn { 
+            padding: 14px 20px; border-radius: 12px; font-size: 10px; font-weight: 900; 
+            text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 8px;
+            transition: 0.2s; text-align: left; width: 100%;
+        }
         .sidebar-btn.active { background: var(--accent); color: #000; }
-        .content-area { flex: 1; padding: 60px; display: none; }
+        .content-area { flex: 1; padding: 60px; overflow-y: auto; display: none; }
         .content-area.active { display: block; }
 
-        /* --- GAME GRID --- */
-        .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; width: 90%; max-width: 1100px; }
-        .game-card { background: #080808; border: 1px solid var(--border); border-radius: 30px; padding: 12px; transition: 0.3s; }
-        .game-card:hover { transform: scale(1.05); border-color: var(--accent); }
-        .game-thumb { width: 100%; aspect-ratio: 16/10; object-fit: cover; border-radius: 22px; margin-bottom: 15px; }
+        /* --- DASHBOARD --- */
+        #nebula-main { font-size: 13vw; font-weight: 900; font-style: italic; opacity: 0; transition: 1.5s var(--transition); z-index: 10; }
+        #nebula-main.active { opacity: 1; }
 
-        /* --- DOCK --- */
-        #dock { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; background: rgba(10,10,10,0.8); padding: 12px 20px; border-radius: 24px; border: 1px solid var(--border); z-index: 80000; transition: 1s ease; }
+        #dock {
+            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 15px; background: rgba(10,10,10,0.8);
+            padding: 12px 20px; border-radius: 24px; border: 1px solid var(--border);
+            z-index: 80000; opacity: 0; transition: 1s ease;
+        }
+        .dock-btn { width: 56px; height: 56px; background: #000; border: 1px solid var(--border); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .dock-btn:hover { transform: scale(1.2) translateY(-10px); border-color: var(--accent); box-shadow: 0 10px 30px var(--accent); }
 
         #workspace { position: fixed; inset: 0; z-index: 100000; display: none; background: #000; }
-        iframe { width: 100%; height: 100%; border: none; }
+        #render-target { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        #render-target iframe { border: none; }
+
+        .hover-effect { transition: 0.3s; }
+        .hover-effect:active { transform: scale(0.95); }
     </style>
 </head>
-<body oncontextmenu="return false;">
+<body oncontextmenu="return Core.showCtx(event)">
 
-    <canvas id="stars-canvas"></canvas>
     <div id="dot"></div>
+    <div id="stars"></div>
 
-    <div id="context-menu">
-        <div class="menu-item" onclick="Core.openUI('settings')">Settings</div>
-        <div class="menu-item" onclick="Core.openUI('games')">Games</div>
-        <div class="menu-item" onclick="location.reload()">Reload OS</div>
+    <div id="intro-stage">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg" class="windows-logo">
     </div>
 
-    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <h1 id="nebula-main" class="text-[13vw] font-black italic opacity-10">NEBULA</h1>
+    <div id="ctx-menu">
+        <div class="ctx-item" onclick="location.reload()">Refresh System</div>
+        <div class="ctx-item" onclick="Core.openUI('settings')">Open Settings</div>
+        <div class="ctx-item" onclick="Core.openUI('games')">Launch Archive</div>
+        <div class="ctx-item" style="color: #ff4444;" onclick="Core.exitLayers()">Close All Layers</div>
+    </div>
+
+    <div id="login-stage" class="fixed inset-0 bg-black z-[900000] flex flex-col items-center justify-center transition-opacity duration-1000">
+        <h2 class="text-[10px] font-black tracking-[25px] opacity-20 mb-12 uppercase">Access Protocol</h2>
+        <input type="text" id="user-id" placeholder="ENTER SYSTEM ID" class="bg-transparent border-b-2 border-white/5 w-96 p-4 text-3xl font-black text-center outline-none focus:border-[#00d2ff] mb-12">
+        <button onclick="Core.boot()" class="hover-effect px-16 py-5 bg-white text-black font-black rounded-full text-[11px] uppercase tracking-widest">Initialize</button>
+    </div>
+
+    <div class="absolute inset-0 flex items-center justify-center">
+        <h1 id="nebula-main">NEBULA</h1>
     </div>
 
     <div id="settings-layer" class="ui-layer">
         <div class="settings-frame">
             <div class="sidebar flex flex-col">
-                <button class="sidebar-btn active" onclick="Core.tab('sys')">System</button>
-                <button class="sidebar-btn" onclick="Core.tab('proxy')">Proxy Setup</button>
-                <div class="mt-auto"><button onclick="Core.exitLayers()" class="sidebar-btn text-red-500">Close</button></div>
+                <button class="sidebar-btn active" onclick="Core.tab('sys')">User Profile</button>
+                <button class="sidebar-btn" onclick="Core.tab('pxy')">Proxy Node</button>
+                <button class="sidebar-btn" onclick="Core.tab('abt')">System About</button>
+                <div class="mt-auto"><button onclick="Core.exitLayers()" class="sidebar-btn text-red-500">Exit</button></div>
             </div>
             <div id="tab-sys" class="content-area active">
-                <h2 class="text-4xl font-black italic mb-6 uppercase">System Info</h2>
+                <h2 class="text-4xl font-black italic mb-10 uppercase">Identity</h2>
                 <div class="p-6 bg-white/5 rounded-2xl border border-white/5">
-                    <p class="text-[10px] opacity-30 uppercase font-black">Build Version</p>
-                    <p class="text-xl font-bold">TITAN_V35_STABLE</p>
+                    <p class="text-[10px] font-black opacity-30 mb-2 uppercase">Active Operator</p>
+                    <p id="stat-name" class="text-2xl font-black text-cyan-400">Guest</p>
                 </div>
             </div>
-            <div id="tab-proxy" class="content-area">
-                <h2 class="text-4xl font-black italic mb-6 uppercase">Proxy Console</h2>
-                <input type="text" id="proxy-input" placeholder="https://secure-gate.io/proxy?url=" class="w-full bg-black border border-white/10 p-5 rounded-2xl font-bold focus:border-[#00d2ff] outline-none mb-4">
-                <p class="text-[10px] opacity-30 font-bold uppercase tracking-widest">Routing through encrypted tunnel v2.1</p>
+            <div id="tab-pxy" class="content-area">
+                <h2 class="text-4xl font-black italic mb-10 uppercase">Proxy Engine</h2>
+                <input type="text" id="proxy-input" placeholder="Enter URL (https://...)" class="w-full bg-black border border-white/10 p-5 rounded-2xl font-bold focus:border-[#00d2ff] outline-none mb-4">
+                <button onclick="Core.launch(document.getElementById('proxy-input').value, false)" class="w-full py-5 bg-white text-black font-black rounded-2xl text-[10px] uppercase">Initialize Tunnel</button>
+            </div>
+            <div id="tab-abt" class="content-area">
+                <h2 class="text-4xl font-black italic mb-10 uppercase">v35.0 Restore</h2>
+                <p class="opacity-50">Titan build protocols restored. Hotkeys active.</p>
             </div>
         </div>
     </div>
 
     <div id="games-layer" class="ui-layer flex-col pt-24 overflow-y-auto">
-        <div class="w-full max-w-6xl flex justify-between items-end mb-12 px-10">
+        <div class="w-full max-w-6xl flex justify-between items-center mb-12 px-10">
             <h2 class="text-6xl font-black italic tracking-tighter">ARCHIVE</h2>
-            <button onclick="Core.exitLayers()" class="px-12 py-4 border border-white/10 rounded-full font-black text-[10px] uppercase">Back</button>
+            <button onclick="Core.exitLayers()" class="hover-effect px-10 py-3 border border-white/10 rounded-full font-black text-[10px]">BACK_TO_CORE</button>
         </div>
-        <div class="game-grid">
-            <div class="game-card" onclick="Core.launch('https://games.cdn.famobi.com/html5games/o/om-nom-run/v1240/?fg_domain=play.famobi.com&fg_aid=A1000-111&fg_uid=abe80572-560a-444d-baf7-2fa4a7b2c02f&fg_pid=e37ab3ce-88cd-4438-9b9c-a37df5d33736&fg_beat=255&locale=en')">
-                <img src="https://img.cdn.famobi.com/portal/html5games/images/tmp/120/OmNomRunTeaser.jpg?v=0.2-ecf77b68" class="game-thumb">
-                <h3 class="text-lg font-black italic uppercase">Om Nom Run</h3>
+        <div class="grid grid-cols-3 gap-8 w-[90%] max-w-6xl pb-20">
+            <div class="hover-effect game-card cursor-pointer" onclick="Core.launch('https://games.cdn.famobi.com/html5games/o/om-nom-run/v1240/?fg_domain=play.famobi.com&fg_aid=A1000-111&fg_uid=abe80572-560a-444d-baf7-2fa4a7b2c02f&fg_pid=e37ab3ce-88cd-4438-9b9c-a37df5d33736&fg_beat=255&locale=en', false)">
+                <img src="https://img.cdn.famobi.com/portal/html5games/images/tmp/120/OmNomRunTeaser.jpg?v=0.2-ecf77b68" class="w-full rounded-2xl mb-4">
+                <h3 class="font-black uppercase italic">Om Nom Run</h3>
             </div>
-            <div class="game-card" onclick="Core.launch('https://games.cdn.famobi.com/html5games/m/moto-x3m-pool-party/v080/?fg_domain=play.famobi.com&fg_aid=A1000-1&fg_uid=b2102250-eb51-4704-9cab-ff296491cc68&fg_pid=4638e320-4444-4514-81c4-d80a8c662371&fg_beat=258&locale=en')">
-                <img src="https://img.cdn.famobi.com/portal/html5games/images/tmp/120/MotoX3mPoolPartyTeaser.jpg?v=0.2-ecf77b68" class="game-thumb">
-                <h3 class="text-lg font-black italic uppercase">Moto X3M Pool</h3>
+            <div class="hover-effect game-card cursor-pointer" onclick="Core.launch('https://games.cdn.famobi.com/html5games/m/moto-x3m-pool-party/v080/?fg_domain=play.famobi.com&fg_aid=A1000-1&fg_uid=b2102250-eb51-4704-9cab-ff296491cc68&fg_pid=4638e320-4444-4514-81c4-d80a8c662371&fg_beat=258&locale=en', false)">
+                <img src="https://img.cdn.famobi.com/portal/html5games/images/tmp/120/MotoX3mPoolPartyTeaser.jpg?v=0.2-ecf77b68" class="w-full rounded-2xl mb-4">
+                <h3 class="font-black uppercase italic">Moto X3M</h3>
             </div>
-            <div class="game-card" onclick="Core.launch('https://html5.gamedistribution.com/1377b99c10284c229423118a941af3b1/?utm_source=example.com&utm_medium=ovo&utm_campaign=block-and-redirect')">
-                <img src="https://img.gamedistribution.com/1377b99c10284c229423118a941af3b1-512x512.jpeg" class="game-thumb">
-                <h3 class="text-lg font-black italic uppercase">OvO</h3>
+            <div class="hover-effect game-card cursor-pointer" onclick="Core.launch('<iframe src=\'https://html5.gamedistribution.com/1377b99c10284c229423118a941af3b1/?utm_source=example.com&utm_medium=ovo&utm_campaign=block-and-redirect\' width=\'800\' height=\'600\' scrolling=\'none\' frameborder=\'0\'></iframe>', true)">
+                <img src="https://img.gamedistribution.com/1377b99c10284c229423118a941af3b1-512x512.jpeg" class="w-full rounded-2xl mb-4">
+                <h3 class="font-black uppercase italic">OvO</h3>
             </div>
         </div>
     </div>
 
     <div id="dock">
-        <button class="w-14 h-14 bg-black rounded-2xl border border-white/10 flex items-center justify-center text-2xl" onclick="Core.exitLayers()">🏠</button>
-        <button class="w-14 h-14 bg-black rounded-2xl border border-white/10 flex items-center justify-center text-2xl" onclick="Core.openUI('games')">🎮</button>
-        <button class="w-14 h-14 bg-black rounded-2xl border border-white/10 flex items-center justify-center text-2xl" onclick="Core.openUI('settings')">⚙️</button>
+        <button class="dock-btn" onclick="Core.exitLayers()">🏠</button>
+        <button class="dock-btn" onclick="Core.openUI('games')">🎮</button>
+        <button class="dock-btn" onclick="Core.openUI('settings')">⚙️</button>
     </div>
 
     <div id="workspace">
-        <button onclick="Core.exitLayers()" class="fixed top-8 left-8 px-8 py-3 bg-black border border-white/10 rounded-full font-black text-[10px] z-[110000]">EXIT_SESSION</button>
-        <iframe id="viewer"></iframe>
+        <button onclick="Core.exitLayers()" class="fixed top-8 left-8 hover-effect px-8 py-3 bg-black border border-white/10 rounded-full font-black text-[10px] z-[110000]">CLOSE_SESSION</button>
+        <div id="render-target"></div>
     </div>
 
     <script>
         const Core = {
+            boot() {
+                const name = document.getElementById('user-id').value;
+                if(!name) return;
+                document.getElementById('stat-name').innerText = name;
+                document.getElementById('login-stage').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('login-stage').style.display = 'none';
+                    document.getElementById('nebula-main').classList.add('active');
+                    document.getElementById('dock').style.opacity = '1';
+                    this.createStars();
+                }, 800);
+            },
+            createStars() {
+                const container = document.getElementById('stars');
+                for(let i=0; i<150; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    star.style.width = star.style.height = Math.random()*3 + 'px';
+                    star.style.left = Math.random()*100 + '%';
+                    star.style.top = Math.random()*100 + '%';
+                    star.style.animationDelay = Math.random()*3 + 's';
+                    container.appendChild(star);
+                }
+            },
+            showCtx(e) {
+                e.preventDefault();
+                const menu = document.getElementById('ctx-menu');
+                menu.style.display = 'block';
+                menu.style.left = e.clientX + 'px';
+                menu.style.top = e.clientY + 'px';
+                return false;
+            },
             openUI(id) {
-                this.exitLayers(true); 
-                const layer = document.getElementById(id + '-layer');
-                layer.style.display = 'flex';
-                setTimeout(() => layer.classList.add('active'), 50);
+                this.exitLayers(true);
+                const l = document.getElementById(id + '-layer');
+                l.style.display = 'flex';
+                setTimeout(() => l.classList.add('active'), 50);
                 document.getElementById('dock').style.opacity = '0';
             },
             exitLayers(switching = false) {
-                document.querySelectorAll('.ui-layer').forEach(l => { l.classList.remove('active'); setTimeout(() => { if(!l.classList.contains('active')) l.style.display = 'none'; }, 400); });
+                document.querySelectorAll('.ui-layer').forEach(l => {
+                    l.classList.remove('active');
+                    setTimeout(() => { if(!l.classList.contains('active')) l.style.display = 'none'; }, 400);
+                });
                 document.getElementById('workspace').style.display = 'none';
-                document.getElementById('viewer').src = '';
+                document.getElementById('render-target').innerHTML = '';
                 if(!switching) document.getElementById('dock').style.opacity = '1';
-                document.getElementById('context-menu').style.display = 'none';
             },
             tab(t) {
                 document.querySelectorAll('.content-area').forEach(c => c.classList.remove('active'));
@@ -153,49 +235,34 @@
                 document.getElementById('tab-' + t).classList.add('active');
                 event.currentTarget.classList.add('active');
             },
-            launch(url) {
-                document.getElementById('viewer').src = url;
+            launch(content, isRaw) {
+                const target = document.getElementById('render-target');
+                target.innerHTML = isRaw ? content : `<iframe src="${content}" width="100%" height="100%"></iframe>`;
                 document.getElementById('workspace').style.display = 'block';
                 document.getElementById('games-layer').classList.remove('active');
+                document.getElementById('settings-layer').classList.remove('active');
             }
         };
 
-        // --- STARS ENGINE ---
-        const canvas = document.getElementById('stars-canvas');
-        const ctx = canvas.getContext('2d');
-        let stars = [];
-        function initStars() {
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            stars = Array(200).fill(0).map(() => ({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 2, speed: Math.random() * 0.5 }));
-        }
-        function animate() {
-            ctx.clearRect(0,0,canvas.width, canvas.height);
-            ctx.fillStyle = '#fff';
-            stars.forEach(s => { s.y += s.speed; if(s.y > canvas.height) s.y = 0; ctx.fillRect(s.x, s.y, s.size, s.size); });
-            requestAnimationFrame(animate);
-        }
+        window.onclick = () => document.getElementById('ctx-menu').style.display = 'none';
+        
+        window.addEventListener('keydown', e => {
+            if(e.altKey && e.key === 't') {
+                e.preventDefault();
+                Core.exitLayers();
+            }
+        });
 
         window.onload = () => {
-            initStars(); animate();
             const dot = document.getElementById('dot');
             window.addEventListener('mousemove', e => {
-                dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px';
+                dot.style.left = e.clientX + 'px';
+                dot.style.top = e.clientY + 'px';
             });
-
-            // Alt+T Logic
-            window.addEventListener('keydown', e => {
-                if(e.altKey && e.key === 't') { Core.openUI('settings'); Core.tab('proxy'); }
-            });
-
-            // Right Click Logic
-            window.addEventListener('contextmenu', e => {
-                const menu = document.getElementById('context-menu');
-                menu.style.display = 'block';
-                menu.style.left = e.clientX + 'px';
-                menu.style.top = e.clientY + 'px';
-            });
-
-            window.addEventListener('click', () => { document.getElementById('context-menu').style.display = 'none'; });
+            setTimeout(() => {
+                document.getElementById('intro-stage').style.opacity = '0';
+                setTimeout(() => document.getElementById('intro-stage').style.display = 'none', 800);
+            }, 3000);
         };
     </script>
 </body>
