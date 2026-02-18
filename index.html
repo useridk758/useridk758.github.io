@@ -14,17 +14,12 @@
             --card: #0c0c0c;
         }
 
-        /* --- CRITICAL MOUSE FIX --- */
-        * { 
-            margin: 0; padding: 0; box-sizing: border-box; 
-            /* Fallback: If dot fails, you'll still see a normal cursor */
-            cursor: auto; 
-        }
+        /* --- THE ULTIMATE MOUSE FIX --- */
+        /* Default state: normal cursor is visible. */
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: auto; }
 
-        /* Hide the real cursor only if the custom dot is active */
-        body.custom-cursor-active * {
-            cursor: none !important;
-        }
+        /* Only hide real cursor if JS successfully moves the dot */
+        body.cursor-active * { cursor: none !important; }
         
         #dot {
             position: fixed; 
@@ -32,19 +27,20 @@
             height: 10px; 
             background: var(--accent);
             border-radius: 50%; 
-            /* Max Z-Index to stay on top of EVERYTHING */
             z-index: 2147483647; 
             pointer-events: none;
             box-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent);
             transform: translate(-50%, -50%);
-            display: none; /* Hidden until movement detected */
-            border: 1px solid white;
+            display: none; /* JS will turn this on */
+            border: 1px solid rgba(255,255,255,0.5);
         }
 
         body { 
             background: var(--bg); color: #fff; 
             font-family: 'Inter', sans-serif; 
             overflow: hidden; height: 100vh;
+            background-image: radial-gradient(circle at 2px 2px, rgba(0,210,255,0.03) 1px, transparent 0);
+            background-size: 30px 30px;
         }
 
         /* --- UI COMPONENTS --- */
@@ -52,105 +48,148 @@
             position: fixed; inset: 0; background: rgba(0,0,0,0.98); 
             z-index: 5000; display: none; opacity: 0; 
             align-items: center; justify-content: center; backdrop-filter: blur(25px);
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .layer.active { display: flex; opacity: 1; }
 
         #dock { 
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
-            display: flex; gap: 10px; background: rgba(15,15,15,0.9);
-            padding: 10px; border-radius: 18px; border: 1px solid #333; 
-            z-index: 10000;
+            display: flex; gap: 12px; background: rgba(10,10,10,0.95);
+            padding: 10px 15px; border-radius: 20px; border: 1px solid #333; 
+            z-index: 10000; transition: all 0.5s ease;
         }
         
         .dock-btn { 
-            width: 44px; height: 44px; background: #111; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center; font-size: 20px;
+            width: 42px; height: 42px; background: #151515; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 18px;
+            border: 1px solid #222; transition: all 0.2s;
+        }
+        .dock-btn:hover { background: var(--accent); color: #000; transform: translateY(-5px); }
+
+        /* --- GAME TILES --- */
+        .g-container { width: 95%; max-width: 1200px; height: 80vh; overflow-y: auto; padding: 10px; }
+        .g-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
+        
+        .g-card { 
+            background: #080808; border: 1px solid #1a1a1a; border-radius: 12px; 
+            overflow: hidden; transition: all 0.3s;
+        }
+        .g-card:hover { border-color: var(--accent); transform: scale(1.05); }
+        .g-img { width: 100%; aspect-ratio: 1; object-fit: cover; background: #111; }
+        .g-name { padding: 10px; font-size: 10px; font-weight: 900; text-transform: uppercase; text-align: center; }
+
+        /* --- P*XIESS BAR --- */
+        .p-bar {
+            width: 500px; background: #0a0a0a; border: 1px solid #222;
+            padding: 20px; border-radius: 15px; text-align: center; font-size: 18px;
+            font-weight: 700; color: var(--accent); outline: none;
         }
 
-        /* --- GRID --- */
-        .g-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; width: 90%; max-width: 1200px; }
-        .g-card { background: #080808; border: 1px solid #222; border-radius: 12px; overflow: hidden; }
-        .g-card:hover { border-color: var(--accent); }
-        .g-img { width: 100%; aspect-ratio: 1; object-fit: cover; background: #111; }
-
-        #workspace { position: fixed; inset: 0; z-index: 4000; display: none; }
+        #workspace { position: fixed; inset: 0; z-index: 4000; display: none; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
+
+        #hud {
+            position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 20px; background: #0a0a0a; padding: 10px 30px;
+            border-radius: 15px; border: 1px solid #222; z-index: 15000; display: none;
+        }
     </style>
 </head>
 <body>
 
     <div id="dot"></div>
 
-    <div id="boot" class="fixed inset-0 bg-black z-[100000] flex items-center justify-center">
-        <div class="text-center">
-            <h1 class="text-6xl font-black italic mb-6">NEBULA</h1>
-            <input type="text" id="uid" placeholder="ACCESS KEY..." class="bg-[#111] border border-[#222] p-4 rounded-xl mb-4 text-center outline-none focus:border-[#00d2ff]">
-            <br>
-            <button onclick="OS.boot()" class="px-10 py-4 bg-white text-black font-bold rounded-xl hover:bg-[#00d2ff]">LOGIN</button>
+    <div id="boot" class="fixed inset-0 bg-black z-[100000] flex items-center justify-center transition-opacity duration-500">
+        <div class="w-80 text-center">
+            <h1 class="text-5xl font-black italic mb-8 tracking-tighter">NEBULA</h1>
+            <input type="text" id="uid" placeholder="AUTH_KEY" class="w-full bg-[#0a0a0a] border border-[#222] p-4 rounded-xl mb-4 text-center font-bold outline-none focus:border-[#00d2ff]">
+            <button onclick="OS.boot()" class="w-full py-4 bg-white text-black font-black rounded-xl hover:bg-[#00d2ff] transition-all uppercase text-xs tracking-widest">Connect</button>
+        </div>
+    </div>
+
+    <div id="pxiess-layer" class="layer" onclick="OS.close()">
+        <div class="text-center" onclick="event.stopPropagation()">
+            <h1 class="text-6xl font-black italic mb-8 tracking-tighter">P*XIESS</h1>
+            <input type="text" placeholder="URL_OR_QUERY" class="p-bar" onkeypress="if(event.key==='Enter')OS.launch(this.value)">
         </div>
     </div>
 
     <div id="games-layer" class="layer" onclick="OS.close()">
-        <div class="g-grid" id="g-inject" onclick="event.stopPropagation()"></div>
+        <div class="g-container" onclick="event.stopPropagation()">
+            <h2 class="text-xl font-black italic mb-6 border-l-4 border-[#00d2ff] pl-3 uppercase">Asset_Matrix</h2>
+            <div class="g-grid" id="g-inject"></div>
+        </div>
+    </div>
+
+    <div id="workspace"><iframe id="view"></iframe></div>
+    
+    <div id="hud">
+        <button onclick="OS.home()" class="text-[9px] font-black hover:text-[#00d2ff]">EXIT</button>
+        <button onclick="OS.open('games')" class="text-[9px] font-black hover:text-[#00d2ff]">GAMES</button>
     </div>
 
     <div id="dock" style="display:none;">
         <div class="dock-btn" onclick="OS.home()">🏠</div>
+        <div class="dock-btn" onclick="OS.open('pxiess')">🌐</div>
         <div class="dock-btn" onclick="OS.open('games')">🎮</div>
+        <div class="dock-btn" onclick="OS.settings()">⚙️</div>
     </div>
-
-    <div id="workspace"><iframe id="view"></iframe></div>
 
     <script>
         const ASSET_PATH = "https://cdn.jsdelivr.net/gh/gn-math/assets@main/";
         const LIBRARY = [
-            { n: "Om Nom Run", p: "https://play.famobi.com/om-nom-run", ext: true },
+            { n: "Om Nom Run", p: "https://games.cdn.famobi.com/html5games/o/om-nom-run/v1240/?fg_domain=play.famobi.com&fg_aid=A1000-111&fg_uid=abe80572-560a-444d-baf7-2fa4a7b2c02f&fg_pid=e37ab3ce-88cd-4438-9b9c-a37df5d33736&fg_beat=227&original_ref=https%3A%2F%2Fplay.famobi.com%2Fom-nom-run", ext: true },
             { n: "FNAF 1", p: "fnaf/1/index.html" },
             { n: "Ultrakill", p: "ports/ultrakill/index.html" },
-            { n: "Minecraft", p: "eagler/1.8/index.html" }
+            { n: "Minecraft", p: "eagler/1.8/index.html" },
+            { n: "Slope", p: "games/slope/index.html" },
+            { n: "Retro Bowl", p: "games/retrobowl/index.html" }
         ];
 
         const OS = {
-            initMouse() {
+            init() {
                 const dot = document.getElementById('dot');
                 
                 window.addEventListener('mousemove', e => {
-                    // Show dot and hide real cursor once mouse moves
+                    // Critical: Activate custom cursor mode only when movement is detected
+                    document.body.classList.add('cursor-active');
                     dot.style.display = 'block';
-                    document.body.classList.add('custom-cursor-active');
                     
-                    // Direct positioning for speed
                     dot.style.left = e.clientX + 'px';
                     dot.style.top = e.clientY + 'px';
                 });
 
-                // Fail-safe: if the mouse leaves the window, restore default
-                window.addEventListener('mouseout', () => {
-                    document.body.classList.remove('custom-cursor-active');
-                    dot.style.display = 'none';
-                });
-            },
-
-            boot() {
-                document.getElementById('boot').style.display = 'none';
-                document.getElementById('dock').style.display = 'flex';
-                this.renderGames();
-            },
-
-            renderGames() {
+                // Render Tiles
                 const grid = document.getElementById('g-inject');
-                grid.innerHTML = '';
                 LIBRARY.forEach(g => {
                     const card = document.createElement('div');
                     card.className = "g-card";
-                    card.innerHTML = `<img src="https://api.dicebear.com/7.x/identicon/svg?seed=${g.n}" class="g-img"><div class="p-3 text-[10px] font-bold">${g.n}</div>`;
+                    card.innerHTML = `
+                        <img src="https://api.dicebear.com/7.x/shapes/svg?seed=${g.n}" class="g-img">
+                        <div class="g-name">${g.n}</div>
+                    `;
                     card.onclick = () => this.launch(g.ext ? g.p : ASSET_PATH + g.p);
                     grid.appendChild(card);
                 });
             },
 
+            boot() {
+                if(!document.getElementById('uid').value) return;
+                document.getElementById('boot').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('boot').style.display = 'none';
+                    document.getElementById('dock').style.display = 'flex';
+                }, 500);
+            },
+
+            settings() {
+                document.getElementById('boot').style.display = 'flex';
+                document.getElementById('boot').style.opacity = '1';
+                document.getElementById('dock').style.display = 'none';
+            },
+
             open(id) {
+                this.close();
                 const l = document.getElementById(id + '-layer');
                 l.style.display = 'flex';
                 setTimeout(() => l.classList.add('active'), 10);
@@ -159,24 +198,25 @@
             close() {
                 document.querySelectorAll('.layer').forEach(l => {
                     l.classList.remove('active');
-                    setTimeout(() => l.style.display = 'none', 300);
+                    setTimeout(() => l.style.display = 'none', 400);
                 });
             },
 
             launch(url) {
                 document.getElementById('view').src = url;
                 document.getElementById('workspace').style.display = 'block';
+                document.getElementById('hud').style.display = 'flex';
                 this.close();
             },
 
             home() {
                 document.getElementById('workspace').style.display = 'none';
                 document.getElementById('view').src = "";
+                document.getElementById('hud').style.display = 'none';
             }
         };
 
-        // Run mouse init immediately
-        OS.initMouse();
+        OS.init();
     </script>
 </body>
 </html>
