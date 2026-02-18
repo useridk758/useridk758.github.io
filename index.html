@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | TITAN v39.0</title>
+    <title>NEBULA | TITAN v40.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     
@@ -52,9 +52,8 @@
 
         /* --- WORKSPACE --- */
         #workspace { position: fixed; inset: 0; z-index: 100000; display: none; background: #000; }
-        #render-target { width: 100%; height: 100%; }
-        iframe { width: 100%; height: 100%; border: none; }
-
+        #render-target { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        
         #dock {
             position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
             display: flex; gap: 15px; background: rgba(10,10,10,0.8);
@@ -101,18 +100,23 @@
         <div class="grid grid-cols-3 gap-8 w-[90%] max-w-6xl pb-20">
             <div class="game-card cursor-pointer" onclick="Core.launchOvO()">
                 <img src="https://img.gamedistribution.com/1377b99c10284c229423118a941af3b1-512x512.jpeg" class="w-full rounded-2xl mb-4">
-                <h3 class="font-black uppercase italic text-cyan-400">OvO Runtime</h3>
+                <h3 class="font-black uppercase italic text-cyan-400 text-center">OvO Engine</h3>
+            </div>
+
+            <div class="game-card cursor-pointer" onclick="Core.launchMoto()">
+                <img src="https://img.gamedistribution.com/264b971a07994432bc1645e317bb8ecf-512x512.jpeg" class="w-full rounded-2xl mb-4">
+                <h3 class="font-black uppercase italic text-orange-500 text-center">Moto X3M</h3>
             </div>
 
             <div class="game-card cursor-pointer" onclick="Core.launch('https://games.cdn.famobi.com/html5games/m/moto-x3m-pool-party/v080/?fg_domain=play.famobi.com&fg_aid=A1000-1&fg_uid=b2102250-eb51-4704-9cab-ff296491cc68&fg_pid=4638e320-4444-4514-81c4-d80a8c662371&fg_beat=258&locale=en')">
                 <img src="https://img.cdn.famobi.com/portal/html5games/images/tmp/120/MotoX3mPoolPartyTeaser.jpg?v=0.2-ecf77b68" class="w-full rounded-2xl mb-4">
-                <h3 class="font-black uppercase italic text-white">Moto X3M</h3>
+                <h3 class="font-black uppercase italic text-white text-center">X3M Pool Party</h3>
             </div>
         </div>
     </div>
 
     <div id="workspace">
-        <button onclick="Core.exitLayers()" class="fixed top-8 left-8 px-8 py-3 bg-black border border-white/10 rounded-full font-black text-[10px] z-[110000] text-white">CLOSE_SESSION</button>
+        <button onclick="Core.exitLayers()" class="fixed top-8 left-8 px-8 py-3 bg-black border border-white/10 rounded-full font-black text-[10px] z-[110000] text-white hover:bg-white hover:text-black transition">CLOSE_SESSION</button>
         <div id="render-target"></div>
     </div>
 
@@ -173,11 +177,10 @@
             },
             launch(url) {
                 const target = document.getElementById('render-target');
-                target.innerHTML = `<iframe src="${url}"></iframe>`;
+                target.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; border:none;"></iframe>`;
                 document.getElementById('workspace').style.display = 'block';
             },
             launchOvO() {
-                // This combines the parts from your screenshots into one execution block
                 const target = document.getElementById('render-target');
                 const fullEngineCode = `
                     <!DOCTYPE html>
@@ -185,11 +188,7 @@
                     <head>
                         <meta charset="UTF-8" />
                         <base href="https://brourbeinsus.github.io/OvO/">
-                        <style>
-                            * { padding: 0; margin: 0; }
-                            body { background: #000; overflow: hidden; }
-                            canvas { width: 100vw; height: 100vh; }
-                        </style>
+                        <style>* { padding: 0; margin: 0; } body { background: #000; overflow: hidden; } canvas { width: 100vw; height: 100vh; }</style>
                     </head>
                     <body>
                         <div id="c2canvasdiv"><canvas id="c2canvas" width="640" height="640"></canvas></div>
@@ -197,16 +196,28 @@
                         <script src="GameAnalytics.js"><\/script>
                         <script src="Tween.js"><\/script>
                         <script src="c2runtime.js"><\/script>
-                        <script>
-                            jQuery(document).ready(function() { cr_createRuntime("c2canvas"); });
-                        <\/script>
+                        <script>jQuery(document).ready(function() { cr_createRuntime("c2canvas"); });<\/script>
                     </body>
                     </html>
                 `;
                 const blob = new Blob([fullEngineCode], {type: 'text/html'});
                 const url = URL.createObjectURL(blob);
-                target.innerHTML = `<iframe src="${url}" allowfullscreen></iframe>`;
+                target.innerHTML = `<iframe src="${url}" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>`;
                 document.getElementById('workspace').style.display = 'block';
+            },
+            launchMoto() {
+                // Using your exact provided embed structure
+                const target = document.getElementById('render-target');
+                target.innerHTML = `
+                    <div style="height: 600px; width: 900px; position: relative; background: #000; border: 2px solid #333; border-radius: 15px; overflow: hidden; box-shadow: 0 0 50px rgba(255,165,0,0.2);">
+                        <iframe style="height:100%;width:100%" src="https://html5gameshq.com/iframed/moto-x3m" frameborder="0" scrolling="no"></iframe>
+                        <div style="position: absolute; bottom: 10px; right: 10px; font-size: 10px; opacity: 0.5;">
+                            <a href="https://html5gameshq.com/?r=embed-ref" target="_blank" style="color: white; text-decoration: none;">More Games at HTML5GamesHQ...</a>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('workspace').style.display = 'block';
+                document.getElementById('games-layer').classList.remove('active');
             }
         };
 
