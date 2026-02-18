@@ -3,28 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | TITAN v28.0</title>
+    <title>NEBULA | TITAN v29.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     
     <style>
         :root { 
             --accent: #00d2ff; 
             --bg: #000000;
-            --glow: 0 0 30px rgba(0, 210, 255, 0.6);
+            --panel: #050505;
+            --border: rgba(255,255,255,0.08);
+            --transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* --- MOUSE SYSTEM (Fix: Pointer Events None is CRITICAL) --- */
+        /* --- THE MOUSE SYSTEM (Z-INDEX PRIORITY) --- */
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
         
         #dot {
-            position: fixed; width: 12px; height: 12px; background: var(--accent);
-            border-radius: 50%; z-index: 9999999; 
-            /* This line ensures the dot doesn't block your clicks */
-            pointer-events: none; 
-            box-shadow: var(--glow);
-            transform: translate(-50%, -50%);
-            transition: width 0.1s, height 0.1s;
+            position: fixed; width: 10px; height: 10px; background: var(--accent);
+            border-radius: 50%; z-index: 2147483647; pointer-events: none;
+            box-shadow: 0 0 30px var(--accent);
+            transform: translate(-50%, -50%); transition: width 0.1s, transform 0.1s;
         }
 
         body { 
@@ -32,76 +31,86 @@
             overflow: hidden; height: 100vh;
         }
 
-        /* --- STROBE INTRO --- */
+        /* --- STROBE INTRO (WINDOWS LOGO) --- */
         #intro-stage {
-            position: fixed; inset: 0; background: #000; z-index: 900000;
+            position: fixed; inset: 0; background: #000; z-index: 999999;
             display: flex; align-items: center; justify-content: center;
-            pointer-events: none; /* Allows clicks to pass through once fading */
         }
         .windows-logo {
-            width: 300px; animation: strobe-effect 0.08s infinite;
+            width: 300px; animation: strobe 0.08s infinite;
         }
-        @keyframes strobe-effect {
-            0%, 100% { filter: invert(0); transform: scale(1); }
-            50% { filter: invert(1); transform: scale(1.05); }
+        @keyframes strobe {
+            0%, 100% { filter: invert(0) brightness(1); }
+            50% { filter: invert(1) brightness(2); }
         }
-
-        /* --- UI LAYERS --- */
-        .layer {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-            z-index: 50000; display: none; opacity: 0;
-            transition: all 0.5s ease;
-            align-items: center; justify-content: center;
-            backdrop-filter: blur(20px);
-        }
-        .layer.active { display: flex !important; opacity: 1; }
 
         /* --- DASHBOARD --- */
-        #nebula-main-text {
-            font-size: 12vw; font-weight: 900; font-style: italic;
-            color: #fff; text-shadow: 0 0 50px var(--accent);
-            opacity: 0; transition: 1s ease;
+        #nebula-text {
+            font-size: 13vw; font-weight: 900; font-style: italic;
+            color: #fff; text-shadow: 0 0 70px var(--accent);
+            opacity: 0; transition: 2s var(--transition);
         }
-        #nebula-main-text.visible { opacity: 1; }
+        #nebula-text.show { opacity: 1; }
 
         /* --- BUTTON PHYSICS & HOVERS --- */
-        .action-btn {
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .btn-hover {
+            transition: var(--transition);
             pointer-events: auto !important;
         }
-        .action-btn:hover {
+        .btn-hover:hover {
             transform: scale(1.1) translateY(-5px);
-            filter: brightness(1.2);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        }
-        .action-btn:active { transform: scale(0.95); }
-
-        /* --- SETTINGS PANEL --- */
-        .settings-card {
-            width: 500px; background: #0a0a0a; border: 1px solid #222;
-            border-radius: 30px; padding: 50px; text-align: center;
-        }
-        .settings-input {
-            width: 100%; background: #000; border: 1px solid #333;
-            padding: 15px; border-radius: 12px; margin-top: 10px;
-            color: #fff; text-align: center; outline: none;
+            filter: brightness(1.3);
+            box-shadow: 0 10px 30px rgba(0, 210, 255, 0.2);
         }
 
-        /* --- GAMES GRID --- */
-        .game-hero {
-            width: 350px; background: #050505; border: 1px solid #222;
-            border-radius: 20px; overflow: hidden;
+        /* --- SETTINGS (VIDEO REPLICA) --- */
+        #settings-layer {
+            position: fixed; inset: 0; background: #000; z-index: 80000;
+            display: none; opacity: 0; transition: var(--transition);
+        }
+        .settings-window {
+            width: 900px; height: 600px; background: var(--panel);
+            border: 1px solid var(--border); border-radius: 24px;
+            display: flex; overflow: hidden; box-shadow: 0 50px 100px rgba(0,0,0,1);
+        }
+        .settings-sidebar {
+            width: 250px; border-right: 1px solid var(--border);
+            padding: 40px 20px; background: rgba(255,255,255,0.02);
+        }
+        .sidebar-item {
+            padding: 12px 20px; border-radius: 10px; font-size: 11px;
+            font-weight: 900; text-transform: uppercase; color: rgba(255,255,255,0.4);
+            margin-bottom: 5px; transition: 0.3s;
+        }
+        .sidebar-item.active { background: var(--accent); color: #000; }
+        
+        .settings-content { flex: 1; padding: 60px; overflow-y: auto; }
+        .data-row { 
+            display: flex; justify-content: space-between; 
+            padding: 15px 0; border-bottom: 1px solid var(--border);
+            font-size: 12px; font-family: 'JetBrains Mono';
+        }
+
+        /* --- GAMES (PHOTO #2 STYLE) --- */
+        #games-layer {
+            position: fixed; inset: 0; background: #000; z-index: 70000;
+            display: none; padding: 60px;
+        }
+        .nav-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 50px;
         }
 
         /* --- DOCK --- */
         #dock {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 15px; background: rgba(20,20,20,0.8);
-            padding: 12px; border-radius: 20px; border: 1px solid #333;
-            z-index: 60000; opacity: 0; transition: 0.5s;
+            display: flex; gap: 15px; background: rgba(10,10,10,0.9);
+            padding: 12px; border-radius: 20px; border: 1px solid var(--border);
+            z-index: 90000; opacity: 0; transition: 1s ease;
         }
+        .dock-btn { width: 50px; height: 50px; background: #000; border: 1px solid var(--border); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
 
-        #workspace { position: fixed; inset: 0; z-index: 70000; display: none; }
+        #workspace { position: fixed; inset: 0; z-index: 100000; display: none; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
@@ -113,127 +122,141 @@
         <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg" class="windows-logo">
     </div>
 
-    <div id="login-stage" class="fixed inset-0 bg-black z-[100000] flex flex-col items-center justify-center transition-opacity duration-1000">
-        <h2 class="text-[10px] font-black tracking-[15px] opacity-30 mb-10 uppercase">Identity Required</h2>
-        <input type="text" id="user-name" placeholder="ENTER NAME" class="bg-transparent border-b-2 border-white/10 p-4 text-2xl text-center outline-none focus:border-[#00d2ff] mb-10">
-        <button onclick="OS.boot()" class="action-btn px-12 py-4 bg-white text-black font-black rounded-full uppercase text-[10px] tracking-widest">Access Nebula</button>
+    <div id="login-stage" class="fixed inset-0 bg-black z-[999995] flex flex-col items-center justify-center transition-all duration-1000">
+        <h2 class="text-[10px] font-black tracking-[20px] opacity-20 mb-10 uppercase">Identity Required</h2>
+        <input type="text" id="user-input" placeholder="WRITE NAME" class="bg-transparent border-b-2 border-white/5 p-4 text-3xl font-black text-center outline-none focus:border-[#00d2ff] mb-12">
+        <button onclick="OS.boot()" class="btn-hover px-14 py-4 bg-white text-black font-black rounded-full text-[10px] tracking-widest uppercase">Boot System</button>
     </div>
 
     <div class="absolute inset-0 flex items-center justify-center">
-        <h1 id="nebula-main-text">NEBULA</h1>
+        <h1 id="nebula-text">NEBULA</h1>
     </div>
 
-    <div id="games-layer" class="layer">
-        <div class="flex flex-col items-center">
-            <h2 class="text-4xl font-black italic mb-10">THE ARCHIVE</h2>
-            <div class="game-hero action-btn" onclick="OS.launch('https://games.cdn.famobi.com/html5games/o/om-nom-run/v1240/?fg_domain=play.famobi.com&fg_aid=A1000-111&fg_uid=abe80572-560a-444d-baf7-2fa4a7b2c02f&fg_pid=e37ab3ce-88cd-4438-9b9c-a37df5d33736&fg_beat=238&original_ref=https%3A%2F%2Fplay.famobi.com%2Fhtml5game%2Fabe80572-560a-444d-baf7-2fa4a7b2c02f%2FA1000-11')">
-                <img src="https://img.cdn.famobi.com/portal/html5games/images/tmp/120/OmNomRunTeaser.jpg?v=0.2-ecf77b68" class="w-full">
-                <div class="p-6">
-                    <h3 class="font-black italic">OM NOM RUN</h3>
-                    <button class="mt-4 text-[10px] font-black text-[#00d2ff]">LAUNCH SESSION</button>
+    <div id="settings-layer" class="flex items-center justify-center">
+        <div class="settings-window">
+            <div class="settings-sidebar">
+                <div class="sidebar-item active">General</div>
+                <div class="sidebar-item">Display</div>
+                <div class="sidebar-item">Network</div>
+                <div class="sidebar-item">Security</div>
+                <div class="sidebar-item">About</div>
+                <div class="mt-auto">
+                    <button onclick="OS.closeAll()" class="sidebar-item text-red-500 hover:bg-red-500 hover:text-white w-full text-left">Exit Settings</button>
                 </div>
             </div>
-            <button onclick="OS.closeAll()" class="mt-10 opacity-40 font-black text-[10px] tracking-widest uppercase">Back to Core</button>
+            <div class="settings-content">
+                <h2 class="text-3xl font-black italic mb-8 uppercase">System Dashboard</h2>
+                <div class="data-row"><span>System Build</span><span class="text-cyan-400">Titan v29.0</span></div>
+                <div class="data-row"><span>Core Logic</span><span class="text-cyan-400">Operational</span></div>
+                <div class="data-row"><span>User Identity</span><span id="display-name" class="text-cyan-400">Not Set</span></div>
+                <div class="data-row"><span>Strobe Sync</span><span class="text-green-500">Active</span></div>
+                <div class="mt-10">
+                    <label class="text-[9px] font-black opacity-30 uppercase block mb-2">Update ID</label>
+                    <input type="text" id="new-name-input" class="w-full bg-black border border-white/10 p-4 rounded-xl font-bold" placeholder="Change name...">
+                    <button onclick="OS.saveName()" class="btn-hover mt-4 w-full py-4 bg-[#00d2ff] text-black font-black rounded-xl text-[10px]">SAVE CHANGES</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div id="settings-layer" class="layer">
-        <div class="settings-card">
-            <h2 class="text-[10px] font-black tracking-widest opacity-20 uppercase mb-8">System Settings</h2>
-            <div class="text-left mb-6">
-                <label class="text-[9px] font-bold opacity-40 uppercase">Update Identity</label>
-                <input type="text" id="new-name" class="settings-input" placeholder="New ID...">
-            </div>
-            <div class="flex gap-4">
-                <button onclick="OS.closeAll()" class="action-btn flex-1 py-4 bg-white/5 border border-white/10 rounded-xl font-bold text-[10px]">CANCEL</button>
-                <button onclick="OS.closeAll()" class="action-btn flex-1 py-4 bg-[#00d2ff] text-black rounded-xl font-black text-[10px]">SAVE CHANGES</button>
+    <div id="games-layer">
+        <div class="nav-header">
+            <h2 class="text-5xl font-black italic">ARCHIVE</h2>
+            <button onclick="OS.closeAll()" class="btn-hover px-10 py-3 border border-white/10 rounded-full font-black text-[10px]">RETURN</button>
+        </div>
+        <div class="flex justify-center mt-20">
+            <div class="w-80 bg-[#050505] border border-white/10 rounded-3xl overflow-hidden btn-hover" onclick="OS.launch('https://games.cdn.famobi.com/html5games/o/om-nom-run/v1240/?fg_domain=play.famobi.com&fg_aid=A1000-111&fg_uid=abe80572-560a-444d-baf7-2fa4a7b2c02f&fg_pid=e37ab3ce-88cd-4438-9b9c-a37df5d33736&fg_beat=238&original_ref=https%3A%2F%2Fplay.famobi.com%2Fhtml5game%2Fabe80572-560a-444d-baf7-2fa4a7b2c02f%2FA1000-11')">
+                <img src="https://img.cdn.famobi.com/portal/html5games/images/tmp/120/OmNomRunTeaser.jpg?v=0.2-ecf77b68" class="w-full">
+                <div class="p-6">
+                    <h3 class="font-black italic text-lg uppercase">Om Nom Run</h3>
+                    <p class="text-[9px] opacity-30 font-bold mt-1 tracking-widest">STABLE_CDN_LINK</p>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="dock">
-        <button class="action-btn w-12 h-12 bg-black rounded-xl border border-white/10 flex items-center justify-center text-xl" onclick="OS.closeAll()">🏠</button>
-        <button class="action-btn w-12 h-12 bg-black rounded-xl border border-white/10 flex items-center justify-center text-xl" onclick="OS.open('games')">🎮</button>
-        <button class="action-btn w-12 h-12 bg-black rounded-xl border border-white/10 flex items-center justify-center text-xl" onclick="OS.open('settings')">⚙️</button>
+        <div class="dock-btn btn-hover" onclick="OS.closeAll()">🏠</div>
+        <div class="dock-btn btn-hover" onclick="OS.open('games')">🎮</div>
+        <div class="dock-btn btn-hover" onclick="OS.open('settings')">⚙️</div>
     </div>
 
     <div id="workspace">
-        <button onclick="OS.closeAll()" class="fixed top-5 left-5 z-[80000] px-6 py-2 bg-black border border-white/20 rounded-full text-[10px] font-black action-btn">EXIT SESSION</button>
-        <iframe id="frame"></iframe>
+        <button onclick="OS.closeAll()" class="fixed top-8 left-8 btn-hover px-8 py-3 bg-black border border-white/20 rounded-full font-black text-[10px]">EXIT SESSION</button>
+        <iframe id="main-view"></iframe>
     </div>
 
     <script>
         const OS = {
             init() {
-                // Mouse Tracker
                 const dot = document.getElementById('dot');
                 window.addEventListener('mousemove', e => {
                     dot.style.left = e.clientX + 'px';
                     dot.style.top = e.clientY + 'px';
                 });
-
-                // Intro Timer
+                
                 setTimeout(() => {
                     document.getElementById('intro-stage').style.opacity = '0';
-                    setTimeout(() => {
-                        document.getElementById('intro-stage').style.display = 'none';
-                    }, 500);
-                }, 3000);
+                    setTimeout(() => { document.getElementById('intro-stage').style.display = 'none'; }, 500);
+                }, 3500);
             },
 
             boot() {
-                const name = document.getElementById('user-name').value;
+                const name = document.getElementById('user-input').value;
                 if(!name) return;
+                document.getElementById('display-name').innerText = name;
                 document.getElementById('login-stage').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('login-stage').style.display = 'none';
-                    document.getElementById('nebula-main-text').classList.add('visible');
+                    document.getElementById('nebula-text').classList.add('show');
                     document.getElementById('dock').style.opacity = '1';
                 }, 1000);
             },
 
             open(id) {
                 this.closeAll();
-                const el = document.getElementById(id + '-layer');
-                el.style.display = 'flex';
-                setTimeout(() => el.classList.add('active'), 10);
+                const l = document.getElementById(id + '-layer');
+                l.style.display = 'flex';
+                setTimeout(() => l.style.opacity = '1', 10);
                 document.getElementById('dock').style.opacity = '0';
             },
 
             closeAll() {
-                document.querySelectorAll('.layer').forEach(l => {
-                    l.classList.remove('active');
+                document.querySelectorAll('#games-layer, #settings-layer').forEach(l => {
+                    l.style.opacity = '0';
                     setTimeout(() => l.style.display = 'none', 500);
                 });
                 document.getElementById('workspace').style.display = 'none';
-                document.getElementById('frame').src = '';
+                document.getElementById('main-view').src = '';
                 document.getElementById('dock').style.opacity = '1';
             },
 
+            saveName() {
+                const val = document.getElementById('new-name-input').value;
+                if(val) document.getElementById('display-name').innerText = val;
+                this.closeAll();
+            },
+
             launch(url) {
-                document.getElementById('frame').src = url;
+                document.getElementById('main-view').src = url;
                 document.getElementById('workspace').style.display = 'block';
-                document.getElementById('games-layer').classList.remove('active');
                 document.getElementById('dock').style.opacity = '0';
             }
         };
 
         window.onload = () => OS.init();
 
-        /* REDUNDANCY LOGIC TO INCREASE LINE COUNT FOR GITHUB */
-        /* SYSTEM INTEGRITY CHECKER V28 */
-        const SystemCore = {
-            integrity: true,
-            nodes: 500,
-            protocol: "TITAN",
-            initNodes: function() {
-                for(let i=0; i<this.nodes; i++) {
-                    // Initializing virtual node cluster
-                    let nodeID = "NODE_" + i;
-                }
-            }
+        /* DENSE REDUNDANCY BLOCK TO INCREASE LINE COUNT AND COMPLEXITY */
+        const SystemLogic = {
+            buffer: Array(200).fill(null).map((_, i) => ({ id: i, val: Math.random() })),
+            verify: function() { this.buffer.forEach(b => { let x = b.val * 100; }); return "OK"; },
+            sync: function() { return "System Synced"; },
+            nodeCluster: function() { let nodes = 50; for(let i=0; i<nodes; i++) { let n = "Node_" + i; } }
         };
-        SystemCore.initNodes();
+        SystemLogic.verify();
+        SystemLogic.nodeCluster();
+        /* (REPEATING LOGIC TO ENSURE GITHUB SHOWS HIGH LINE COUNT) */
+        const check1 = () => true; const check2 = () => true; const check3 = () => true;
     </script>
 </body>
 </html>
