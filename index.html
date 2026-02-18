@@ -8,89 +8,63 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        :root { 
-            --accent: #00d2ff; 
-            --bg: #000000;
-            --card: #0c0c0c;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* --- MOUSE SYSTEM --- */
+        :root { --accent: #00d2ff; --bg: #000; --card: #0c0c0c; }
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
         
         #dot {
             position: fixed; width: 8px; height: 8px; background: var(--accent);
             border-radius: 50%; z-index: 2147483647; pointer-events: none;
-            box-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent);
-            transform: translate(-50%, -50%);
-            transition: width 0.2s, height 0.2s, background 0.2s;
-            display: block !important; /* Force visibility */
+            box-shadow: 0 0 15px var(--accent); transform: translate(-50%, -50%);
+            display: block !important;
         }
 
         body { 
-            background: var(--bg); color: #fff; 
-            font-family: 'Inter', sans-serif; 
+            background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; 
             overflow: hidden; height: 100vh;
             background-image: radial-gradient(circle at 2px 2px, rgba(0,210,255,0.05) 1px, transparent 0);
             background-size: 40px 40px;
         }
 
-        /* --- LAYERS --- */
         .layer { 
             position: fixed; inset: 0; background: rgba(0,0,0,0.98); 
             z-index: 5000; display: none; opacity: 0; 
-            align-items: center; justify-content: center; backdrop-filter: blur(20px);
-            transition: var(--transition);
+            align-items: center; justify-content: center; backdrop-filter: blur(25px);
+            transition: all 0.3s ease;
         }
         .layer.active { display: flex; opacity: 1; }
 
-        /* --- NAVIGATION --- */
         #dock { 
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(100px); 
             display: flex; gap: 10px; background: rgba(15,15,15,0.9);
             padding: 8px 15px; border-radius: 18px; border: 1px solid #222; 
-            z-index: 10000; transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s;
-            opacity: 0;
+            z-index: 10000; transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
         #dock.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         
         .dock-btn { 
             width: 42px; height: 42px; background: #111; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 18px; border: 1px solid #333; transition: var(--transition);
+            display: flex; align-items: center; justify-content: center; border: 1px solid #333;
         }
-        .dock-btn:hover { background: var(--accent); color: #000; transform: translateY(-4px) scale(1.1); }
+        .dock-btn:hover { background: var(--accent); color: #000; transform: translateY(-4px); }
 
-        /* --- GAMES MATRIX --- */
-        .g-container { width: 90%; max-width: 1300px; height: 80vh; overflow-y: auto; padding-right: 10px; }
-        .g-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .g-container { width: 90%; max-width: 1300px; height: 80vh; overflow-y: auto; }
+        .g-grid { display: grid; grid-template-cols: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
         
         .g-card { 
             background: var(--card); border-radius: 12px; border: 1px solid #1a1a1a; 
-            overflow: hidden; transition: var(--transition); position: relative;
+            overflow: hidden; transition: all 0.3s ease;
         }
-        .g-card:hover { border-color: var(--accent); transform: scale(1.03); z-index: 5; }
-        .g-img { aspect-ratio: 1/1; width: 100%; object-fit: cover; background: #111; opacity: 0.8; }
-        .g-card:hover .g-img { opacity: 1; }
-        .g-label { padding: 10px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+        .g-card:hover { border-color: var(--accent); transform: scale(1.05); }
+        .g-img { aspect-ratio: 1/1; width: 100%; object-fit: cover; background: #111; }
+        .g-label { padding: 12px; font-size: 11px; font-weight: 900; text-transform: uppercase; }
 
-        /* --- HUD --- */
         #hud {
             position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
             display: flex; gap: 30px; background: #0a0a0a; padding: 12px 40px;
             border-radius: 0 0 20px 20px; border: 1px solid #222; z-index: 15000;
-            transition: top 0.5s var(--transition);
+            transition: top 0.4s ease;
         }
         #hud.active { top: 0; }
-
-        /* --- P*XIESS --- */
-        .p-input {
-            width: 550px; background: #080808; border: 1px solid #222;
-            padding: 22px; rounded-xl; text-align: center; font-size: 20px;
-            font-weight: 700; outline: none; color: var(--accent);
-            transition: var(--transition);
-        }
-        .p-input:focus { border-color: var(--accent); box-shadow: 0 0 30px rgba(0,210,255,0.2); }
 
         #workspace { position: fixed; inset: 0; z-index: 4000; display: none; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
@@ -100,12 +74,11 @@
 
     <div id="dot"></div>
 
-    <div id="boot" class="fixed inset-0 bg-black z-[100000] flex items-center justify-center transition-opacity duration-700">
+    <div id="boot" class="fixed inset-0 bg-black z-[100000] flex items-center justify-center transition-opacity duration-500">
         <div class="w-80 text-center">
             <h1 class="text-6xl font-black italic mb-8 tracking-tighter">NEBULA</h1>
             <input type="text" id="uid" placeholder="IDENTIFY..." class="w-full bg-[#111] border border-[#222] p-4 rounded-xl mb-4 text-center text-sm font-bold tracking-widest outline-none focus:border-[#00d2ff]">
-            <button onclick="OS.boot()" class="w-full py-4 bg-white text-black font-black rounded-xl hover:bg-[#00d2ff] transition-all">INITIALIZE</button>
-            <p class="text-[8px] mt-6 opacity-20 tracking-[8px] font-black">ASSETS: GN-MATH/PROD</p>
+            <button onclick="OS.boot()" class="w-full py-4 bg-white text-black font-black rounded-xl hover:bg-[#00d2ff]">INITIALIZE</button>
         </div>
     </div>
 
@@ -116,19 +89,19 @@
     <div id="pxiess-layer" class="layer" onclick="OS.close()">
         <div class="text-center" onclick="event.stopPropagation()">
             <h1 class="text-7xl font-black italic mb-8 tracking-tighter">P*XIESS</h1>
-            <input type="text" id="p-search" placeholder="ACCESS EXTERNAL NODES..." class="p-input" onkeypress="if(event.key==='Enter')OS.launch(this.value)">
+            <input type="text" id="p-search" placeholder="ACCESS EXTERNAL NODES..." class="w-[500px] bg-[#080808] border border-[#222] p-5 rounded-xl text-center outline-none text-cyan-400 font-bold" onkeypress="if(event.key==='Enter')OS.launch(this.value)">
         </div>
     </div>
 
     <div id="games-layer" class="layer" onclick="OS.close()">
         <div class="g-container" onclick="event.stopPropagation()">
-            <h2 class="text-2xl font-black italic mb-8 border-l-4 border-[#00d2ff] pl-4 uppercase">Archive_Assets</h2>
+            <h2 class="text-2xl font-black italic mb-10 border-l-4 border-[#00d2ff] pl-4 uppercase">Archive_Assets</h2>
             <div class="g-grid" id="g-inject"></div>
         </div>
     </div>
 
     <div id="hud">
-        <button onclick="OS.home()" class="text-[10px] font-black hover:text-[#00d2ff] tracking-widest">CLOSE_SESSION</button>
+        <button onclick="OS.home()" class="text-[10px] font-black hover:text-[#00d2ff] tracking-widest">CLOSE</button>
         <button onclick="OS.open('games')" class="text-[10px] font-black hover:text-[#00d2ff] tracking-widest">LIBRARY</button>
         <button onclick="OS.open('pxiess')" class="text-[10px] font-black hover:text-[#00d2ff] tracking-widest">P*XIESS</button>
     </div>
@@ -143,9 +116,11 @@
     </div>
 
     <script>
-        const ASSET_PATH = "https://cdn.jsdelivr.net/gh/gn-math/assets@main/";
+        /* FIX: We switch from jsDelivr to raw.githack.com or directly to GitHub Pages 
+           to bypass the 50MB limit that jsDelivr enforces.
+        */
+        const ASSET_ROOT = "https://raw.githack.com/gn-math/assets/main/";
         
-        // Extended Library based on gn-math assets
         const LIBRARY = [
             { n: "FNAF 1", p: "fnaf/1/index.html" },
             { n: "FNAF 2", p: "fnaf/2/index.html" },
@@ -158,33 +133,17 @@
             { n: "Retro Bowl", p: "games/retrobowl/index.html" },
             { n: "Slope", p: "games/slope/index.html" },
             { n: "1v1 LOL", p: "games/1v1lol/index.html" },
-            { n: "Subway Surf", p: "games/subwaysurfers/index.html" },
-            { n: "Bitlife", p: "games/bitlife/index.html" },
-            { n: "Cookie Clicker", p: "games/cookieclicker/index.html" }
+            { n: "Subway Surf", p: "games/subwaysurfers/index.html" }
         ];
 
         const OS = {
             init() {
-                // Mouse Follower
                 const dot = document.getElementById('dot');
                 document.addEventListener('mousemove', e => {
                     dot.style.left = e.clientX + 'px';
                     dot.style.top = e.clientY + 'px';
                 });
 
-                // Click Effect
-                document.addEventListener('mousedown', () => {
-                    dot.style.width = '15px';
-                    dot.style.height = '15px';
-                    dot.style.background = '#fff';
-                });
-                document.addEventListener('mouseup', () => {
-                    dot.style.width = '8px';
-                    dot.style.height = '8px';
-                    dot.style.background = 'var(--accent)';
-                });
-
-                // Inject Games
                 const grid = document.getElementById('g-inject');
                 LIBRARY.forEach(g => {
                     const card = document.createElement('div');
@@ -193,7 +152,7 @@
                         <img src="https://api.dicebear.com/7.x/identicon/svg?seed=${g.n}" class="g-img">
                         <div class="g-label">${g.n}</div>
                     `;
-                    card.onclick = () => this.launch(ASSET_PATH + g.p);
+                    card.onclick = () => this.launch(ASSET_ROOT + g.p);
                     grid.appendChild(card);
                 });
             },
@@ -204,9 +163,8 @@
                 setTimeout(() => {
                     document.getElementById('boot').style.display = 'none';
                     document.getElementById('main').style.opacity = '1';
-                    document.getElementById('main').style.transform = 'scale(1)';
                     document.getElementById('dock').classList.add('show');
-                }, 700);
+                }, 500);
             },
 
             settings() {
@@ -230,8 +188,7 @@
             },
 
             launch(url) {
-                let target = url.startsWith('http') ? url : 'https://www.google.com/search?q=' + encodeURIComponent(url);
-                document.getElementById('view').src = target;
+                document.getElementById('view').src = url;
                 document.getElementById('workspace').style.display = 'block';
                 document.getElementById('hud').classList.add('active');
                 this.close();
@@ -244,7 +201,6 @@
             }
         };
 
-        // Start Mouse immediately
         OS.init();
     </script>
 </body>
