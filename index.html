@@ -5,120 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEBULA | P*XIESS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    
     <style>
-        :root { --accent: #00d2ff; --bg: #000; --card: #0c0c0c; }
+        :root { --accent: #00d2ff; --bg: #000; }
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
         
         #dot {
-            position: fixed; width: 8px; height: 8px; background: var(--accent);
-            border-radius: 50%; z-index: 2147483647; pointer-events: none;
-            box-shadow: 0 0 15px var(--accent); transform: translate(-50%, -50%);
-            display: block !important;
+            position: fixed; width: 6px; height: 6px; background: var(--accent);
+            border-radius: 50%; z-index: 100000; pointer-events: none;
+            box-shadow: 0 0 12px var(--accent); transform: translate(-50%, -50%);
         }
 
         body { 
             background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; 
             overflow: hidden; height: 100vh;
-            background-image: radial-gradient(circle at 2px 2px, rgba(0,210,255,0.05) 1px, transparent 0);
-            background-size: 40px 40px;
         }
 
+        /* --- COMPACT GRID --- */
+        .g-container { width: 95%; max-width: 1200px; height: 85vh; overflow-y: auto; padding: 20px; }
+        .g-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); 
+            gap: 8px; /* Super tight squares */
+        }
+        
+        .g-card { 
+            aspect-ratio: 1/1; background: #0a0a0a; border: 1px solid #151515; 
+            position: relative; overflow: hidden; transition: all 0.2s ease;
+        }
+        
+        .g-card:hover { 
+            border-color: var(--accent); transform: scale(1.1); z-index: 50; 
+            box-shadow: 0 0 20px rgba(0,210,255,0.4); 
+        }
+
+        /* Title only shows on hover */
+        .g-label { 
+            position: absolute; bottom: 0; width: 100%; background: rgba(0,210,255,0.9);
+            color: #000; font-size: 8px; font-weight: 900; text-align: center;
+            padding: 2px 0; opacity: 0; text-transform: uppercase; transition: 0.1s;
+        }
+        .g-card:hover .g-label { opacity: 1; }
+
+        .g-img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); opacity: 0.5; }
+        .g-card:hover .g-img { filter: grayscale(0%); opacity: 1; }
+
+        /* --- LAYERS & DOCK --- */
         .layer { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.98); 
-            z-index: 5000; display: none; opacity: 0; 
-            align-items: center; justify-content: center; backdrop-filter: blur(25px);
-            transition: all 0.3s ease;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
+            z-index: 5000; display: none; opacity: 0; align-items: center; justify-content: center; 
+            backdrop-filter: blur(10px); transition: 0.3s;
         }
         .layer.active { display: flex; opacity: 1; }
 
         #dock { 
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(100px); 
-            display: flex; gap: 10px; background: rgba(15,15,15,0.9);
-            padding: 8px 15px; border-radius: 18px; border: 1px solid #222; 
-            z-index: 10000; transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+            display: flex; gap: 8px; background: #080808; padding: 6px;
+            border-radius: 12px; border: 1px solid #111; z-index: 10000;
         }
-        #dock.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        
-        .dock-btn { 
-            width: 42px; height: 42px; background: #111; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center; border: 1px solid #333;
-        }
-        .dock-btn:hover { background: var(--accent); color: #000; transform: translateY(-4px); }
-
-        .g-container { width: 90%; max-width: 1300px; height: 80vh; overflow-y: auto; }
-        .g-grid { display: grid; grid-template-cols: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
-        
-        .g-card { 
-            background: var(--card); border-radius: 12px; border: 1px solid #1a1a1a; 
-            overflow: hidden; transition: all 0.3s ease;
-        }
-        .g-card:hover { border-color: var(--accent); transform: scale(1.05); }
-        .g-img { aspect-ratio: 1/1; width: 100%; object-fit: cover; background: #111; }
-        .g-label { padding: 12px; font-size: 11px; font-weight: 900; text-transform: uppercase; }
+        .dock-btn { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 14px; border-radius: 8px; border: 1px solid #222; }
+        .dock-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
 
         #hud {
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 30px; background: #0a0a0a; padding: 12px 40px;
-            border-radius: 0 0 20px 20px; border: 1px solid #222; z-index: 15000;
-            transition: top 0.4s ease;
+            position: fixed; top: 0; width: 100%; display: flex; justify-content: center; gap: 40px;
+            background: rgba(0,0,0,0.8); padding: 8px; border-bottom: 1px solid #222; z-index: 20000;
+            display: none;
         }
-        #hud.active { top: 0; }
-
+        
         #workspace { position: fixed; inset: 0; z-index: 4000; display: none; background: #000; }
-        iframe { width: 100%; height: 100%; border: none; }
+        iframe { width: 100%; height: 100%; border: none; padding-top: 35px; }
     </style>
 </head>
-<body oncontextmenu="return false">
+<body>
 
     <div id="dot"></div>
 
-    <div id="boot" class="fixed inset-0 bg-black z-[100000] flex items-center justify-center transition-opacity duration-500">
-        <div class="w-80 text-center">
-            <h1 class="text-6xl font-black italic mb-8 tracking-tighter">NEBULA</h1>
-            <input type="text" id="uid" placeholder="IDENTIFY..." class="w-full bg-[#111] border border-[#222] p-4 rounded-xl mb-4 text-center text-sm font-bold tracking-widest outline-none focus:border-[#00d2ff]">
-            <button onclick="OS.boot()" class="w-full py-4 bg-white text-black font-black rounded-xl hover:bg-[#00d2ff]">INITIALIZE</button>
+    <div id="boot" class="fixed inset-0 bg-black z-[100000] flex items-center justify-center">
+        <div class="w-64 text-center">
+            <h1 class="text-4xl font-black italic mb-6 tracking-tighter text-white">NEBULA</h1>
+            <input type="text" id="uid" placeholder="ID..." class="w-full bg-[#080808] border border-[#222] p-3 rounded-lg mb-3 text-center text-xs font-bold text-white outline-none focus:border-[#00d2ff]">
+            <button onclick="OS.boot()" class="w-full py-3 bg-white text-black font-black rounded-lg text-xs hover:bg-[#00d2ff]">INIT</button>
         </div>
     </div>
 
-    <main id="main" class="absolute inset-0 flex items-center justify-center opacity-0 transition-all duration-1000 scale-95">
-        <h1 class="text-[10vw] font-black italic text-white/5 select-none">NEBULA</h1>
-    </main>
-
-    <div id="pxiess-layer" class="layer" onclick="OS.close()">
-        <div class="text-center" onclick="event.stopPropagation()">
-            <h1 class="text-7xl font-black italic mb-8 tracking-tighter">P*XIESS</h1>
-            <input type="text" id="p-search" placeholder="ACCESS EXTERNAL NODES..." class="w-[500px] bg-[#080808] border border-[#222] p-5 rounded-xl text-center outline-none text-cyan-400 font-bold" onkeypress="if(event.key==='Enter')OS.launch(this.value)">
-        </div>
-    </div>
-
-    <div id="games-layer" class="layer" onclick="OS.close()">
-        <div class="g-container" onclick="event.stopPropagation()">
-            <h2 class="text-2xl font-black italic mb-10 border-l-4 border-[#00d2ff] pl-4 uppercase">Archive_Assets</h2>
+    <div id="games-layer" class="layer active" style="display:flex; opacity:1;">
+        <div class="g-container">
             <div class="g-grid" id="g-inject"></div>
         </div>
     </div>
 
     <div id="hud">
-        <button onclick="OS.home()" class="text-[10px] font-black hover:text-[#00d2ff] tracking-widest">CLOSE</button>
-        <button onclick="OS.open('games')" class="text-[10px] font-black hover:text-[#00d2ff] tracking-widest">LIBRARY</button>
-        <button onclick="OS.open('pxiess')" class="text-[10px] font-black hover:text-[#00d2ff] tracking-widest">P*XIESS</button>
+        <button onclick="OS.home()" class="text-[9px] font-black tracking-widest text-white/50 hover:text-white">EXIT_SESSION</button>
+        <button onclick="OS.open('games')" class="text-[9px] font-black tracking-widest text-white/50 hover:text-white">MATRIX</button>
     </div>
 
     <div id="workspace"><iframe id="view"></iframe></div>
 
     <div id="dock">
         <div class="dock-btn" onclick="OS.home()">🏠</div>
-        <div class="dock-btn" onclick="OS.open('pxiess')">🌐</div>
         <div class="dock-btn" onclick="OS.open('games')">🎮</div>
-        <div class="dock-btn" onclick="OS.settings()">⚙️</div>
+        <div class="dock-btn" onclick="location.reload()">⚙️</div>
     </div>
 
     <script>
-        /* FIX: We switch from jsDelivr to raw.githack.com or directly to GitHub Pages 
-           to bypass the 50MB limit that jsDelivr enforces.
-        */
         const ASSET_ROOT = "https://raw.githack.com/gn-math/assets/main/";
         
         const LIBRARY = [
@@ -133,7 +121,11 @@
             { n: "Retro Bowl", p: "games/retrobowl/index.html" },
             { n: "Slope", p: "games/slope/index.html" },
             { n: "1v1 LOL", p: "games/1v1lol/index.html" },
-            { n: "Subway Surf", p: "games/subwaysurfers/index.html" }
+            { n: "Subway Surf", p: "games/subwaysurfers/index.html" },
+            { n: "Bitlife", p: "games/bitlife/index.html" },
+            { n: "Cookie", p: "games/cookieclicker/index.html" },
+            { n: "Vex 7", p: "games/vex7/index.html" },
+            { n: "Tunnel", p: "games/tunnelrush/index.html" }
         ];
 
         const OS = {
@@ -158,50 +150,29 @@
             },
 
             boot() {
-                if(!document.getElementById('uid').value) return;
-                document.getElementById('boot').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('boot').style.display = 'none';
-                    document.getElementById('main').style.opacity = '1';
-                    document.getElementById('dock').classList.add('show');
-                }, 500);
-            },
-
-            settings() {
-                document.getElementById('boot').style.display = 'flex';
-                setTimeout(() => document.getElementById('boot').style.opacity = '1', 10);
-                document.getElementById('dock').classList.remove('show');
+                document.getElementById('boot').style.display = 'none';
+                this.init();
             },
 
             open(id) {
-                this.close();
-                const l = document.getElementById(id + '-layer');
-                l.style.display = 'flex';
-                setTimeout(() => l.classList.add('active'), 10);
-            },
-
-            close() {
-                document.querySelectorAll('.layer').forEach(l => {
-                    l.classList.remove('active');
-                    setTimeout(() => { if(!l.classList.contains('active')) l.style.display = 'none'; }, 300);
-                });
+                document.getElementById('games-layer').style.display = 'flex';
+                setTimeout(() => document.getElementById('games-layer').style.opacity = '1', 10);
             },
 
             launch(url) {
                 document.getElementById('view').src = url;
                 document.getElementById('workspace').style.display = 'block';
-                document.getElementById('hud').classList.add('active');
-                this.close();
+                document.getElementById('hud').style.display = 'flex';
+                document.getElementById('games-layer').style.display = 'none';
             },
 
             home() {
                 document.getElementById('workspace').style.display = 'none';
                 document.getElementById('view').src = "";
-                document.getElementById('hud').classList.remove('active');
+                document.getElementById('hud').style.display = 'none';
+                this.open('games');
             }
         };
-
-        OS.init();
     </script>
 </body>
 </html>
