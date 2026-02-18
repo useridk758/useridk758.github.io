@@ -3,20 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | TITAN v40.0</title>
+    <title>NEBULA | TITAN v41.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     
     <style>
         :root { 
             --accent: #00d2ff; 
-            --bg: #000000;
-            --panel: #050505;
+            --bg: #000;
+            --panel: #0a0a0a;
             --border: rgba(255,255,255,0.1);
-            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* --- MOUSE & CORE --- */
+        /* --- CORE STYLES --- */
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
         #dot {
             position: fixed; width: 12px; height: 12px; background: var(--accent);
@@ -25,144 +24,154 @@
         }
         body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* --- STAR FIELD --- */
-        #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; }
-
-        /* --- INTRO STROBE --- */
-        #intro-stage {
-            position: fixed; inset: 0; background: #000; z-index: 1000000;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .windows-logo { width: 300px; animation: strobe 0.08s infinite; }
-        @keyframes strobe { 0%, 100% { filter: invert(0); } 50% { filter: invert(1); } }
-
         /* --- UI LAYERS --- */
         .ui-layer {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
             z-index: 50000; display: none; opacity: 0;
-            transition: var(--transition); backdrop-filter: blur(40px);
+            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); backdrop-filter: blur(40px);
             align-items: center; justify-content: center;
         }
         .ui-layer.active { display: flex !important; opacity: 1; }
 
-        /* --- GAME CARDS --- */
-        .game-card { background: #080808; border: 1px solid var(--border); border-radius: 30px; padding: 15px; transition: 0.3s; }
-        .game-card:hover { transform: scale(1.05); border-color: var(--accent); }
+        /* --- SETTINGS PANEL --- */
+        .settings-card {
+            width: 800px; height: 500px; background: var(--panel);
+            border: 1px solid var(--border); border-radius: 24px;
+            display: flex; overflow: hidden;
+        }
+        .settings-sidebar { width: 200px; border-right: 1px solid var(--border); padding: 20px; }
+        .settings-content { flex: 1; padding: 40px; }
+        .nav-btn { width: 100%; text-align: left; padding: 12px; border-radius: 8px; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #666; transition: 0.2s; }
+        .nav-btn.active { background: var(--accent); color: #000; }
 
-        /* --- WORKSPACE --- */
+        /* --- RIGHT CLICK MENU --- */
+        #ctx-menu {
+            position: fixed; background: rgba(15,15,15,0.98); border: 1px solid var(--border);
+            border-radius: 12px; padding: 6px; z-index: 999999; display: none;
+            backdrop-filter: blur(20px); min-width: 200px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .ctx-item { padding: 10px 14px; font-size: 11px; font-weight: 800; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; transition: 0.2s; }
+        .ctx-item:hover { background: var(--accent); color: #000; }
+        .ctx-sep { height: 1px; background: var(--border); margin: 6px 0; }
+
+        /* --- DOCK & WORKSPACE --- */
         #workspace { position: fixed; inset: 0; z-index: 100000; display: none; background: #000; }
         #render-target { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-        
+        iframe { width: 100%; height: 100%; border: none; }
+
         #dock {
-            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 15px; background: rgba(10,10,10,0.8);
-            padding: 12px 20px; border-radius: 24px; border: 1px solid var(--border);
-            z-index: 80000; opacity: 0; transition: 1s ease;
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 12px; background: rgba(15,15,15,0.8);
+            padding: 10px; border-radius: 20px; border: 1px solid var(--border);
+            z-index: 80000; opacity: 0; transition: 1s;
         }
-        .dock-btn { width: 56px; height: 56px; background: #000; border: 1px solid var(--border); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: 0.3s; }
+        .dock-btn { width: 50px; height: 50px; background: #000; border: 1px solid var(--border); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; transition: 0.3s; }
         .dock-btn:hover { border-color: var(--accent); transform: translateY(-5px); }
 
-        #ctx-menu {
-            position: fixed; background: rgba(10,10,10,0.95); border: 1px solid var(--border);
-            border-radius: 12px; padding: 8px; z-index: 999999; display: none;
-            backdrop-filter: blur(10px); min-width: 180px;
-        }
-        .ctx-item { padding: 10px 15px; font-size: 11px; font-weight: 700; border-radius: 6px; cursor: pointer; }
-        .ctx-item:hover { background: var(--accent); color: #000; }
+        /* --- ANIMATIONS --- */
+        @keyframes strobe { 0%, 100% { filter: invert(0); } 50% { filter: invert(1); } }
+        .strobe { animation: strobe 0.08s infinite; }
     </style>
 </head>
 <body oncontextmenu="return Core.showCtx(event)">
 
     <div id="dot"></div>
-    <div id="stars"></div>
 
-    <div id="intro-stage">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg" class="windows-logo">
+    <div id="intro-stage" class="fixed inset-0 bg-black z-[1000000] flex items-center justify-center">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg" class="windows-logo strobe w-72">
     </div>
 
-    <div id="login-stage" class="fixed inset-0 bg-black z-[900000] flex flex-col items-center justify-center transition-opacity duration-1000">
-        <h2 class="text-[10px] font-black tracking-[25px] opacity-20 mb-12 uppercase">Access Protocol</h2>
-        <input type="text" id="user-id" placeholder="ENTER SYSTEM ID" class="bg-transparent border-b-2 border-white/5 w-96 p-4 text-3xl font-black text-center outline-none focus:border-[#00d2ff] mb-12 uppercase">
-        <button onclick="Core.boot()" class="px-16 py-5 bg-white text-black font-black rounded-full text-[11px] uppercase tracking-widest hover:scale-105 transition">Initialize</button>
+    <div id="login-stage" class="fixed inset-0 bg-black z-[900000] flex flex-col items-center justify-center">
+        <h2 class="text-[10px] font-black tracking-[20px] opacity-20 mb-8 uppercase">Nebula Protocol</h2>
+        <input type="text" id="user-id" placeholder="ID_REQUIRED" class="bg-transparent border-b-2 border-white/10 w-80 p-4 text-2xl font-black text-center outline-none focus:border-[#00d2ff] mb-8 uppercase">
+        <button onclick="Core.boot()" class="px-12 py-4 bg-white text-black font-black rounded-full text-[10px] uppercase tracking-widest hover:scale-105 transition">Initialize</button>
     </div>
 
-    <div class="absolute inset-0 flex items-center justify-center">
-        <h1 id="nebula-main" class="text-[13vw] font-black italic opacity-0 transition-all duration-1000">NEBULA</h1>
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <h1 id="nebula-main" class="text-[12vw] font-black italic opacity-0 transition-all duration-1000">NEBULA</h1>
     </div>
 
-    <div id="games-layer" class="ui-layer flex-col pt-24 overflow-y-auto">
-        <div class="w-full max-w-6xl flex justify-between items-center mb-12 px-10">
-            <h2 class="text-6xl font-black italic tracking-tighter text-white">ARCHIVE</h2>
-            <button onclick="Core.exitLayers()" class="px-10 py-3 border border-white/10 rounded-full font-black text-[10px] text-white">BACK</button>
+    <div id="settings-layer" class="ui-layer">
+        <div class="settings-card">
+            <div class="settings-sidebar">
+                <button class="nav-btn active" onclick="Core.tab('proxy')">Proxy Node</button>
+                <button class="nav-btn" onclick="Core.tab('sys')">System Stats</button>
+                <button class="nav-btn text-red-500 mt-4" onclick="Core.exitLayers()">Close</button>
+            </div>
+            <div id="tab-proxy" class="settings-content">
+                <h3 class="text-2xl font-black italic mb-4 uppercase">Proxy Search</h3>
+                <p class="text-[10px] opacity-50 mb-6 font-bold">ENTER URL TO TUNNEL THROUGH NEBULA CORE</p>
+                <input type="text" id="proxy-input" placeholder="https://..." class="w-full bg-black border border-white/10 p-4 rounded-xl font-bold focus:border-[#00d2ff] outline-none mb-4">
+                <button onclick="Core.launch(document.getElementById('proxy-input').value)" class="w-full py-4 bg-white text-black font-black rounded-xl text-[10px] uppercase">Launch Tunnel</button>
+            </div>
+            <div id="tab-sys" class="settings-content hidden">
+                <h3 class="text-2xl font-black italic mb-4 uppercase">System Info</h3>
+                <div class="space-y-2 opacity-80 font-mono text-xs">
+                    <p>USER: <span id="stat-user">GUEST</span></p>
+                    <p>OS_VER: Titan v41.0</p>
+                    <p>CORE: Active</p>
+                </div>
+            </div>
         </div>
-        
-        <div class="grid grid-cols-3 gap-8 w-[90%] max-w-6xl pb-20">
-            <div class="game-card cursor-pointer" onclick="Core.launchOvO()">
-                <img src="https://img.gamedistribution.com/1377b99c10284c229423118a941af3b1-512x512.jpeg" class="w-full rounded-2xl mb-4">
-                <h3 class="font-black uppercase italic text-cyan-400 text-center">OvO Engine</h3>
-            </div>
+    </div>
 
-            <div class="game-card cursor-pointer" onclick="Core.launchMoto()">
-                <img src="https://img.gamedistribution.com/264b971a07994432bc1645e317bb8ecf-512x512.jpeg" class="w-full rounded-2xl mb-4">
-                <h3 class="font-black uppercase italic text-orange-500 text-center">Moto X3M</h3>
+    <div id="games-layer" class="ui-layer flex-col pt-20">
+        <h2 class="text-5xl font-black italic mb-10">ARCHIVE</h2>
+        <div class="flex gap-6">
+            <div class="w-48 p-4 bg-white/5 rounded-2xl border border-white/5 cursor-pointer hover:border-[#00d2ff] transition" onclick="Core.launchOvO()">
+                <img src="https://img.gamedistribution.com/1377b99c10284c229423118a941af3b1-512x512.jpeg" class="rounded-xl mb-3">
+                <p class="text-center font-black text-xs italic">OvO Engine</p>
             </div>
-
-            <div class="game-card cursor-pointer" onclick="Core.launch('https://games.cdn.famobi.com/html5games/m/moto-x3m-pool-party/v080/?fg_domain=play.famobi.com&fg_aid=A1000-1&fg_uid=b2102250-eb51-4704-9cab-ff296491cc68&fg_pid=4638e320-4444-4514-81c4-d80a8c662371&fg_beat=258&locale=en')">
-                <img src="https://img.cdn.famobi.com/portal/html5games/images/tmp/120/MotoX3mPoolPartyTeaser.jpg?v=0.2-ecf77b68" class="w-full rounded-2xl mb-4">
-                <h3 class="font-black uppercase italic text-white text-center">X3M Pool Party</h3>
+            <div class="w-48 p-4 bg-white/5 rounded-2xl border border-white/5 cursor-pointer hover:border-[#00d2ff] transition" onclick="Core.launchMoto()">
+                <img src="https://img.gamedistribution.com/264b971a07994432bc1645e317bb8ecf-512x512.jpeg" class="rounded-xl mb-3">
+                <p class="text-center font-black text-xs italic">Moto X3M</p>
             </div>
         </div>
     </div>
 
     <div id="workspace">
-        <button onclick="Core.exitLayers()" class="fixed top-8 left-8 px-8 py-3 bg-black border border-white/10 rounded-full font-black text-[10px] z-[110000] text-white hover:bg-white hover:text-black transition">CLOSE_SESSION</button>
+        <button onclick="Core.exitLayers()" class="fixed top-6 left-6 px-6 py-2 bg-black border border-white/10 rounded-full font-black text-[9px] z-[110000] text-white hover:bg-white hover:text-black transition">EXIT SESSION</button>
         <div id="render-target"></div>
     </div>
 
     <div id="dock">
         <button class="dock-btn" onclick="Core.exitLayers()">🏠</button>
         <button class="dock-btn" onclick="Core.openUI('games')">🎮</button>
+        <button class="dock-btn" onclick="Core.openUI('settings')">⚙️</button>
     </div>
 
     <div id="ctx-menu">
-        <div class="ctx-item" onclick="location.reload()">Refresh</div>
-        <div class="ctx-item" onclick="Core.exitLayers()">Exit All</div>
+        <div class="ctx-item" onclick="location.reload()">Refresh System <span>⟳</span></div>
+        <div class="ctx-item" onclick="Core.openUI('settings')">Open Settings <span>⚙</span></div>
+        <div class="ctx-item" onclick="Core.openUI('games')">Open Archive <span>🎮</span></div>
+        <div class="ctx-sep"></div>
+        <div class="ctx-item" onclick="Core.exitLayers()">Close All Windows <span>✕</span></div>
+        <div class="ctx-item" onclick="window.close()">Shutdown <span>⏻</span></div>
     </div>
 
     <script>
         const Core = {
             boot() {
-                const name = document.getElementById('user-id').value;
-                if(!name) return;
+                const id = document.getElementById('user-id').value;
+                if(!id) return;
+                document.getElementById('stat-user').innerText = id;
                 document.getElementById('login-stage').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('login-stage').style.display = 'none';
                     document.getElementById('nebula-main').classList.add('opacity-100');
                     document.getElementById('dock').style.opacity = '1';
-                    this.createStars();
                 }, 800);
-            },
-            createStars() {
-                const container = document.getElementById('stars');
-                for(let i=0; i<150; i++) {
-                    const star = document.createElement('div');
-                    star.className = 'star';
-                    star.style.width = star.style.height = Math.random()*2 + 'px';
-                    star.style.left = Math.random()*100 + '%';
-                    star.style.top = Math.random()*100 + '%';
-                    container.appendChild(star);
-                }
             },
             showCtx(e) {
                 e.preventDefault();
-                const menu = document.getElementById('ctx-menu');
-                menu.style.display = 'block';
-                menu.style.left = e.clientX + 'px';
-                menu.style.top = e.clientY + 'px';
+                const m = document.getElementById('ctx-menu');
+                m.style.display = 'block';
+                m.style.left = e.clientX + 'px';
+                m.style.top = e.clientY + 'px';
                 return false;
             },
             openUI(id) {
+                this.exitLayers();
                 const l = document.getElementById(id + '-layer');
                 l.style.display = 'flex';
                 setTimeout(() => l.classList.add('active'), 50);
@@ -175,57 +184,44 @@
                 document.getElementById('workspace').style.display = 'none';
                 document.getElementById('render-target').innerHTML = '';
             },
+            tab(t) {
+                document.getElementById('tab-proxy').classList.add('hidden');
+                document.getElementById('tab-sys').classList.add('hidden');
+                document.getElementById('tab-' + t).classList.remove('hidden');
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                event.currentTarget.classList.add('active');
+            },
+            // FORCE REDIRECT PROTECTION (Sandbox Mode)
             launch(url) {
                 const target = document.getElementById('render-target');
-                target.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; border:none;"></iframe>`;
+                // sandbox="allow-scripts allow-same-origin allow-forms" prevents the iframe from breaking out
+                target.innerHTML = `<iframe src="${url}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" allowfullscreen></iframe>`;
                 document.getElementById('workspace').style.display = 'block';
+                this.exitLayers();
             },
             launchOvO() {
-                const target = document.getElementById('render-target');
-                const fullEngineCode = `
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <meta charset="UTF-8" />
-                        <base href="https://brourbeinsus.github.io/OvO/">
-                        <style>* { padding: 0; margin: 0; } body { background: #000; overflow: hidden; } canvas { width: 100vw; height: 100vh; }</style>
-                    </head>
-                    <body>
-                        <div id="c2canvasdiv"><canvas id="c2canvas" width="640" height="640"></canvas></div>
-                        <script src="jquery-3.4.1.min.js"><\/script>
-                        <script src="GameAnalytics.js"><\/script>
-                        <script src="Tween.js"><\/script>
-                        <script src="c2runtime.js"><\/script>
-                        <script>jQuery(document).ready(function() { cr_createRuntime("c2canvas"); });<\/script>
-                    </body>
-                    </html>
-                `;
+                const fullEngineCode = `<!DOCTYPE html><html><head><meta charset="UTF-8" /><base href="https://brourbeinsus.github.io/OvO/"><style>* { padding: 0; margin: 0; } body { background: #000; overflow: hidden; } canvas { width: 100vw; height: 100vh; }</style></head><body><div id="c2canvasdiv"><canvas id="c2canvas" width="640" height="640"></canvas></div><script src="jquery-3.4.1.min.js"><\/script><script src="GameAnalytics.js"><\/script><script src="Tween.js"><\/script><script src="c2runtime.js"><\/script><script>jQuery(document).ready(function() { cr_createRuntime("c2canvas"); });<\/script></body></html>`;
                 const blob = new Blob([fullEngineCode], {type: 'text/html'});
-                const url = URL.createObjectURL(blob);
-                target.innerHTML = `<iframe src="${url}" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>`;
-                document.getElementById('workspace').style.display = 'block';
+                this.launch(URL.createObjectURL(blob));
             },
             launchMoto() {
-                // Using your exact provided embed structure
+                const motoEmbed = `<div style="height: 600px; width: 900px;"><iframe style="height:100%;width:100%" src="https://html5gameshq.com/iframed/moto-x3m" frameborder="0" scrolling="no"></iframe></div>`;
                 const target = document.getElementById('render-target');
-                target.innerHTML = `
-                    <div style="height: 600px; width: 900px; position: relative; background: #000; border: 2px solid #333; border-radius: 15px; overflow: hidden; box-shadow: 0 0 50px rgba(255,165,0,0.2);">
-                        <iframe style="height:100%;width:100%" src="https://html5gameshq.com/iframed/moto-x3m" frameborder="0" scrolling="no"></iframe>
-                        <div style="position: absolute; bottom: 10px; right: 10px; font-size: 10px; opacity: 0.5;">
-                            <a href="https://html5gameshq.com/?r=embed-ref" target="_blank" style="color: white; text-decoration: none;">More Games at HTML5GamesHQ...</a>
-                        </div>
-                    </div>
-                `;
+                target.innerHTML = motoEmbed;
                 document.getElementById('workspace').style.display = 'block';
-                document.getElementById('games-layer').classList.remove('active');
+                this.exitLayers();
             }
         };
 
-        window.onclick = () => document.getElementById('ctx-menu').style.display = 'none';
-        
+        // ALT-T LISTENER
         window.addEventListener('keydown', e => {
-            if(e.altKey && e.key === 't') Core.exitLayers();
+            if(e.altKey && e.key === 't') {
+                e.preventDefault();
+                Core.exitLayers();
+            }
         });
+
+        window.onclick = () => document.getElementById('ctx-menu').style.display = 'none';
 
         window.onload = () => {
             const dot = document.getElementById('dot');
