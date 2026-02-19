@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | TITAN v42.0</title>
+    <title>NEBULA | v43.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     
@@ -18,6 +18,14 @@
             border-radius: 50%; z-index: 9999999; pointer-events: none;
             box-shadow: 0 0 25px var(--accent); transform: translate(-50%, -50%);
         }
+
+        /* --- FLASHING INTRO --- */
+        #intro-stage {
+            position: fixed; inset: 0; background: #000; z-index: 1000000;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .windows-logo { width: 300px; animation: strobe 0.08s infinite; }
+        @keyframes strobe { 0%, 100% { filter: invert(0); } 50% { filter: invert(1); } }
 
         /* --- STARS --- */
         #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
@@ -47,20 +55,16 @@
         #workspace { position: fixed; inset: 0; z-index: 100000; display: none; background: #000; }
         #render-target { width: 100%; height: 100%; }
         iframe { width: 100%; height: 100%; border: none; }
-
-        /* --- CTX MENU --- */
-        #ctx-menu {
-            position: fixed; background: rgba(10,10,10,0.98); border: 1px solid var(--border);
-            border-radius: 12px; padding: 8px; z-index: 999999; display: none; min-width: 180px;
-        }
-        .ctx-item { padding: 10px; font-size: 11px; font-weight: 800; border-radius: 6px; cursor: pointer; }
-        .ctx-item:hover { background: var(--accent); color: #000; }
     </style>
 </head>
-<body oncontextmenu="return Core.showCtx(event)">
+<body>
 
     <div id="dot"></div>
     <div id="stars"></div>
+
+    <div id="intro-stage">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg" class="windows-logo">
+    </div>
 
     <div id="login-stage" class="fixed inset-0 bg-black z-[900000] flex flex-col items-center justify-center">
         <h2 class="text-[10px] font-black tracking-[20px] opacity-20 mb-8 uppercase">Nebula Protocol</h2>
@@ -88,7 +92,7 @@
                 <img src="https://img.gamedistribution.com/1377b99c10284c229423118a941af3b1-512x512.jpeg" class="rounded-2xl mb-4">
                 <p class="text-center font-black italic">OvO Engine</p>
             </div>
-            <div class="w-56 p-4 bg-white/5 rounded-2xl border border-white/10 cursor-pointer hover:border-[#00d2ff] transition" onclick="Core.launch('https://games.cdn.famobi.com/html5games/m/moto-x3m-pool-party/v080/?fg_domain=play.famobi.com&fg_aid=A1000-1&locale=en')">
+            <div class="w-56 p-4 bg-white/5 rounded-3xl border border-white/10 cursor-pointer hover:border-[#00d2ff] transition" onclick="Core.launch('https://games.cdn.famobi.com/html5games/m/moto-x3m/v110/?fg_domain=play.famobi.com&fg_aid=A1000-1&locale=en')">
                 <img src="https://img.gamedistribution.com/264b971a07994432bc1645e317bb8ecf-512x512.jpeg" class="rounded-2xl mb-4">
                 <p class="text-center font-black italic">Moto X3M</p>
             </div>
@@ -103,12 +107,6 @@
         <button class="dock-btn" onclick="Core.exitLayers()">🏠</button>
         <button class="dock-btn" onclick="Core.openUI('games')">🎮</button>
         <button class="dock-btn" onclick="Core.openUI('proxy')">🌐</button>
-    </div>
-
-    <div id="ctx-menu">
-        <div class="ctx-item" onclick="location.reload()">System Refresh</div>
-        <div class="ctx-item" onclick="Core.openUI('proxy')">Open Proxy</div>
-        <div class="ctx-item" onclick="Core.exitLayers()">Emergency Exit</div>
     </div>
 
     <script>
@@ -136,12 +134,6 @@
                     container.appendChild(s);
                 }
             },
-            showCtx(e) {
-                e.preventDefault();
-                const m = document.getElementById('ctx-menu');
-                m.style.display = 'block'; m.style.left = e.clientX + 'px'; m.style.top = e.clientY + 'px';
-                return false;
-            },
             openUI(id) {
                 this.exitLayers();
                 const l = document.getElementById(id + '-layer');
@@ -159,17 +151,17 @@
             launch(url) {
                 this.exitLayers();
                 const target = document.getElementById('render-target');
-                target.innerHTML = `<iframe src="${url}" allow="autoplay; fullscreen; keyboard"></iframe>`;
+                // Use a clean iframe without excessive sandbox restrictions that break games
+                target.innerHTML = `<iframe src="${url}" allow="autoplay; fullscreen; keyboard; focus-without-user-activation"></iframe>`;
                 document.getElementById('workspace').style.display = 'block';
             },
             launchOvO() {
-                const engine = `<!DOCTYPE html><html><head><base href="https://brourbeinsus.github.io/OvO/"><style>body,html{margin:0;padding:0;overflow:hidden;background:#000}canvas{width:100vw;height:100vh}</style></head><body><script src="jquery-3.4.1.min.js"><\/script><script src="c2runtime.js"><\/script><script>jQuery(document).ready(function(){cr_createRuntime("c2canvas")});<\/script><canvas id="c2canvas" width="640" height="640"></canvas></body></html>`;
-                const blob = new Blob([engine], {type: 'text/html'});
-                this.launch(URL.createObjectURL(blob));
+                // OvO requires a specific environment to load scripts correctly
+                this.launch('https://dedragames.com/games/ovo/1/');
             }
         };
 
-        // --- KEY LISTENERS (ALT-T FIX) ---
+        // --- ALT-T FIX ---
         window.addEventListener('keydown', e => {
             if(e.altKey && e.key.toLowerCase() === 't') {
                 e.preventDefault();
@@ -177,11 +169,20 @@
             }
         });
 
-        window.onclick = () => document.getElementById('ctx-menu').style.display = 'none';
         window.onmousemove = e => {
             const d = document.getElementById('dot');
-            d.style.left = e.clientX + 'px'; d.style.top = e.clientY + 'px';
+            if(d) { d.style.left = e.clientX + 'px'; d.style.top = e.clientY + 'px'; }
         };
+
+        // --- REMOVE INTRO ---
+        setTimeout(() => {
+            const intro = document.getElementById('intro-stage');
+            if(intro) {
+                intro.style.transition = 'opacity 0.5s';
+                intro.style.opacity = '0';
+                setTimeout(() => intro.remove(), 500);
+            }
+        }, 3000);
     </script>
 </body>
 </html>
