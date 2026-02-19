@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | TITAN v47.0</title>
+    <title>NEBULA | TITAN v48.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     
@@ -47,7 +47,7 @@
         .proxy-btn:hover { border-color: var(--accent); background: #1a1a1a; }
     </style>
 </head>
-<body oncontextmenu="return Core.showCtx(event)">
+<body oncontextmenu="return false;">
 
     <div id="dot"></div>
     <div id="stars"></div>
@@ -83,7 +83,7 @@
     <div id="games-layer" class="fixed inset-0 bg-black/95 z-[50000] hidden flex-col items-center justify-center backdrop-blur-3xl">
         <h2 class="text-6xl font-black italic mb-12 text-white">ARCHIVE</h2>
         <div class="flex gap-8">
-            <div class="w-52 p-4 bg-white/5 rounded-3xl border border-white/10 cursor-pointer hover:border-[#00d2ff]" onclick="Core.launch('https://play.famobi.com/om-nom-run')">
+            <div class="w-52 p-4 bg-white/5 rounded-3xl border border-white/10 cursor-pointer hover:border-[#00d2ff]" onclick="Core.launch('https://games.cdn.famobi.com/html5games/o/om-nom-run/v1240/?fg_domain=play.famobi.com&fg_aid=A1000-111&fg_uid=abe80572-560a-444d-baf7-2fa4a7b2c02f&fg_pid=e37ab3ce-88cd-4438-9b9c-a37df5d33736&fg_beat=067&original_ref=https%3A%2F%2Fplay.famobi.com%2Fom-nom-run')">
                 <img src="https://img.cdn.famobi.com/portal/html5games/images/tmp/120/OmNomRunTeaser.jpg" class="rounded-2xl mb-4">
                 <p class="text-center font-black italic text-white">Om Nom Run</p>
             </div>
@@ -125,11 +125,6 @@
                     container.appendChild(s);
                 }
             },
-            showCtx(e) {
-                e.preventDefault();
-                // We're keeping the standard menu for better reliability
-                return false;
-            },
             openUI(id) {
                 this.exitLayers();
                 document.getElementById(id + '-layer').style.display = 'flex';
@@ -143,11 +138,9 @@
                 this.exitLayers();
                 const target = document.getElementById('render-target');
                 
-                // --- THE CRITICAL FIX ---
-                // We name the frame "nebula_frame".
-                // We do NOT use allow-popups-to-escape-sandbox.
-                // We keep allow-popups so the game loads, but without the "escape" flag, 
-                // the browser tries to keep children in the same context.
+                // --- LOCKDOWN INJECTION ---
+                // Removing "allow-popups-to-escape-sandbox" forces new windows 
+                // to stay within the sandboxed environment (same tab).
                 target.innerHTML = `
                     <iframe 
                         name="nebula_frame" 
