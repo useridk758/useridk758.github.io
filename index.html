@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | TITAN v45.0</title>
+    <title>NEBULA | TITAN v46.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     
@@ -45,16 +45,9 @@
         .proxy-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
         .proxy-btn { padding: 15px; background: #111; border: 1px solid var(--border); border-radius: 15px; text-align: center; font-weight: 900; font-size: 10px; transition: 0.2s; }
         .proxy-btn:hover { border-color: var(--accent); background: #1a1a1a; }
-
-        #ctx-menu {
-            position: fixed; background: rgba(10,10,10,0.98); border: 1px solid var(--border);
-            border-radius: 12px; padding: 8px; z-index: 999999; display: none; min-width: 180px;
-        }
-        .ctx-item { padding: 10px; font-size: 11px; font-weight: 800; border-radius: 6px; cursor: pointer; }
-        .ctx-item:hover { background: var(--accent); color: #000; }
     </style>
 </head>
-<body oncontextmenu="return Core.showCtx(event)">
+<body oncontextmenu="Core.showCtx(event); return false;">
 
     <div id="dot"></div>
     <div id="stars"></div>
@@ -72,8 +65,8 @@
 
     <div id="proxy-layer" class="fixed inset-0 bg-black/95 z-[50000] hidden flex-col items-center justify-center backdrop-blur-3xl">
         <div class="w-[500px] p-10 bg-[#0a0a0a] border border-white/10 rounded-3xl">
-            <h3 class="text-3xl font-black italic mb-6">IMP PROXY</h3>
-            <input type="text" id="proxy-input" placeholder="Enter URL (https://...)" class="w-full bg-black border border-white/10 p-4 rounded-xl font-bold focus:border-[#00d2ff] outline-none mb-4">
+            <h3 class="text-3xl font-black italic mb-6 text-[#00d2ff]">IMP PROXY</h3>
+            <input type="text" id="proxy-input" placeholder="https://..." class="w-full bg-black border border-white/10 p-4 rounded-xl font-bold focus:border-[#00d2ff] outline-none mb-4 text-white">
             <button onclick="Core.launch(document.getElementById('proxy-input').value)" class="w-full py-4 bg-white text-black font-black rounded-xl text-[10px] uppercase">Launch Tunnel</button>
             <div class="proxy-grid">
                 <div class="proxy-btn" onclick="Core.launch('https://tiktok.com')">TIKTOK</div>
@@ -83,7 +76,7 @@
                 <div class="proxy-btn" onclick="Core.launch('https://github.com')">GITHUB</div>
                 <div class="proxy-btn" style="background:var(--accent); color:#000;">+</div>
             </div>
-            <button onclick="Core.exitLayers()" class="w-full mt-6 text-[10px] font-bold opacity-30 uppercase">Cancel</button>
+            <button onclick="Core.exitLayers()" class="w-full mt-6 text-[10px] font-bold opacity-30 uppercase text-white">Cancel</button>
         </div>
     </div>
 
@@ -115,13 +108,6 @@
         </div>
     </div>
 
-    <div id="ctx-menu">
-        <div class="ctx-item" onclick="location.reload()">System Refresh</div>
-        <div class="ctx-item" onclick="Core.openUI('proxy')">Imp Proxy</div>
-        <div class="ctx-item" onclick="Core.openUI('games')">Archive</div>
-        <div class="ctx-item" onclick="Core.exitLayers()">Close Session (Alt+T)</div>
-    </div>
-
     <script>
         const Core = {
             boot() {
@@ -139,12 +125,6 @@
                     container.appendChild(s);
                 }
             },
-            showCtx(e) {
-                e.preventDefault();
-                const m = document.getElementById('ctx-menu');
-                m.style.display = 'block'; m.style.left = e.clientX + 'px'; m.style.top = e.clientY + 'px';
-                return false;
-            },
             openUI(id) {
                 this.exitLayers();
                 document.getElementById(id + '-layer').style.display = 'flex';
@@ -157,12 +137,38 @@
             launch(url) {
                 this.exitLayers();
                 const target = document.getElementById('render-target');
-                // Removed allow-popups and allow-top-navigation to trap links inside nebula OS
-                target.innerHTML = `<iframe src="${url}" allow="autoplay; fullscreen; keyboard" sandbox="allow-forms allow-scripts allow-same-origin"></iframe>`;
+                
+                // --- THE TRAPPER LOGIC ---
+                // We re-enable allow-popups so sites don't break, 
+                // but we name the iframe "nebula_frame" and use the base target.
+                const frameName = "nebula_frame";
+                target.innerHTML = `
+                    <iframe 
+                        name="${frameName}" 
+                        id="active-frame"
+                        src="${url}" 
+                        allow="autoplay; fullscreen; keyboard" 
+                        sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-modals">
+                    </iframe>`;
+                
                 document.getElementById('workspace').style.display = 'block';
+
+                // Try to force links to stay inside if same-origin (best effort for cross-origin)
+                const frame = document.getElementById('active-frame');
+                frame.onload = () => {
+                    try {
+                        const frameDoc = frame.contentDocument || frame.contentWindow.document;
+                        const base = frameDoc.createElement('base');
+                        base.target = "_self"; // Force links to open here
+                        frameDoc.head.appendChild(base);
+                    } catch(e) {
+                        console.log("Cross-origin protection active: Link trapping is restricted to internal navigation.");
+                    }
+                };
             }
         };
 
+        // --- ALT+T & SYSTEM KEYS ---
         window.addEventListener('keydown', e => {
             if(e.altKey && e.key.toLowerCase() === 't') {
                 e.preventDefault();
@@ -170,7 +176,6 @@
             }
         });
 
-        window.onclick = () => document.getElementById('ctx-menu').style.display = 'none';
         window.onmousemove = e => {
             const d = document.getElementById('dot');
             if(d) { d.style.left = e.clientX + 'px'; d.style.top = e.clientY + 'px'; }
