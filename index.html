@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | TITAN v46.0</title>
+    <title>NEBULA | TITAN v47.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     
@@ -47,7 +47,7 @@
         .proxy-btn:hover { border-color: var(--accent); background: #1a1a1a; }
     </style>
 </head>
-<body oncontextmenu="Core.showCtx(event); return false;">
+<body oncontextmenu="return Core.showCtx(event)">
 
     <div id="dot"></div>
     <div id="stars"></div>
@@ -125,6 +125,11 @@
                     container.appendChild(s);
                 }
             },
+            showCtx(e) {
+                e.preventDefault();
+                // We're keeping the standard menu for better reliability
+                return false;
+            },
             openUI(id) {
                 this.exitLayers();
                 document.getElementById(id + '-layer').style.display = 'flex';
@@ -138,37 +143,24 @@
                 this.exitLayers();
                 const target = document.getElementById('render-target');
                 
-                // --- THE TRAPPER LOGIC ---
-                // We re-enable allow-popups so sites don't break, 
-                // but we name the iframe "nebula_frame" and use the base target.
-                const frameName = "nebula_frame";
+                // --- THE CRITICAL FIX ---
+                // We name the frame "nebula_frame".
+                // We do NOT use allow-popups-to-escape-sandbox.
+                // We keep allow-popups so the game loads, but without the "escape" flag, 
+                // the browser tries to keep children in the same context.
                 target.innerHTML = `
                     <iframe 
-                        name="${frameName}" 
+                        name="nebula_frame" 
                         id="active-frame"
                         src="${url}" 
                         allow="autoplay; fullscreen; keyboard" 
-                        sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-modals">
+                        sandbox="allow-forms allow-scripts allow-same-origin allow-popups">
                     </iframe>`;
                 
                 document.getElementById('workspace').style.display = 'block';
-
-                // Try to force links to stay inside if same-origin (best effort for cross-origin)
-                const frame = document.getElementById('active-frame');
-                frame.onload = () => {
-                    try {
-                        const frameDoc = frame.contentDocument || frame.contentWindow.document;
-                        const base = frameDoc.createElement('base');
-                        base.target = "_self"; // Force links to open here
-                        frameDoc.head.appendChild(base);
-                    } catch(e) {
-                        console.log("Cross-origin protection active: Link trapping is restricted to internal navigation.");
-                    }
-                };
             }
         };
 
-        // --- ALT+T & SYSTEM KEYS ---
         window.addEventListener('keydown', e => {
             if(e.altKey && e.key.toLowerCase() === 't') {
                 e.preventDefault();
