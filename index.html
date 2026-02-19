@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | TITAN v44.0</title>
+    <title>NEBULA | TITAN v45.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     
@@ -12,51 +12,46 @@
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
         body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* --- MOUSE --- */
         #dot {
             position: fixed; width: 12px; height: 12px; background: var(--accent);
             border-radius: 50%; z-index: 9999999; pointer-events: none;
             box-shadow: 0 0 25px var(--accent); transform: translate(-50%, -50%);
         }
 
-        /* --- STARS --- */
         #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
         .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; animation: twinkle 3s infinite; }
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-        /* --- RIGHT CLICK MENU --- */
-        #ctx-menu {
-            position: fixed; background: rgba(10,10,10,0.98); border: 1px solid var(--border);
-            border-radius: 12px; padding: 8px; z-index: 999999; display: none; min-width: 180px;
-            backdrop-filter: blur(20px);
-        }
-        .ctx-item { padding: 10px; font-size: 11px; font-weight: 800; border-radius: 6px; cursor: pointer; transition: 0.2s; }
-        .ctx-item:hover { background: var(--accent); color: #000; }
-
         /* --- AUTO-HIDE DOCK --- */
         #dock-container {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 80px;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 60px;
             display: flex; align-items: flex-end; justify-content: center;
-            z-index: 80000; padding-bottom: 20px;
+            z-index: 100001; padding-bottom: 15px;
         }
         #dock {
-            display: flex; gap: 15px; background: rgba(15,15,15,0.95);
-            padding: 12px 20px; border-radius: 20px; border: 1px solid var(--border);
-            transform: translateY(120%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; gap: 15px; background: rgba(10,10,10,0.95);
+            padding: 10px 20px; border-radius: 18px; border: 1px solid var(--border);
+            transform: translateY(150%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(10px);
         }
         #dock-container:hover #dock { transform: translateY(0); }
-        .dock-btn { width: 50px; height: 50px; background: #000; border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; transition: 0.2s; }
-        .dock-btn:hover { border-color: var(--accent); transform: translateY(-5px); }
+        .dock-btn { width: 45px; height: 45px; background: #000; border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.2s; }
+        .dock-btn:hover { border-color: var(--accent); transform: translateY(-3px); }
 
-        /* --- WORKSPACE --- */
         #workspace { position: fixed; inset: 0; z-index: 100000; display: none; background: #000; }
         #render-target { width: 100%; height: 100%; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* --- PROXY GRID --- */
         .proxy-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
         .proxy-btn { padding: 15px; background: #111; border: 1px solid var(--border); border-radius: 15px; text-align: center; font-weight: 900; font-size: 10px; transition: 0.2s; }
         .proxy-btn:hover { border-color: var(--accent); background: #1a1a1a; }
+
+        #ctx-menu {
+            position: fixed; background: rgba(10,10,10,0.98); border: 1px solid var(--border);
+            border-radius: 12px; padding: 8px; z-index: 999999; display: none; min-width: 180px;
+        }
+        .ctx-item { padding: 10px; font-size: 11px; font-weight: 800; border-radius: 6px; cursor: pointer; }
+        .ctx-item:hover { background: var(--accent); color: #000; }
     </style>
 </head>
 <body oncontextmenu="return Core.showCtx(event)">
@@ -65,22 +60,21 @@
     <div id="stars"></div>
 
     <div id="intro-stage" class="fixed inset-0 bg-black z-[1000000] flex items-center justify-center">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg" style="width:300px; animation: strobe 0.08s infinite;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg" style="width:250px; animation: strobe 0.08s infinite;">
     </div>
     <style>@keyframes strobe { 0%, 100% { filter: invert(0); } 50% { filter: invert(1); } }</style>
 
     <div id="login-stage" class="fixed inset-0 bg-black z-[900000] flex flex-col items-center justify-center">
-        <h2 class="text-[10px] font-black tracking-[20px] opacity-20 mb-8 uppercase text-white">Nebula Protocol</h2>
-        <input type="text" id="user-id" placeholder="ID_REQUIRED" class="bg-transparent border-b-2 border-white/10 w-80 p-4 text-2xl font-black text-center outline-none focus:border-[#00d2ff] mb-8 uppercase text-white">
+        <h2 class="text-[10px] font-black tracking-[20px] opacity-20 mb-8 uppercase">Nebula Protocol</h2>
+        <input type="text" id="user-id" placeholder="ID_REQUIRED" class="bg-transparent border-b-2 border-white/10 w-80 p-4 text-2xl font-black text-center outline-none focus:border-[#00d2ff] mb-8 uppercase">
         <button onclick="Core.boot()" class="px-12 py-4 bg-white text-black font-black rounded-full text-[10px] uppercase tracking-widest">Initialize</button>
     </div>
 
     <div id="proxy-layer" class="fixed inset-0 bg-black/95 z-[50000] hidden flex-col items-center justify-center backdrop-blur-3xl">
         <div class="w-[500px] p-10 bg-[#0a0a0a] border border-white/10 rounded-3xl">
             <h3 class="text-3xl font-black italic mb-6">IMP PROXY</h3>
-            <input type="text" id="proxy-input" placeholder="https://..." class="w-full bg-black border border-white/10 p-4 rounded-xl font-bold focus:border-[#00d2ff] outline-none mb-4 text-white">
+            <input type="text" id="proxy-input" placeholder="Enter URL (https://...)" class="w-full bg-black border border-white/10 p-4 rounded-xl font-bold focus:border-[#00d2ff] outline-none mb-4">
             <button onclick="Core.launch(document.getElementById('proxy-input').value)" class="w-full py-4 bg-white text-black font-black rounded-xl text-[10px] uppercase">Launch Tunnel</button>
-            
             <div class="proxy-grid">
                 <div class="proxy-btn" onclick="Core.launch('https://tiktok.com')">TIKTOK</div>
                 <div class="proxy-btn" onclick="Core.launch('https://youtube.com')">YOUTUBE</div>
@@ -94,18 +88,18 @@
     </div>
 
     <div id="games-layer" class="fixed inset-0 bg-black/95 z-[50000] hidden flex-col items-center justify-center backdrop-blur-3xl">
-        <h2 class="text-6xl font-black italic mb-12">ARCHIVE</h2>
+        <h2 class="text-6xl font-black italic mb-12 text-white">ARCHIVE</h2>
         <div class="flex gap-8">
-            <div class="w-52 p-4 bg-white/5 rounded-3xl border border-white/10 cursor-pointer hover:border-[#00d2ff]" onclick="Core.launch('https://games.cdn.famobi.com/html5games/o/om-nom-run/v110/?fg_domain=play.famobi.com&fg_aid=A1000-1&locale=en')">
+            <div class="w-52 p-4 bg-white/5 rounded-3xl border border-white/10 cursor-pointer hover:border-[#00d2ff]" onclick="Core.launch('https://play.famobi.com/om-nom-run')">
                 <img src="https://img.cdn.famobi.com/portal/html5games/images/tmp/120/OmNomRunTeaser.jpg" class="rounded-2xl mb-4">
-                <p class="text-center font-black italic">Om Nom Run</p>
+                <p class="text-center font-black italic text-white">Om Nom Run</p>
             </div>
             <div class="w-52 p-4 bg-white/5 rounded-3xl border border-white/10 cursor-pointer hover:border-[#00d2ff]" onclick="Core.launch('https://games.cdn.famobi.com/html5games/m/moto-x3m/v110/?fg_domain=play.famobi.com&fg_aid=A1000-1&locale=en')">
                 <img src="https://img.gamedistribution.com/264b971a07994432bc1645e317bb8ecf-512x512.jpeg" class="rounded-2xl mb-4">
-                <p class="text-center font-black italic">Moto X3M</p>
+                <p class="text-center font-black italic text-white">Moto X3M</p>
             </div>
         </div>
-        <button onclick="Core.exitLayers()" class="mt-12 text-[10px] font-bold opacity-30 uppercase">Back</button>
+        <button onclick="Core.exitLayers()" class="mt-12 text-[10px] font-bold opacity-30 uppercase text-white">Back</button>
     </div>
 
     <div id="workspace">
@@ -148,9 +142,7 @@
             showCtx(e) {
                 e.preventDefault();
                 const m = document.getElementById('ctx-menu');
-                m.style.display = 'block';
-                m.style.left = e.clientX + 'px';
-                m.style.top = e.clientY + 'px';
+                m.style.display = 'block'; m.style.left = e.clientX + 'px'; m.style.top = e.clientY + 'px';
                 return false;
             },
             openUI(id) {
@@ -164,14 +156,13 @@
             },
             launch(url) {
                 this.exitLayers();
-                // We use sandbox attributes that allow scripts but prevent top-level navigation
                 const target = document.getElementById('render-target');
-                target.innerHTML = `<iframe src="${url}" allow="autoplay; fullscreen; keyboard" sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>`;
+                // Removed allow-popups and allow-top-navigation to trap links inside nebula OS
+                target.innerHTML = `<iframe src="${url}" allow="autoplay; fullscreen; keyboard" sandbox="allow-forms allow-scripts allow-same-origin"></iframe>`;
                 document.getElementById('workspace').style.display = 'block';
             }
         };
 
-        // --- ALT+T & GLOBAL LISTENERS ---
         window.addEventListener('keydown', e => {
             if(e.altKey && e.key.toLowerCase() === 't') {
                 e.preventDefault();
@@ -182,15 +173,16 @@
         window.onclick = () => document.getElementById('ctx-menu').style.display = 'none';
         window.onmousemove = e => {
             const d = document.getElementById('dot');
-            d.style.left = e.clientX + 'px'; d.style.top = e.clientY + 'px';
+            if(d) { d.style.left = e.clientX + 'px'; d.style.top = e.clientY + 'px'; }
         };
 
-        // INTRO TIMEOUT
         setTimeout(() => {
             const intro = document.getElementById('intro-stage');
-            intro.style.transition = 'opacity 1s';
-            intro.style.opacity = '0';
-            setTimeout(() => intro.remove(), 1000);
+            if(intro) {
+                intro.style.transition = 'opacity 1s';
+                intro.style.opacity = '0';
+                setTimeout(() => intro.remove(), 1000);
+            }
         }, 3000);
     </script>
 </body>
