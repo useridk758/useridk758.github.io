@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | TITAN v54.0</title>
+    <title>NEBULA | TITAN v55.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     
@@ -15,16 +15,21 @@
         /* MOUSE */
         #dot { position: fixed; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; z-index: 9999999; pointer-events: none; box-shadow: 0 0 25px var(--accent); transform: translate(-50%, -50%); transition: none; }
 
+        /* STAR EFFECT */
+        #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; animation: twinkle var(--d) infinite; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
         /* FLASHING INTRO */
         #intro-stage { position: fixed; inset: 0; background: #000; z-index: 1000000; display: flex; align-items: center; justify-content: center; }
         @keyframes strobe { 0%, 100% { filter: invert(0); } 50% { filter: invert(1); } }
         .strobe-img { width: 250px; animation: strobe 0.08s infinite; }
 
-        /* RIGHT CLICK MENU */
+        /* RIGHT CLICK MENU (CLEANED) */
         #ctx-menu {
             position: fixed; background: rgba(10,10,10,0.98); border: 1px solid var(--border);
-            border-radius: 12px; padding: 8px; z-index: 999999; display: none; min-width: 180px;
-            backdrop-filter: blur(20px); transition: opacity 0.2s;
+            border-radius: 12px; padding: 8px; z-index: 999999; display: none; min-width: 150px;
+            backdrop-filter: blur(20px); transition: none;
         }
         .ctx-item { padding: 10px; font-size: 11px; font-weight: 800; border-radius: 6px; cursor: pointer; }
         .ctx-item:hover { background: var(--accent); color: #000; }
@@ -44,12 +49,12 @@
             font-size: 11px; color: var(--accent); width: 350px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
 
-        /* DOCK */
+        /* DOCK (SMALLER BUTTONS) */
         #dock-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; display: flex; align-items: flex-end; justify-content: center; z-index: 100001; padding-bottom: 15px; }
-        #dock { display: flex; gap: 15px; background: rgba(10,10,10,0.95); padding: 10px 20px; border-radius: 18px; border: 1px solid var(--border); transform: translateY(150%); backdrop-filter: blur(10px); }
+        #dock { display: flex; gap: 10px; background: rgba(10,10,10,0.95); padding: 8px 15px; border-radius: 15px; border: 1px solid var(--border); transform: translateY(150%); backdrop-filter: blur(10px); }
         #dock-container:hover #dock { transform: translateY(0); }
-        .dock-btn { width: 45px; height: 45px; background: #000; border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-        .dock-btn:hover { border-color: var(--accent); transform: translateY(-5px); }
+        .dock-btn { width: 38px; height: 38px; background: #000; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .dock-btn:hover { border-color: var(--accent); transform: translateY(-3px); }
 
         /* WORKSPACE */
         #workspace { position: fixed; inset: 0; z-index: 100000; display: none; background: #000; padding-top: 50px; opacity: 0; }
@@ -65,35 +70,48 @@
         .game-card:hover { border-color: var(--accent); transform: scale(1.05); }
         .game-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 16px; margin-bottom: 15px; }
 
-        .proxy-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
-        .proxy-btn { padding: 15px; background: #111; border: 1px solid var(--border); border-radius: 12px; text-align: center; font-weight: 900; font-size: 10px; cursor: pointer; }
+        /* HIDDEN COMMAND CONSOLE */
+        #admin-console {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);
+            width: 400px; background: #0a0a0a; border: 1px solid var(--accent);
+            z-index: 2000000; display: none; padding: 20px; border-radius: 15px;
+            box-shadow: 0 0 50px rgba(0,210,255,0.2);
+        }
+        #admin-console.active { display: block; transform: translate(-50%, -50%) scale(1); }
     </style>
 </head>
 <body oncontextmenu="return Core.showCtx(event)">
 
+    <div id="stars"></div>
     <div id="dot"></div>
+    
     <div id="ctx-menu">
         <div class="ctx-item" onclick="location.reload()">System Refresh</div>
         <div class="ctx-item" onclick="Core.openUI('proxy')">Imp Proxy</div>
         <div class="ctx-item" onclick="Core.openUI('games')">Archive</div>
-        <div class="ctx-item" onclick="Core.exitSession()">Kill Session (Alt+T)</div>
     </div>
 
     <div id="intro-stage">
         <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg" class="strobe-img">
     </div>
 
+    <div id="admin-console">
+        <h3 class="text-xs font-black text-[#00d2ff] mb-4 tracking-widest uppercase">Admin Terminal</h3>
+        <button onclick="Core.exitSession()" class="w-full py-3 mb-2 bg-red-500/20 text-red-500 border border-red-500/50 rounded-lg text-[10px] font-bold uppercase hover:bg-red-500 hover:text-white">Kill Current Session</button>
+        <button onclick="location.reload()" class="w-full py-3 mb-2 bg-white/5 border border-white/10 rounded-lg text-[10px] font-bold uppercase">Hard Reset Core</button>
+        <button onclick="document.getElementById('admin-console').classList.remove('active')" class="w-full py-2 text-[9px] opacity-30 uppercase">Close Terminal</button>
+    </div>
+
     <div id="login-stage" class="fixed inset-0 bg-black z-[900000] flex flex-col items-center justify-center">
         <h2 class="text-[10px] font-black tracking-[20px] opacity-20 mb-8 uppercase">Nebula Protocol</h2>
         <input type="text" id="user-id" placeholder="ID_REQUIRED" class="bg-transparent border-b-2 border-white/10 w-80 p-4 text-2xl font-black text-center outline-none focus:border-[#00d2ff] mb-8 text-white">
-        <button onclick="Core.boot()" class="px-12 py-4 bg-white text-black font-black rounded-full text-[10px] uppercase tracking-widest hover:scale-110">Initialize</button>
+        <button onclick="Core.boot()" class="px-12 py-4 bg-white text-black font-black rounded-full text-[10px] uppercase tracking-widest">Initialize</button>
     </div>
 
     <div id="top-bar">
         <div id="url-display">about:blank</div>
         <div class="ml-auto flex gap-3">
-            <button onclick="Core.toggleFullscreen()" class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-[9px] font-black uppercase hover:bg-white hover:text-black">Full Screen</button>
-            <button onclick="Core.exitSession()" class="px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-lg text-[9px] font-black text-red-500 uppercase hover:bg-red-500 hover:text-white">Exit</button>
+            <button onclick="Core.toggleFullscreen()" class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-[9px] font-black uppercase hover:bg-white hover:text-black transition">Full Screen</button>
         </div>
     </div>
 
@@ -102,11 +120,6 @@
             <h3 class="text-3xl font-black italic mb-6 text-[#00d2ff]">IMP PROXY</h3>
             <input type="text" id="proxy-input" placeholder="https://..." class="w-full bg-black border border-white/10 p-4 rounded-xl font-bold focus:border-[#00d2ff] outline-none mb-4 text-white">
             <button onclick="Core.launch(document.getElementById('proxy-input').value, false)" class="w-full py-4 bg-white text-black font-black rounded-xl text-[10px] uppercase">Launch</button>
-            <div class="proxy-grid">
-                <div class="proxy-btn" onclick="Core.launch('https://tiktok.com', false)">TIKTOK</div>
-                <div class="proxy-btn" onclick="Core.launch('https://youtube.com', false)">YOUTUBE</div>
-                <div class="proxy-btn" onclick="Core.launch('https://discord.com', false)">DISCORD</div>
-            </div>
             <button onclick="Core.closeUI()" class="w-full mt-6 text-[10px] font-bold opacity-30 uppercase">Cancel</button>
         </div>
     </div>
@@ -120,7 +133,7 @@
             </div>
             <div class="game-card" onclick="Core.launch('https://useridk758.github.io/underestimatablepig/', true)">
                 <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/710.png">
-                <p class="text-center font-black italic uppercase">FNAE</p>
+                <p class="text-center font-black italic uppercase">Five Nights at Epstein's</p>
             </div>
         </div>
         <button onclick="Core.closeUI()" class="mt-12 text-[10px] font-bold opacity-30 uppercase">Back</button>
@@ -129,8 +142,7 @@
     <div id="settings-layer" class="ui-layer">
         <div class="w-[400px] p-8 bg-[#0a0a0a] border border-white/10 rounded-3xl text-center">
             <h3 class="text-2xl font-black italic mb-4 uppercase">Settings</h3>
-            <button onclick="Core.aboutBlankCloak()" class="w-full py-3 mb-4 bg-white text-black rounded-xl text-[10px] font-black uppercase hover:scale-105">About:Blank Cloak</button>
-            <button onclick="location.reload()" class="w-full py-3 border border-white/10 rounded-xl text-[10px] font-bold uppercase opacity-50 hover:opacity-100">Reboot System</button>
+            <button onclick="Core.aboutBlankCloak()" class="w-full py-3 mb-4 bg-white text-black rounded-xl text-[10px] font-black uppercase">About:Blank Cloak</button>
             <button onclick="Core.closeUI()" class="mt-6 text-[10px] font-bold opacity-30 uppercase">Close</button>
         </div>
     </div>
@@ -152,7 +164,19 @@
         const Core = {
             boot() { 
                 document.getElementById('login-stage').classList.add('opacity-0');
-                setTimeout(() => { document.getElementById('login-stage').style.display = 'none'; }, 400);
+                setTimeout(() => { document.getElementById('login-stage').style.display = 'none'; this.genStars(); }, 400);
+            },
+            genStars() {
+                const container = document.getElementById('stars');
+                for(let i=0; i<100; i++) {
+                    const s = document.createElement('div');
+                    s.className = 'star';
+                    s.style.width = s.style.height = Math.random()*2 + 'px';
+                    s.style.left = Math.random()*100 + '%';
+                    s.style.top = Math.random()*100 + '%';
+                    s.style.setProperty('--d', (Math.random()*3+2)+'s');
+                    container.appendChild(s);
+                }
             },
             showCtx(e) {
                 e.preventDefault();
@@ -174,6 +198,7 @@
             },
             exitSession() {
                 this.closeUI();
+                document.getElementById('admin-console').classList.remove('active');
                 const ws = document.getElementById('workspace');
                 ws.classList.remove('active');
                 document.getElementById('top-bar').classList.remove('active');
@@ -195,19 +220,20 @@
             },
             aboutBlankCloak() {
                 const win = window.open('about:blank', '_blank');
-                if (!win) return alert("Pop-up blocked! Enable pop-ups to use cloaking.");
+                if (!win) return;
                 const iframe = win.document.createElement('iframe');
                 iframe.style.width = '100vw'; iframe.style.height = '100vh'; iframe.style.border = 'none';
                 iframe.style.position = 'fixed'; iframe.style.top = '0'; iframe.style.left = '0';
                 iframe.src = window.location.href;
                 win.document.body.appendChild(iframe);
-                win.document.body.style.margin = '0';
-                win.document.body.style.padding = '0';
             }
         };
 
         window.addEventListener('keydown', e => { 
-            if(e.altKey && e.key.toLowerCase() === 't') { e.preventDefault(); Core.exitSession(); } 
+            if(e.altKey && e.key.toLowerCase() === 't') { 
+                e.preventDefault(); 
+                document.getElementById('admin-console').classList.toggle('active');
+            } 
         });
 
         window.onclick = () => document.getElementById('ctx-menu').style.display = 'none';
@@ -216,7 +242,6 @@
             if(d) { d.style.left = e.clientX + 'px'; d.style.top = e.clientY + 'px'; } 
         };
 
-        // Intro Timer
         setTimeout(() => {
             const intro = document.getElementById('intro-stage');
             intro.style.opacity = '0';
