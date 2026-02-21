@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | TITAN v58.0</title>
+    <title>NEBULA | TITAN v59.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     
@@ -43,7 +43,7 @@
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
             display: flex; flex-direction: column; align-items: center; z-index: 100001; 
         }
-        #dock-container.hidden-nav { display: none; } /* Hide when in site/game */
+        #dock-container.hidden-nav { display: none; } 
 
         #dock-label { 
             margin-bottom: 10px; font-size: 10px; font-weight: 900; letter-spacing: 2px; 
@@ -122,17 +122,18 @@
                 <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/710.png">
                 <p class="text-center font-black uppercase text-xs">Five Nights at Epstein's</p>
             </div>
+            <div class="item-card" onclick="Core.launch('https://useridk758.github.io/somethingislikereallyreallyreallywrongwithmerightnow/', true)">
+                <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/38.png">
+                <p class="text-center font-black uppercase text-xs">Five Nights at Freddy's</p>
+            </div>
         </div>
         <button onclick="Core.closeUI()" class="mt-8 text-[10px] font-bold opacity-30 uppercase">Back</button>
     </div>
 
     <div id="apps-layer" class="ui-layer">
         <h2 class="text-5xl font-black mb-8 text-white uppercase">Applications</h2>
-        <div class="card-grid">
-            <div class="item-card" onclick="Core.launch('https://www.tiktok.com', false)">
-                <div class="thumb-box bg-gradient-to-br from-black to-gray-800 flex items-center justify-center text-3xl">🎵</div>
-                <p class="text-center font-black uppercase text-xs">TikTok</p>
-            </div>
+        <div class="text-center p-10 bg-white/5 rounded-3xl border border-white/10">
+            <p class="text-lg font-black text-[#00d2ff] uppercase tracking-widest">no apps yet, still finding a way to add them.</p>
         </div>
         <button onclick="Core.closeUI()" class="mt-8 text-[10px] font-bold opacity-30 uppercase">Back</button>
     </div>
@@ -185,10 +186,7 @@
             clearLabel() {
                 document.getElementById('dock-label').style.opacity = '0';
             },
-            showCtx(e) {
-                e.preventDefault();
-                return false;
-            },
+            showCtx(e) { e.preventDefault(); return false; },
             openUI(id) {
                 this.closeUI();
                 const l = document.getElementById(id + '-layer');
@@ -216,10 +214,8 @@
                 const ws = document.getElementById('workspace');
                 const tb = document.getElementById('top-bar');
                 const dock = document.getElementById('dock-container');
-                
                 document.getElementById('url-display').innerText = isGame ? "about:blank" : url;
                 target.innerHTML = `<iframe src="${url}" allow="autoplay; fullscreen; keyboard" sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>`;
-                
                 ws.style.display = 'block';
                 dock.classList.add('hidden-nav');
                 setTimeout(() => { ws.classList.add('active'); tb.classList.add('active'); }, 50);
