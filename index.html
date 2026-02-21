@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | TITAN v62.0</title>
+    <title>NEBULA | TITAN v63.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     
@@ -115,6 +115,18 @@
                 <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/443.png">
                 <p class="text-center font-black uppercase text-[10px]">Adventure Drivers</p>
             </div>
+            <div class="item-card" onclick="Core.launch('https://markakopian-sudo.github.io/basket/', true)">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSq1_jjw0D4GzxNiZiIetbSXmsubq2HeQRNLc7yynN-tJbajuVnLtWD_MLOKLeyFEgDYmgwiQ&s=10">
+                <p class="text-center font-black uppercase text-[10px]">Basket Random</p>
+            </div>
+            <div class="item-card" onclick="Core.launch('https://markakopian-sudo.github.io/businessanasun/', true)">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMWgIRmr1_PK-JOKBAbLveo1O-zfgcyrw2ncdJ006Vte91uo47Jc9uqU5ce3_V53nxsyzZ&s=10">
+                <p class="text-center font-black uppercase text-[10px]">BitLife</p>
+            </div>
+            <div class="item-card" onclick="Core.launch('https://markakopian-sudo.github.io/somethingrandomlol/', true)">
+                <img src="https://imgs.crazygames.com/escape-road-asm_1x1/20250724105032/escape-road-asm_1x1-cover?format=auto&quality=100&metadata=none&width=1200">
+                <p class="text-center font-black uppercase text-[10px]">Escape Road</p>
+            </div>
             <div class="item-card" onclick="Core.launch('https://useridk758.github.io/underestimatablepig/', true)">
                 <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/710.png">
                 <p class="text-center font-black uppercase text-[10px]">Five Nights at Epstein's</p>
@@ -122,6 +134,26 @@
             <div class="item-card" onclick="Core.launch('https://useridk758.github.io/somethingislikereallyreallyreallywrongwithmerightnow/', true)">
                 <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/38.png">
                 <p class="text-center font-black uppercase text-[10px]">Five Nights at Freddy's</p>
+            </div>
+            <div class="item-card" onclick="Core.launch('https://markakopian-sudo.github.io/understandme/', true)">
+                <img src="https://static.wikia.nocookie.net/fivenightsatfreddys/images/b/b3/480px-Five_Nights_at_Freddy%27s_2_icon.jpg/revision/latest?cb=20141102170003">
+                <p class="text-center font-black uppercase text-[10px]">Five Nights at Freddy's 2</p>
+            </div>
+            <div class="item-card" onclick="Core.launch('https://markakopian-sudo.github.io/wtfgng/', true)">
+                <img src="https://static.wikia.nocookie.net/freddy-fazbears-pizza/images/7/70/FNaF3_Steam_Greenlight_Icon.png/revision/latest/thumbnail/width/360/height/360?cb=20150130050641">
+                <p class="text-center font-black uppercase text-[10px]">Five Nights at Freddy's 3</p>
+            </div>
+            <div class="item-card" onclick="Core.launch('https://markakopian-sudo.github.io/anasun/', true)">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShPfyqQvG-spufnROHTOGTauc4IDY-IG2e0A&s">
+                <p class="text-center font-black uppercase text-[10px]">Five Nights at Freddy's 4</p>
+            </div>
+            <div class="item-card" onclick="Core.launch('https://markakopian-sudo.github.io/eureka/', true)">
+                <img src="https://play-lh.googleusercontent.com/p7kWbWBFxQIrzolEqiV5uSvctLeyssZvBV7UBOX29wzZI52IdcSs4qCB_zsQJL1mt9A">
+                <p class="text-center font-black uppercase text-[10px]">Geometry Dash Lite</p>
+            </div>
+            <div class="item-card" onclick="Core.launch('https://markakopian-sudo.github.io/axpersiktir/', true)">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0gbeEDgMCkUABqOuTD59f_-nnamoBfxmaNcTrcXy1DZSPsQMRYqhLf3lVt6iMPyweKPQm&s=10">
+                <p class="text-center font-black uppercase text-[10px]">Retro Bowl</p>
             </div>
             <div class="item-card border-[#00d2ff]" onclick="Core.launch('https://forms.gle/fgxJFBDbTRT4ML4d8', false)">
                 <div class="thumb-box bg-[#00d2ff]/10 flex items-center justify-center text-3xl">📝</div>
@@ -138,16 +170,13 @@
                 <div class="thumb-box bg-red-500/20 flex items-center justify-center text-5xl">🔴</div>
                 <p class="text-center font-black uppercase text-[10px]">Soundboard</p>
             </div>
-            <div class="col-span-3 flex items-center p-8 bg-white/5 border border-white/10 rounded-3xl">
-                <p class="text-xs font-black text-[#00d2ff] uppercase tracking-widest">Finding more apps to add...</p>
-            </div>
         </div>
         <button onclick="Core.closeUI()" class="mt-8 text-[10px] font-bold opacity-30 uppercase">Back</button>
     </div>
 
     <div id="proxy-layer" class="ui-layer">
         <div class="w-[450px] p-10 bg-[#0a0a0a] border border-white/10 rounded-3xl">
-            <h3 class="text-2xl font-black mb-6 text-[#00d2ff] uppercase">Nebula Proxy</h3>
+            <h3 class="text-2xl font-black mb-6 text-[#00d2ff] uppercase">Imp Proxy</h3>
             <input type="text" id="proxy-input" placeholder="Enter URL..." class="w-full bg-black border border-white/10 p-4 rounded-xl font-bold focus:border-[#00d2ff] outline-none mb-4 text-white">
             <button onclick="Core.launch(document.getElementById('proxy-input').value, false)" class="w-full py-4 bg-white text-black font-black rounded-xl text-[10px] uppercase">Launch Website</button>
             <button onclick="Core.closeUI()" class="w-full mt-6 text-[10px] font-bold opacity-30 uppercase">Cancel</button>
