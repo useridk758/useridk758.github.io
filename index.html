@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | TITAN v57.0</title>
+    <title>NEBULA | TITAN v58.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     
@@ -38,10 +38,20 @@
             font-size: 11px; color: var(--accent); width: 350px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
 
-        /* DOCK (PERMANENTLY VISIBLE) */
-        #dock-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; display: flex; align-items: center; justify-content: center; z-index: 100001; }
-        #dock { display: flex; gap: 10px; background: rgba(10,10,10,0.95); padding: 8px 15px; border-radius: 15px; border: 1px solid var(--border); transform: translateY(0); backdrop-filter: blur(10px); }
-        .dock-btn { width: 38px; height: 38px; background: #000; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        /* DOCK (BOTTOM MIDDLE & HOVER TEXT) */
+        #dock-container { 
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
+            display: flex; flex-direction: column; align-items: center; z-index: 100001; 
+        }
+        #dock-container.hidden-nav { display: none; } /* Hide when in site/game */
+
+        #dock-label { 
+            margin-bottom: 10px; font-size: 10px; font-weight: 900; letter-spacing: 2px; 
+            color: var(--accent); opacity: 0; transition: opacity 0.2s; text-transform: uppercase;
+        }
+        #dock { display: flex; gap: 12px; background: rgba(10,10,10,0.95); padding: 10px 18px; border-radius: 18px; border: 1px solid var(--border); backdrop-filter: blur(10px); }
+        
+        .dock-btn { width: 40px; height: 40px; background: #000; border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
         .dock-btn:hover { border-color: var(--accent); transform: translateY(-3px); }
 
         /* WORKSPACE */
@@ -50,21 +60,21 @@
         #render-target { width: 100%; height: 100%; overflow: hidden; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* UI LAYERS (NO ITALICS) */
+        /* UI LAYERS */
         .ui-layer { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 105000; display: none; opacity: 0; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(30px); }
         .ui-layer.active { display: flex; opacity: 1; }
         h2, h3, p { font-style: normal !important; } 
         
-        .game-card { width: 280px; padding: 15px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 24px; cursor: pointer; }
-        .game-card:hover { border-color: var(--accent); transform: scale(1.05); }
-        .game-card img, .game-card .thumb-box { width: 100%; height: 160px; object-fit: cover; border-radius: 16px; margin-bottom: 15px; }
+        .card-grid { display: flex; gap: 8px; overflow-x: auto; padding: 10px; max-width: 90vw; }
+        .item-card { width: 240px; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 20px; cursor: pointer; flex-shrink: 0; }
+        .item-card:hover { border-color: var(--accent); transform: scale(1.03); }
+        .item-card img, .item-card .thumb-box { width: 100%; height: 140px; object-fit: cover; border-radius: 14px; margin-bottom: 12px; }
 
         /* ADMIN TERMINAL */
         #admin-console {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);
             width: 400px; background: #0a0a0a; border: 1px solid var(--accent);
             z-index: 2000000; display: none; padding: 20px; border-radius: 15px;
-            box-shadow: 0 0 50px rgba(0,210,255,0.2);
         }
         #admin-console.active { display: block; transform: translate(-50%, -50%) scale(1); }
     </style>
@@ -77,8 +87,8 @@
     <div id="top-bar">
         <div id="url-display">about:blank</div>
         <div class="ml-auto flex gap-3">
-            <button onclick="Core.toggleFullscreen()" class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-[9px] font-black uppercase hover:bg-white hover:text-black transition">Full Screen</button>
-            <button onclick="Core.exitSession()" class="px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-lg text-[9px] font-black text-red-500 uppercase hover:bg-red-500 hover:text-white transition">Exit Session</button>
+            <button onclick="Core.toggleFullscreen()" class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-[9px] font-black uppercase">Full Screen</button>
+            <button onclick="Core.exitSession()" class="px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-lg text-[9px] font-black text-red-500 uppercase">Exit Session</button>
         </div>
     </div>
 
@@ -98,32 +108,40 @@
     </div>
 
     <div id="games-layer" class="ui-layer">
-        <h2 class="text-6xl font-black mb-12 text-white">ARCHIVE</h2>
-        <div class="flex gap-8 overflow-x-auto p-4 max-w-full">
-            <div class="game-card border-[#00d2ff]" onclick="Core.launch('https://forms.gle/fgxJFBDbTRT4ML4d8', false)">
-                <div class="thumb-box bg-[#00d2ff]/10 flex items-center justify-center">
-                    <span class="text-4xl">📝</span>
-                </div>
-                <p class="text-center font-black text-[#00d2ff] uppercase">Suggestions :3</p>
+        <h2 class="text-5xl font-black mb-8 text-white uppercase">Archive</h2>
+        <div class="card-grid">
+            <div class="item-card border-[#00d2ff]" onclick="Core.launch('https://forms.gle/fgxJFBDbTRT4ML4d8', false)">
+                <div class="thumb-box bg-[#00d2ff]/10 flex items-center justify-center text-3xl">📝</div>
+                <p class="text-center font-black text-[#00d2ff] uppercase text-xs">Suggestions :3</p>
             </div>
-            
-            <div class="game-card" onclick="Core.launch('https://useridk758.github.io/my-html-games/', true)">
+            <div class="item-card" onclick="Core.launch('https://useridk758.github.io/my-html-games/', true)">
                 <img src="https://cdn-bgp.bluestacks.com/BGP/us/gametiles_lol.onevone.jpg">
-                <p class="text-center font-black uppercase">1v1.lol</p>
+                <p class="text-center font-black uppercase text-xs">1v1.lol</p>
             </div>
-            <div class="game-card" onclick="Core.launch('https://useridk758.github.io/underestimatablepig/', true)">
+            <div class="item-card" onclick="Core.launch('https://useridk758.github.io/underestimatablepig/', true)">
                 <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/710.png">
-                <p class="text-center font-black uppercase">Five Nights at Epstein's</p>
+                <p class="text-center font-black uppercase text-xs">Five Nights at Epstein's</p>
             </div>
         </div>
-        <button onclick="Core.closeUI()" class="mt-12 text-[10px] font-bold opacity-30 uppercase">Back</button>
+        <button onclick="Core.closeUI()" class="mt-8 text-[10px] font-bold opacity-30 uppercase">Back</button>
+    </div>
+
+    <div id="apps-layer" class="ui-layer">
+        <h2 class="text-5xl font-black mb-8 text-white uppercase">Applications</h2>
+        <div class="card-grid">
+            <div class="item-card" onclick="Core.launch('https://www.tiktok.com', false)">
+                <div class="thumb-box bg-gradient-to-br from-black to-gray-800 flex items-center justify-center text-3xl">🎵</div>
+                <p class="text-center font-black uppercase text-xs">TikTok</p>
+            </div>
+        </div>
+        <button onclick="Core.closeUI()" class="mt-8 text-[10px] font-bold opacity-30 uppercase">Back</button>
     </div>
 
     <div id="proxy-layer" class="ui-layer">
-        <div class="w-[500px] p-10 bg-[#0a0a0a] border border-white/10 rounded-3xl">
-            <h3 class="text-3xl font-black mb-6 text-[#00d2ff]">IMP PROXY</h3>
-            <input type="text" id="proxy-input" placeholder="https://..." class="w-full bg-black border border-white/10 p-4 rounded-xl font-bold focus:border-[#00d2ff] outline-none mb-4 text-white">
-            <button onclick="Core.launch(document.getElementById('proxy-input').value, false)" class="w-full py-4 bg-white text-black font-black rounded-xl text-[10px] uppercase">Launch</button>
+        <div class="w-[450px] p-10 bg-[#0a0a0a] border border-white/10 rounded-3xl">
+            <h3 class="text-2xl font-black mb-6 text-[#00d2ff] uppercase">Imp Proxy</h3>
+            <input type="text" id="proxy-input" placeholder="Enter URL..." class="w-full bg-black border border-white/10 p-4 rounded-xl font-bold focus:border-[#00d2ff] outline-none mb-4 text-white">
+            <button onclick="Core.launch(document.getElementById('proxy-input').value, false)" class="w-full py-4 bg-white text-black font-black rounded-xl text-[10px] uppercase">Launch Website</button>
             <button onclick="Core.closeUI()" class="w-full mt-6 text-[10px] font-bold opacity-30 uppercase">Cancel</button>
         </div>
     </div>
@@ -131,11 +149,13 @@
     <div id="workspace"><div id="render-target"></div></div>
 
     <div id="dock-container">
+        <div id="dock-label">System Ready</div>
         <div id="dock">
-            <button class="dock-btn" onclick="Core.exitSession()">🏠</button>
-            <button class="dock-btn" onclick="Core.openUI('games')">🎮</button>
-            <button class="dock-btn" onclick="Core.openUI('proxy')">🌐</button>
-            <button class="dock-btn" onclick="Core.aboutBlankCloak()">🕵️</button>
+            <button class="dock-btn" onmouseover="Core.setLabel('Home')" onmouseout="Core.clearLabel()" onclick="Core.exitSession()">🏠</button>
+            <button class="dock-btn" onmouseover="Core.setLabel('Archive')" onmouseout="Core.clearLabel()" onclick="Core.openUI('games')">🎮</button>
+            <button class="dock-btn" onmouseover="Core.setLabel('Apps')" onmouseout="Core.clearLabel()" onclick="Core.openUI('apps')">📱</button>
+            <button class="dock-btn" onmouseover="Core.setLabel('Proxy')" onmouseout="Core.clearLabel()" onclick="Core.openUI('proxy')">🌐</button>
+            <button class="dock-btn" onmouseover="Core.setLabel('Cloak')" onmouseout="Core.clearLabel()" onclick="Core.aboutBlankCloak()">🕵️</button>
         </div>
     </div>
 
@@ -143,10 +163,7 @@
         const Core = {
             boot() { 
                 document.getElementById('login-stage').classList.add('opacity-0');
-                setTimeout(() => { 
-                    document.getElementById('login-stage').style.display = 'none'; 
-                    this.genStars(); 
-                }, 400);
+                setTimeout(() => { document.getElementById('login-stage').style.display = 'none'; this.genStars(); }, 400);
             },
             genStars() {
                 const container = document.getElementById('stars');
@@ -160,10 +177,16 @@
                     container.appendChild(s);
                 }
             },
+            setLabel(text) {
+                const label = document.getElementById('dock-label');
+                label.innerText = text;
+                label.style.opacity = '1';
+            },
+            clearLabel() {
+                document.getElementById('dock-label').style.opacity = '0';
+            },
             showCtx(e) {
                 e.preventDefault();
-                const m = document.getElementById('ctx-menu');
-                if(m) { m.style.display = 'block'; m.style.left = e.clientX + 'px'; m.style.top = e.clientY + 'px'; }
                 return false;
             },
             openUI(id) {
@@ -179,11 +202,12 @@
             },
             exitSession() {
                 this.closeUI();
-                if(document.getElementById('admin-console')) document.getElementById('admin-console').classList.remove('active');
                 const ws = document.getElementById('workspace');
                 const tb = document.getElementById('top-bar');
+                const dock = document.getElementById('dock-container');
                 ws.classList.remove('active');
                 tb.classList.remove('active');
+                dock.classList.remove('hidden-nav');
                 setTimeout(() => { ws.style.display = 'none'; document.getElementById('render-target').innerHTML = ''; }, 300);
             },
             launch(url, isGame) {
@@ -191,16 +215,17 @@
                 const target = document.getElementById('render-target');
                 const ws = document.getElementById('workspace');
                 const tb = document.getElementById('top-bar');
-                document.getElementById('url-display').innerText = isGame ? "about:blank" : url;
+                const dock = document.getElementById('dock-container');
                 
-                // INTERNAL LOADING LOGIC
-                target.innerHTML = `<iframe id="main-frame" src="${url}" allow="autoplay; fullscreen; keyboard" sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>`;
+                document.getElementById('url-display').innerText = isGame ? "about:blank" : url;
+                target.innerHTML = `<iframe src="${url}" allow="autoplay; fullscreen; keyboard" sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>`;
                 
                 ws.style.display = 'block';
+                dock.classList.add('hidden-nav');
                 setTimeout(() => { ws.classList.add('active'); tb.classList.add('active'); }, 50);
             },
             toggleFullscreen() {
-                const frame = document.getElementById('main-frame');
+                const frame = document.querySelector('iframe');
                 if (frame && !document.fullscreenElement) frame.requestFullscreen().catch(() => {});
                 else if (document.fullscreenElement) document.exitFullscreen();
             },
