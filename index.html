@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | TITAN v63.0</title>
+    <title>NEBULA | TITAN v64.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     
@@ -155,7 +155,7 @@
                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0gbeEDgMCkUABqOuTD59f_-nnamoBfxmaNcTrcXy1DZSPsQMRYqhLf3lVt6iMPyweKPQm&s=10">
                 <p class="text-center font-black uppercase text-[10px]">Retro Bowl</p>
             </div>
-            <div class="item-card border-[#00d2ff]" onclick="Core.launch('https://forms.gle/fgxJFBDbTRT4ML4d8', false)">
+            <div class="item-card border-[#00d2ff]" onclick="Core.launch('https://forms.gle/fgxJFBDbTRT4ML4d8', true)">
                 <div class="thumb-box bg-[#00d2ff]/10 flex items-center justify-center text-3xl">📝</div>
                 <p class="text-center font-black text-[#00d2ff] uppercase text-[10px]">Suggestions :3</p>
             </div>
@@ -166,7 +166,7 @@
     <div id="apps-layer" class="ui-layer">
         <h2 class="text-4xl font-black mb-8 text-white uppercase">Applications</h2>
         <div class="card-grid">
-            <div class="item-card" onclick="Core.launch('https://overitnotoverit.github.io/overitnotoverit/', false)">
+            <div class="item-card" onclick="Core.launch('https://overitnotoverit.github.io/overitnotoverit/', true)">
                 <div class="thumb-box bg-red-500/20 flex items-center justify-center text-5xl">🔴</div>
                 <p class="text-center font-black uppercase text-[10px]">Soundboard</p>
             </div>
@@ -206,7 +206,7 @@
             openUI(id) { this.closeUI(); const l = document.getElementById(id + '-layer'); if(l) { l.style.display = 'flex'; setTimeout(() => l.classList.add('active'), 10); } },
             closeUI() { document.querySelectorAll('.ui-layer').forEach(l => { l.classList.remove('active'); setTimeout(() => { if(!l.classList.contains('active')) l.style.display = 'none'; }, 300); }); },
             exitSession() { this.closeUI(); const ws = document.getElementById('workspace'); const tb = document.getElementById('top-bar'); const dock = document.getElementById('dock-container'); ws.classList.remove('active'); tb.classList.remove('active'); dock.classList.remove('hidden-nav'); setTimeout(() => { ws.style.display = 'none'; document.getElementById('render-target').innerHTML = ''; }, 300); },
-            launch(url, isGame) { this.closeUI(); const target = document.getElementById('render-target'); const ws = document.getElementById('workspace'); const tb = document.getElementById('top-bar'); const dock = document.getElementById('dock-container'); document.getElementById('url-display').innerText = isGame ? "about:blank" : url; target.innerHTML = `<iframe src="${url}" allow="autoplay; fullscreen; keyboard" sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>`; ws.style.display = 'block'; dock.classList.add('hidden-nav'); setTimeout(() => { ws.classList.add('active'); tb.classList.add('active'); }, 50); },
+            launch(url, hideUrl) { this.closeUI(); const target = document.getElementById('render-target'); const ws = document.getElementById('workspace'); const tb = document.getElementById('top-bar'); const dock = document.getElementById('dock-container'); document.getElementById('url-display').innerText = hideUrl ? "about:blank" : url; target.innerHTML = `<iframe src="${url}" allow="autoplay; fullscreen; keyboard" sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>`; ws.style.display = 'block'; dock.classList.add('hidden-nav'); setTimeout(() => { ws.classList.add('active'); tb.classList.add('active'); }, 50); },
             toggleFullscreen() { const frame = document.querySelector('iframe'); if (frame && !document.fullscreenElement) frame.requestFullscreen(); else if (document.fullscreenElement) document.exitFullscreen(); },
             aboutBlankCloak() { const win = window.open('about:blank', '_blank'); if (!win) return; const iframe = win.document.createElement('iframe'); iframe.style.width = '100vw'; iframe.style.height = '100vh'; iframe.style.border = 'none'; iframe.style.position = 'fixed'; iframe.style.top = '0'; iframe.style.left = '0'; iframe.src = window.location.href; win.document.body.appendChild(iframe); }
         };
