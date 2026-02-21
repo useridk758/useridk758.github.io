@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | TITAN v55.0</title>
+    <title>NEBULA | TITAN v56.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     
@@ -12,29 +12,18 @@
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* MOUSE */
+        /* MOUSE & STARS */
         #dot { position: fixed; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; z-index: 9999999; pointer-events: none; box-shadow: 0 0 25px var(--accent); transform: translate(-50%, -50%); transition: none; }
-
-        /* STAR EFFECT */
         #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
         .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; animation: twinkle var(--d) infinite; }
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-        /* FLASHING INTRO */
+        /* INTRO */
         #intro-stage { position: fixed; inset: 0; background: #000; z-index: 1000000; display: flex; align-items: center; justify-content: center; }
         @keyframes strobe { 0%, 100% { filter: invert(0); } 50% { filter: invert(1); } }
         .strobe-img { width: 250px; animation: strobe 0.08s infinite; }
 
-        /* RIGHT CLICK MENU (CLEANED) */
-        #ctx-menu {
-            position: fixed; background: rgba(10,10,10,0.98); border: 1px solid var(--border);
-            border-radius: 12px; padding: 8px; z-index: 999999; display: none; min-width: 150px;
-            backdrop-filter: blur(20px); transition: none;
-        }
-        .ctx-item { padding: 10px; font-size: 11px; font-weight: 800; border-radius: 6px; cursor: pointer; }
-        .ctx-item:hover { background: var(--accent); color: #000; }
-
-        /* TOP NAVIGATION BAR */
+        /* TOP BAR */
         #top-bar {
             position: fixed; top: -60px; left: 0; width: 100%; height: 50px;
             background: rgba(10,10,10,0.95); border-bottom: 1px solid var(--border);
@@ -49,10 +38,9 @@
             font-size: 11px; color: var(--accent); width: 350px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
 
-        /* DOCK (SMALLER BUTTONS) */
-        #dock-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; display: flex; align-items: flex-end; justify-content: center; z-index: 100001; padding-bottom: 15px; }
-        #dock { display: flex; gap: 10px; background: rgba(10,10,10,0.95); padding: 8px 15px; border-radius: 15px; border: 1px solid var(--border); transform: translateY(150%); backdrop-filter: blur(10px); }
-        #dock-container:hover #dock { transform: translateY(0); }
+        /* DOCK (ALWAYS VISIBLE NOW) */
+        #dock-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; display: flex; align-items: center; justify-content: center; z-index: 100001; }
+        #dock { display: flex; gap: 10px; background: rgba(10,10,10,0.95); padding: 8px 15px; border-radius: 15px; border: 1px solid var(--border); transform: translateY(0); backdrop-filter: blur(10px); }
         .dock-btn { width: 38px; height: 38px; background: #000; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
         .dock-btn:hover { border-color: var(--accent); transform: translateY(-3px); }
 
@@ -62,15 +50,16 @@
         #render-target { width: 100%; height: 100%; overflow: hidden; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* UI LAYERS */
+        /* UI LAYERS - ALL ITALICS REMOVED */
         .ui-layer { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 105000; display: none; opacity: 0; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(30px); }
         .ui-layer.active { display: flex; opacity: 1; }
+        h2, h3, p { font-style: normal !important; } /* FORCE REMOVE ITALICS */
         
         .game-card { width: 280px; padding: 15px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 24px; cursor: pointer; }
         .game-card:hover { border-color: var(--accent); transform: scale(1.05); }
         .game-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 16px; margin-bottom: 15px; }
 
-        /* HIDDEN COMMAND CONSOLE */
+        /* ADMIN TERMINAL (ALT-T) */
         #admin-console {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);
             width: 400px; background: #0a0a0a; border: 1px solid var(--accent);
@@ -85,21 +74,21 @@
     <div id="stars"></div>
     <div id="dot"></div>
     
-    <div id="ctx-menu">
-        <div class="ctx-item" onclick="location.reload()">System Refresh</div>
-        <div class="ctx-item" onclick="Core.openUI('proxy')">Imp Proxy</div>
-        <div class="ctx-item" onclick="Core.openUI('games')">Archive</div>
+    <div id="top-bar">
+        <div id="url-display">about:blank</div>
+        <div class="ml-auto flex gap-3">
+            <button onclick="Core.toggleFullscreen()" class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-[9px] font-black uppercase hover:bg-white hover:text-black transition">Full Screen</button>
+            <button onclick="Core.exitSession()" class="px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-lg text-[9px] font-black text-red-500 uppercase hover:bg-red-500 hover:text-white transition">Exit Session</button>
+        </div>
     </div>
 
-    <div id="intro-stage">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg" class="strobe-img">
-    </div>
+    <div id="intro-stage"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg" class="strobe-img"></div>
 
     <div id="admin-console">
         <h3 class="text-xs font-black text-[#00d2ff] mb-4 tracking-widest uppercase">Admin Terminal</h3>
-        <button onclick="Core.exitSession()" class="w-full py-3 mb-2 bg-red-500/20 text-red-500 border border-red-500/50 rounded-lg text-[10px] font-bold uppercase hover:bg-red-500 hover:text-white">Kill Current Session</button>
-        <button onclick="location.reload()" class="w-full py-3 mb-2 bg-white/5 border border-white/10 rounded-lg text-[10px] font-bold uppercase">Hard Reset Core</button>
-        <button onclick="document.getElementById('admin-console').classList.remove('active')" class="w-full py-2 text-[9px] opacity-30 uppercase">Close Terminal</button>
+        <button onclick="Core.exitSession()" class="w-full py-3 mb-2 bg-red-500/20 text-red-500 border border-red-500/50 rounded-lg text-[10px] font-bold uppercase">Kill Session</button>
+        <button onclick="location.reload()" class="w-full py-3 mb-2 bg-white/5 border border-white/10 rounded-lg text-[10px] font-bold uppercase">Hard Reset</button>
+        <button onclick="document.getElementById('admin-console').classList.remove('active')" class="w-full py-2 text-[9px] opacity-30 uppercase">Close</button>
     </div>
 
     <div id="login-stage" class="fixed inset-0 bg-black z-[900000] flex flex-col items-center justify-center">
@@ -108,55 +97,45 @@
         <button onclick="Core.boot()" class="px-12 py-4 bg-white text-black font-black rounded-full text-[10px] uppercase tracking-widest">Initialize</button>
     </div>
 
-    <div id="top-bar">
-        <div id="url-display">about:blank</div>
-        <div class="ml-auto flex gap-3">
-            <button onclick="Core.toggleFullscreen()" class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-[9px] font-black uppercase hover:bg-white hover:text-black transition">Full Screen</button>
+    <div id="games-layer" class="ui-layer">
+        <h2 class="text-6xl font-black mb-12 text-white">ARCHIVE</h2>
+        <div class="flex gap-8 overflow-x-auto p-4">
+            <div class="game-card border-[#00d2ff]" onclick="window.open('https://forms.gle/fgxJFBDbTRT4ML4d8', '_blank')">
+                <div class="h-[160px] bg-[#00d2ff]/10 rounded-16 flex items-center justify-center mb-15">
+                    <span class="text-4xl">📝</span>
+                </div>
+                <p class="text-center font-black text-[#00d2ff] uppercase">Suggestions :3</p>
+            </div>
+            
+            <div class="game-card" onclick="Core.launch('https://useridk758.github.io/my-html-games/', true)">
+                <img src="https://cdn-bgp.bluestacks.com/BGP/us/gametiles_lol.onevone.jpg">
+                <p class="text-center font-black uppercase">1v1.lol</p>
+            </div>
+            <div class="game-card" onclick="Core.launch('https://useridk758.github.io/underestimatablepig/', true)">
+                <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/710.png">
+                <p class="text-center font-black uppercase">Five Nights at Epstein's</p>
+            </div>
         </div>
+        <button onclick="Core.closeUI()" class="mt-12 text-[10px] font-bold opacity-30 uppercase">Back</button>
     </div>
 
     <div id="proxy-layer" class="ui-layer">
         <div class="w-[500px] p-10 bg-[#0a0a0a] border border-white/10 rounded-3xl">
-            <h3 class="text-3xl font-black italic mb-6 text-[#00d2ff]">IMP PROXY</h3>
+            <h3 class="text-3xl font-black mb-6 text-[#00d2ff]">IMP PROXY</h3>
             <input type="text" id="proxy-input" placeholder="https://..." class="w-full bg-black border border-white/10 p-4 rounded-xl font-bold focus:border-[#00d2ff] outline-none mb-4 text-white">
             <button onclick="Core.launch(document.getElementById('proxy-input').value, false)" class="w-full py-4 bg-white text-black font-black rounded-xl text-[10px] uppercase">Launch</button>
             <button onclick="Core.closeUI()" class="w-full mt-6 text-[10px] font-bold opacity-30 uppercase">Cancel</button>
         </div>
     </div>
 
-    <div id="games-layer" class="ui-layer">
-        <h2 class="text-6xl font-black italic mb-12">ARCHIVE</h2>
-        <div class="flex gap-8">
-            <div class="game-card" onclick="Core.launch('https://useridk758.github.io/my-html-games/', true)">
-                <img src="https://cdn-bgp.bluestacks.com/BGP/us/gametiles_lol.onevone.jpg">
-                <p class="text-center font-black italic uppercase">1v1.lol</p>
-            </div>
-            <div class="game-card" onclick="Core.launch('https://useridk758.github.io/underestimatablepig/', true)">
-                <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/710.png">
-                <p class="text-center font-black italic uppercase">Five Nights at Epstein's</p>
-            </div>
-        </div>
-        <button onclick="Core.closeUI()" class="mt-12 text-[10px] font-bold opacity-30 uppercase">Back</button>
-    </div>
-
-    <div id="settings-layer" class="ui-layer">
-        <div class="w-[400px] p-8 bg-[#0a0a0a] border border-white/10 rounded-3xl text-center">
-            <h3 class="text-2xl font-black italic mb-4 uppercase">Settings</h3>
-            <button onclick="Core.aboutBlankCloak()" class="w-full py-3 mb-4 bg-white text-black rounded-xl text-[10px] font-black uppercase">About:Blank Cloak</button>
-            <button onclick="Core.closeUI()" class="mt-6 text-[10px] font-bold opacity-30 uppercase">Close</button>
-        </div>
-    </div>
-
-    <div id="workspace">
-        <div id="render-target"></div>
-    </div>
+    <div id="workspace"><div id="render-target"></div></div>
 
     <div id="dock-container">
         <div id="dock">
             <button class="dock-btn" onclick="Core.exitSession()">🏠</button>
             <button class="dock-btn" onclick="Core.openUI('games')">🎮</button>
             <button class="dock-btn" onclick="Core.openUI('proxy')">🌐</button>
-            <button class="dock-btn" onclick="Core.openUI('settings')">⚙️</button>
+            <button class="dock-btn" onclick="Core.aboutBlankCloak()">🕵️</button>
         </div>
     </div>
 
@@ -164,7 +143,10 @@
         const Core = {
             boot() { 
                 document.getElementById('login-stage').classList.add('opacity-0');
-                setTimeout(() => { document.getElementById('login-stage').style.display = 'none'; this.genStars(); }, 400);
+                setTimeout(() => { 
+                    document.getElementById('login-stage').style.display = 'none'; 
+                    this.genStars(); 
+                }, 400);
             },
             genStars() {
                 const container = document.getElementById('stars');
@@ -181,14 +163,13 @@
             showCtx(e) {
                 e.preventDefault();
                 const m = document.getElementById('ctx-menu');
-                m.style.display = 'block'; m.style.left = e.clientX + 'px'; m.style.top = e.clientY + 'px';
+                if(m) { m.style.display = 'block'; m.style.left = e.clientX + 'px'; m.style.top = e.clientY + 'px'; }
                 return false;
             },
             openUI(id) {
                 this.closeUI();
                 const l = document.getElementById(id + '-layer');
-                l.style.display = 'flex';
-                setTimeout(() => l.classList.add('active'), 10);
+                if(l) { l.style.display = 'flex'; setTimeout(() => l.classList.add('active'), 10); }
             },
             closeUI() {
                 document.querySelectorAll('.ui-layer').forEach(l => {
@@ -200,18 +181,20 @@
                 this.closeUI();
                 document.getElementById('admin-console').classList.remove('active');
                 const ws = document.getElementById('workspace');
+                const tb = document.getElementById('top-bar');
                 ws.classList.remove('active');
-                document.getElementById('top-bar').classList.remove('active');
+                tb.classList.remove('active');
                 setTimeout(() => { ws.style.display = 'none'; document.getElementById('render-target').innerHTML = ''; }, 300);
             },
             launch(url, isGame) {
                 this.closeUI();
                 const target = document.getElementById('render-target');
+                const ws = document.getElementById('workspace');
+                const tb = document.getElementById('top-bar');
                 document.getElementById('url-display').innerText = isGame ? "about:blank" : url;
                 target.innerHTML = `<iframe id="main-frame" src="${url}" allow="autoplay; fullscreen; keyboard" sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>`;
-                const ws = document.getElementById('workspace');
                 ws.style.display = 'block';
-                setTimeout(() => { ws.classList.add('active'); document.getElementById('top-bar').classList.add('active'); }, 50);
+                setTimeout(() => { ws.classList.add('active'); tb.classList.add('active'); }, 50);
             },
             toggleFullscreen() {
                 const frame = document.getElementById('main-frame');
@@ -236,7 +219,6 @@
             } 
         });
 
-        window.onclick = () => document.getElementById('ctx-menu').style.display = 'none';
         window.onmousemove = e => { 
             const d = document.getElementById('dot'); 
             if(d) { d.style.left = e.clientX + 'px'; d.style.top = e.clientY + 'px'; } 
@@ -244,8 +226,7 @@
 
         setTimeout(() => {
             const intro = document.getElementById('intro-stage');
-            intro.style.opacity = '0';
-            setTimeout(() => intro.remove(), 500);
+            if(intro) { intro.style.opacity = '0'; setTimeout(() => intro.remove(), 500); }
         }, 3000);
     </script>
 </body>
