@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | TITAN v56.0</title>
+    <title>NEBULA | TITAN v57.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     
@@ -38,7 +38,7 @@
             font-size: 11px; color: var(--accent); width: 350px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
 
-        /* DOCK (ALWAYS VISIBLE NOW) */
+        /* DOCK (PERMANENTLY VISIBLE) */
         #dock-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; display: flex; align-items: center; justify-content: center; z-index: 100001; }
         #dock { display: flex; gap: 10px; background: rgba(10,10,10,0.95); padding: 8px 15px; border-radius: 15px; border: 1px solid var(--border); transform: translateY(0); backdrop-filter: blur(10px); }
         .dock-btn { width: 38px; height: 38px; background: #000; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
@@ -50,16 +50,16 @@
         #render-target { width: 100%; height: 100%; overflow: hidden; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* UI LAYERS - ALL ITALICS REMOVED */
+        /* UI LAYERS (NO ITALICS) */
         .ui-layer { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 105000; display: none; opacity: 0; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(30px); }
         .ui-layer.active { display: flex; opacity: 1; }
-        h2, h3, p { font-style: normal !important; } /* FORCE REMOVE ITALICS */
+        h2, h3, p { font-style: normal !important; } 
         
         .game-card { width: 280px; padding: 15px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 24px; cursor: pointer; }
         .game-card:hover { border-color: var(--accent); transform: scale(1.05); }
-        .game-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 16px; margin-bottom: 15px; }
+        .game-card img, .game-card .thumb-box { width: 100%; height: 160px; object-fit: cover; border-radius: 16px; margin-bottom: 15px; }
 
-        /* ADMIN TERMINAL (ALT-T) */
+        /* ADMIN TERMINAL */
         #admin-console {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);
             width: 400px; background: #0a0a0a; border: 1px solid var(--accent);
@@ -99,9 +99,9 @@
 
     <div id="games-layer" class="ui-layer">
         <h2 class="text-6xl font-black mb-12 text-white">ARCHIVE</h2>
-        <div class="flex gap-8 overflow-x-auto p-4">
-            <div class="game-card border-[#00d2ff]" onclick="window.open('https://forms.gle/fgxJFBDbTRT4ML4d8', '_blank')">
-                <div class="h-[160px] bg-[#00d2ff]/10 rounded-16 flex items-center justify-center mb-15">
+        <div class="flex gap-8 overflow-x-auto p-4 max-w-full">
+            <div class="game-card border-[#00d2ff]" onclick="Core.launch('https://forms.gle/fgxJFBDbTRT4ML4d8', false)">
+                <div class="thumb-box bg-[#00d2ff]/10 flex items-center justify-center">
                     <span class="text-4xl">📝</span>
                 </div>
                 <p class="text-center font-black text-[#00d2ff] uppercase">Suggestions :3</p>
@@ -179,7 +179,7 @@
             },
             exitSession() {
                 this.closeUI();
-                document.getElementById('admin-console').classList.remove('active');
+                if(document.getElementById('admin-console')) document.getElementById('admin-console').classList.remove('active');
                 const ws = document.getElementById('workspace');
                 const tb = document.getElementById('top-bar');
                 ws.classList.remove('active');
@@ -192,7 +192,10 @@
                 const ws = document.getElementById('workspace');
                 const tb = document.getElementById('top-bar');
                 document.getElementById('url-display').innerText = isGame ? "about:blank" : url;
+                
+                // INTERNAL LOADING LOGIC
                 target.innerHTML = `<iframe id="main-frame" src="${url}" allow="autoplay; fullscreen; keyboard" sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>`;
+                
                 ws.style.display = 'block';
                 setTimeout(() => { ws.classList.add('active'); tb.classList.add('active'); }, 50);
             },
