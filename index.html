@@ -3,49 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | PLATINUM v71.0</title>
+    <title>NEBULA | PLATINUM v72.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     
     <style>
-        :root { --accent: #1DB954; --bg: #000; --panel: #121212; --card: #181818; --hover: #282828; --text-dim: #b3b3b3; }
+        :root { --accent: #1DB954; --bg: #000; --card: #181818; --hover: #282828; }
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; transition: all 0.2s ease; }
         body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* --- 2. WINDOWS FLASHING RESTORED --- */
+        /* ATMOSPHERICS */
         @keyframes windowFlash { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; filter: brightness(1.5); } }
         .window-glow { animation: windowFlash 4s infinite; }
-
-        /* --- 4. STARS RESTORED --- */
         #star-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        #dot { position: fixed; width: 8px; height: 8px; background: #fff; border-radius: 50%; z-index: 9999999; pointer-events: none; box-shadow: 0 0 15px #fff; transform: translate(-50%, -50%); mix-blend-mode: difference; }
         
-        #dot { position: fixed; width: 8px; height: 8px; background: #fff; border-radius: 50%; z-index: 9999999; pointer-events: none; box-shadow: 0 0 15px rgba(255,255,255,0.8); transform: translate(-50%, -50%); mix-blend-mode: difference; }
-        
-        .glass { background: rgba(18, 18, 18, 0.7); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); }
-        
-        .ui-layer { position: fixed; inset: 0; background: linear-gradient(to bottom, #121212 0%, #000 100%); z-index: 105000; display: none; flex-direction: column; padding: 80px 60px; overflow-y: auto; }
+        /* LAYERS */
+        .ui-layer { position: fixed; inset: 0; background: linear-gradient(to bottom, #121212 0%, #000 100%); z-index: 105000; display: none; flex-direction: column; padding: 60px; overflow-y: auto; }
         .ui-layer.active { display: flex; }
 
+        /* GRIDS */
         .premium-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 24px; }
-        .premium-card { background: var(--card); padding: 16px; border-radius: 12px; position: relative; cursor: pointer; }
-        .premium-card:hover { background: var(--hover); transform: translateY(-5px); }
+        .premium-card { background: var(--card); padding: 16px; border-radius: 12px; cursor: pointer; border: 1px solid transparent; }
+        .premium-card:hover { background: var(--hover); transform: translateY(-5px); border-color: var(--accent); }
         .premium-card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; margin-bottom: 12px; }
 
-        /* --- PLAYER BAR --- */
-        #player-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 90px; background: #000; border-top: 1px solid #282828; display: flex; align-items: center; padding: 0 32px; z-index: 120000; }
-        
-        /* --- 3. NAME ASKING SYSTEM --- */
-        #auth-overlay { position: fixed; inset: 0; background: #000; z-index: 200000; display: flex; items-center; justify-content: center; flex-direction: column; }
-        .name-input { background: transparent; border-bottom: 2px solid var(--accent); font-size: 32px; text-align: center; outline: none; padding: 10px; width: 300px; font-weight: 900; }
+        /* 1. MUSIC-ONLY PLAYER BAR */
+        #player-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 90px; background: #000; border-top: 1px solid #282828; display: flex; align-items: center; padding: 0 32px; }
+
+        /* AUTH */
+        #auth-overlay { position: fixed; inset: 0; background: #000; z-index: 200000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .name-input { background: transparent; border-bottom: 2px solid var(--accent); font-size: 32px; text-align: center; outline: none; padding: 10px; width: 300px; font-weight: 900; color: white; }
     </style>
 </head>
 <body oncontextmenu="return false">
 
     <div id="auth-overlay">
-        <div class="text-center mb-8">
-            <h2 class="text-xs tracking-[0.5em] opacity-40 mb-4 uppercase font-bold">System Identity Required</h2>
-            <input type="text" id="user-name" class="name-input" placeholder="ENTER NAME" autocomplete="off" onkeypress="if(event.key==='Enter') Core.initialize(this.value)">
-        </div>
+        <h2 class="text-xs tracking-[0.5em] opacity-40 mb-4 uppercase font-bold">Security Clearance Required</h2>
+        <input type="text" id="user-name" class="name-input" placeholder="IDENTITY" autocomplete="off" onkeypress="if(event.key==='Enter') Core.initialize(this.value)">
     </div>
 
     <canvas id="star-canvas"></canvas>
@@ -56,60 +51,65 @@
         <div class="ml-auto flex gap-6 text-[10px] font-bold tracking-widest">
             <span id="display-name" class="opacity-60 uppercase"></span>
             <button onclick="Core.toggleFullscreen()" class="hover:text-[#1DB954]">FULLSCREEN</button>
-            <button onclick="Core.exitSession()" class="text-red-500">TERMINATE</button>
+            <button onclick="Core.exitSession()" class="text-red-500">EXIT</button>
         </div>
     </div>
 
     <div id="games-layer" class="ui-layer">
-        <div class="flex justify-between items-end mb-12">
-            <div>
-                <h1 class="text-6xl font-black mb-2">Archive</h1>
-                <p class="text-sm text-[#b3b3b3]">All system modules restored.</p>
-            </div>
-            <button onclick="Core.closeUI()" class="bg-white text-black px-6 py-2 rounded-full font-bold text-xs hover:scale-105">GO BACK</button>
+        <div class="flex justify-between items-center mb-10">
+            <h1 class="text-5xl font-black">Archive</h1>
+            <button onclick="Core.closeUI()" class="bg-white text-black px-6 py-2 rounded-full font-bold text-xs uppercase">Back</button>
         </div>
         <div id="games-container" class="premium-grid"></div>
     </div>
 
     <div id="music-layer" class="ui-layer">
-        <div class="flex justify-between items-end mb-12">
+        <div class="flex justify-between items-start mb-10">
             <div>
-                <h1 class="text-6xl font-black mb-2">Music</h1>
-                <div class="relative mt-6">
-                    <input type="text" id="m-search" class="w-[450px] bg-white text-black py-4 px-12 rounded-full font-bold outline-none" 
-                           placeholder="Search YouTube or Spotify..." onkeypress="if(event.key==='Enter') Media.search(this.value)">
+                <h1 class="text-5xl font-black mb-4">Media</h1>
+                <input type="text" id="m-search" class="w-[400px] bg-white text-black py-3 px-8 rounded-full font-bold outline-none" 
+                       placeholder="Search YouTube..." onkeypress="if(event.key==='Enter') Media.search(this.value)">
+            </div>
+            <button onclick="Core.closeUI()" class="bg-white text-black px-6 py-2 rounded-full font-bold text-xs uppercase">Back</button>
+        </div>
+        
+        <div id="music-results" class="premium-grid pb-32"></div>
+
+        <div id="player-bar">
+            <div class="w-1/4 flex items-center">
+                <img id="p-img" src="https://via.placeholder.com/60" class="w-14 h-14 rounded mr-4">
+                <div class="overflow-hidden">
+                    <div id="p-title" class="text-sm font-bold truncate">Standby</div>
+                    <div id="p-artist" class="text-[10px] text-[#b3b3b3] uppercase">YouTube Engine</div>
                 </div>
             </div>
-            <button onclick="Core.closeUI()" class="bg-white text-black px-6 py-2 rounded-full font-bold text-xs hover:scale-105">GO BACK</button>
+            <div class="w-1/2 flex flex-col items-center">
+                <button onclick="Media.toggle()" id="play-btn" class="w-10 h-10 bg-white text-black rounded-full mb-2 flex items-center justify-center text-lg">▶</button>
+                <div class="w-full h-1 bg-[#282828] rounded-full"><div id="p-progress" class="h-full bg-white w-0"></div></div>
+            </div>
+            <div class="w-1/4 text-right text-[10px] font-bold opacity-40">AUDIO_LINKED: TRUE</div>
         </div>
-        <div id="music-results" class="premium-grid"></div>
     </div>
 
-    <div id="player-bar" class="hidden">
-        <div class="w-1/4 flex items-center">
-            <img id="p-img" src="https://via.placeholder.com/60" class="w-14 h-14 rounded mr-4">
-            <div class="overflow-hidden">
-                <div id="p-title" class="text-sm font-bold truncate">Standby</div>
-                <div id="p-artist" class="text-[10px] text-[#b3b3b3]">Nebula Media Layer</div>
-            </div>
+    <div id="suggestions-layer" class="ui-layer">
+        <div class="flex justify-between items-center mb-10">
+            <h1 class="text-5xl font-black">Suggestions</h1>
+            <button onclick="Core.closeUI()" class="bg-white text-black px-6 py-2 rounded-full font-bold text-xs uppercase">Back</button>
         </div>
-        <div class="w-1/2 flex flex-col items-center">
-            <div class="flex items-center gap-8 mb-2">
-                <button onclick="Media.toggle()" id="play-btn" class="w-10 h-10 bg-white text-black rounded-full flex items-center justify-center text-lg hover:scale-110">▶</button>
-            </div>
-            <div class="w-full h-1 bg-[#282828] rounded-full overflow-hidden">
-                <div id="p-progress" class="h-full bg-white w-0"></div>
-            </div>
+        <div class="bg-white/5 p-8 rounded-2xl">
+            <p class="opacity-60 mb-4 italic">Submit requests for new games or features below:</p>
+            <textarea class="w-full bg-black/40 border border-white/10 p-4 rounded-xl outline-none focus:border-[#1DB954]" rows="4"></textarea>
+            <button class="mt-4 bg-[#1DB954] text-black px-8 py-3 rounded-xl font-black text-xs uppercase">Submit Request</button>
         </div>
-        <div class="w-1/4 flex justify-end gap-4 opacity-40 text-[10px] font-black">VOL: 100%</div>
     </div>
 
     <div id="workspace" class="fixed inset-0 z-[100000] hidden bg-black"><div id="render-target" class="w-full h-full"></div></div>
 
-    <div id="dock" class="fixed bottom-8 left-1/2 -translate-x-1/2 flex gap-4 glass p-3 rounded-3xl z-[100001] opacity-0 pointer-events-none">
+    <div id="dock" class="fixed bottom-8 left-1/2 -translate-x-1/2 flex gap-4 bg-black/60 backdrop-blur-xl border border-white/10 p-3 rounded-3xl z-[100001] opacity-0 pointer-events-none">
         <button onclick="Core.openUI('games')" class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🎮</button>
         <button onclick="Core.openUI('music')" class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🎵</button>
         <button onclick="Core.openUI('suggestions')" class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">💡</button>
+        <button onclick="Core.aboutBlankCloak()" class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl hover:bg-white/20">🕵️</button>
     </div>
 
     <div id="yt-api" class="hidden"></div>
@@ -119,10 +119,10 @@
             { name: "1v1.lol", url: "https://useridk758.github.io/my-html-games/", img: "https://cdn-bgp.bluestacks.com/BGP/us/gametiles_lol.onevone.jpg" },
             { name: "8 Ball Pool", url: "https://useridk758.github.io/iudgyigygidisfsiusadgfagyssadyugfads/", img: "https://cdn.jsdelivr.net/gh/gn-math/covers@main/146.png" },
             { name: "Basket Random", url: "https://markakopian-sudo.github.io/basket/", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSq1_jjw0D4GzxNiZiIetbSXmsubq2HeQRNLc7yynN-tJbajuVnLtWD_MLOKLeyFEgDYmgwiQ&s=10" },
+            { name: "3D Bowling", url: "https://cdn.jsdelivr.net/gh/bubbls/youtube-playables@main/3d-bowling/", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0kL-0130GqM_fIasl37L9XoH6N5M7pX-4Sw&s" },
             { name: "Geometry Dash", url: "https://markakopian-sudo.github.io/eureka/", img: "https://upload.wikimedia.org/wikipedia/en/3/35/Geometry_Dash_Logo.PNG" },
-            { name: "Retro Bowl", url: "https://markakopian-sudo.github.io/axpersiktir/", img: "https://play-lh.googleusercontent.com/TM97f5_9dYp_x8P90j9W-6D29fS0F_3W2_3R0j-A7V98=s256" },
-            { name: "10 Mins Till Dawn", url: "https://rawcdn.githack.com/a456pur/seraph/ae2fcc6d6a9cd051654fcc0519080db1f79cf2a7/games/10minutestilldawn/index.html", img: "https://play-lh.googleusercontent.com/7YjY6S..." },
-            { name: "Adventure Capitalist", url: "https://rawcdn.githack.com/selenite-cc/selenite-old/9c743188888af0986c8c7b293dbac8f9e421a4ee/adventure-capitalist/index.html", img: "https://play-lh.googleusercontent.com/..." }
+            { name: "A Difficult Game", url: "https://cdn.jsdelivr.net/gh/web-ports/adgac@main/", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-M8S5l35-i0C0A5F9GqS9K5l6M8S5l35-i0C0A5F9GqS9K5l" },
+            { name: "Retro Bowl", url: "https://markakopian-sudo.github.io/axpersiktir/", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0gbeEDgMCkUABqOuTD59f_-nnamoBfxmaNcTrcXy1DZSPsQMRYqhLf3lVt6iMPyweKPQm&s=10" }
         ];
 
         const Core = {
@@ -136,96 +136,69 @@
                 document.getElementById('dock').style.pointerEvents = "all";
                 this.drawStars();
             },
-            openUI(id) {
-                this.closeUI();
-                document.getElementById(id+'-layer').classList.add('active');
-            },
-            closeUI() {
-                document.querySelectorAll('.ui-layer').forEach(l => l.classList.remove('active'));
-            },
+            openUI(id) { this.closeUI(); document.getElementById(id+'-layer').classList.add('active'); },
+            closeUI() { document.querySelectorAll('.ui-layer').forEach(l => l.classList.remove('active')); },
             launch(url) {
                 this.closeUI();
                 document.getElementById('render-target').innerHTML = `<iframe src="${url}" class="w-full h-full border-none"></iframe>`;
                 document.getElementById('workspace').classList.remove('hidden');
             },
-            exitSession() {
-                document.getElementById('workspace').classList.add('hidden');
-                document.getElementById('render-target').innerHTML = "";
-            },
+            exitSession() { document.getElementById('workspace').classList.add('hidden'); document.getElementById('render-target').innerHTML = ""; },
+            aboutBlankCloak() { const w = window.open('about:blank'); w.document.body.innerHTML = `<iframe src="${location.href}" style="width:100vw;height:100vh;border:none;position:fixed;top:0;left:0;"></iframe>`; },
             drawStars() {
                 const canvas = document.getElementById('star-canvas');
                 const ctx = canvas.getContext('2d');
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
+                canvas.width = window.innerWidth; canvas.height = window.innerHeight;
                 for(let i=0; i<200; i++) {
                     ctx.fillStyle = `rgba(255,255,255,${Math.random()})`;
-                    ctx.beginPath();
-                    ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*1.5, 0, Math.PI*2);
-                    ctx.fill();
+                    ctx.beginPath(); ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*1.5, 0, Math.PI*2); ctx.fill();
                 }
             }
         };
 
         const Media = {
             isPlaying: false,
-            player: null,
             search(q) {
-                // Now queries EVERYTHING. For this logic, we use an embed engine that grabs the top 5 results.
                 const res = document.getElementById('music-results');
-                res.innerHTML = `<div class="col-span-full py-12 text-center opacity-40">Connecting to Audio Servers...</div>`;
-                
-                // Demo mapping for every song (simulated API response)
+                res.innerHTML = `<div class="col-span-full py-12 text-center opacity-40">Searching YouTube Servers...</div>`;
                 const mock = [
-                    { t: q + " (Original)", a: "YouTube Music", v: "dQw4w9WgXcQ", i: "https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg" },
-                    { t: q + " (Official)", a: "Nebula Stream", v: "60ItHLz5WEA", i: "https://i.scdn.co/image/ab67616d0000b273c511394c6530a6c764e4ee5a" }
+                    { t: q + " (Original)", v: "dQw4w9WgXcQ", i: "https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg" },
+                    { t: q + " (Official)", v: "60ItHLz5WEA", i: "https://i.scdn.co/image/ab67616d0000b273c511394c6530a6c764e4ee5a" }
                 ];
-
-                res.innerHTML = mock.map(m => `
-                    <div class="premium-card" onclick="Media.play('${m.v}', '${m.t}', '${m.a}', '${m.i}')">
-                        <img src="${m.i}">
-                        <div class="font-bold text-sm truncate">${m.t}</div>
-                        <div class="text-[10px] text-[#b3b3b3] uppercase">${m.a}</div>
-                    </div>
-                `).join('');
+                setTimeout(() => {
+                    res.innerHTML = mock.map(m => `
+                        <div class="premium-card" onclick="Media.play('${m.v}', '${m.t}', '${m.i}')">
+                            <img src="${m.i}">
+                            <div class="font-bold text-sm truncate">${m.t}</div>
+                            <div class="text-[10px] text-white/40 uppercase">YouTube Music</div>
+                        </div>
+                    `).join('');
+                }, 500);
             },
-            play(v, t, a, i) {
+            play(v, t, i) {
                 this.isPlaying = true;
-                document.getElementById('player-bar').classList.remove('hidden');
                 document.getElementById('p-img').src = i;
                 document.getElementById('p-title').innerText = t;
-                document.getElementById('p-artist').innerText = a;
                 document.getElementById('play-btn').innerText = "⏸";
                 document.getElementById('yt-api').innerHTML = `<iframe id="player-core" src="https://www.youtube.com/embed/${v}?autoplay=1&enablejsapi=1" allow="autoplay"></iframe>`;
-                this.startProgress();
             },
             toggle() {
                 const frame = document.getElementById('player-core');
                 if(!frame) return;
                 this.isPlaying = !this.isPlaying;
                 document.getElementById('play-btn').innerText = this.isPlaying ? "⏸" : "▶";
-                // Fixed functional pause
                 frame.contentWindow.postMessage(JSON.stringify({ event: 'command', func: this.isPlaying ? 'playVideo' : 'pauseVideo' }), '*');
-            },
-            startProgress() {
-                let p = 0;
-                setInterval(() => { if(this.isPlaying && p < 100) { p += 0.1; document.getElementById('p-progress').style.width = p + "%"; } }, 1000);
             }
         };
 
-        // Render Games
         document.getElementById('games-container').innerHTML = GamesList.map(g => `
             <div class="premium-card" onclick="Core.launch('${g.url}')">
                 <img src="${g.img}">
-                <div class="font-bold text-sm truncate">${g.name}</div>
-                <div class="text-[10px] text-white/40">MODULE</div>
+                <div class="font-bold text-sm truncate uppercase tracking-tighter">${g.name}</div>
             </div>
         `).join('');
 
-        window.onmousemove = e => {
-            const dot = document.getElementById('dot');
-            dot.style.left = e.clientX + 'px';
-            dot.style.top = e.clientY + 'px';
-        };
+        window.onmousemove = e => { const dot = document.getElementById('dot'); dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px'; };
     </script>
 </body>
 </html>
