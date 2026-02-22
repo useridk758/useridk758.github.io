@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | PLATINUM v72.2</title>
+    <title>NEBULA | PLATINUM v73.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     
@@ -25,6 +25,8 @@
         .premium-card:hover { background: var(--hover); transform: translateY(-5px); border-color: var(--accent); }
         .premium-card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; margin-bottom: 12px; }
 
+        #player-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 90px; background: #000; border-top: 1px solid #282828; display: flex; align-items: center; padding: 0 32px; }
+
         #auth-overlay { position: fixed; inset: 0; background: #000; z-index: 200000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         .name-input { background: transparent; border-bottom: 2px solid var(--accent); font-size: 32px; text-align: center; outline: none; padding: 10px; width: 300px; font-weight: 900; color: white; }
     </style>
@@ -43,7 +45,7 @@
         <div class="font-black text-xl italic tracking-tighter window-glow">NEBULA<span class="text-[#1DB954]">OS</span></div>
         <div class="ml-auto flex gap-6 text-[10px] font-bold tracking-widest">
             <span id="display-name" class="opacity-60 uppercase"></span>
-            <button onclick="Core.exitSession()" class="text-red-500">EXIT</button>
+            <button onclick="Core.toggleFullscreen()" class="hover:text-[#1DB954]">FULLSCREEN</button>
         </div>
     </div>
 
@@ -55,23 +57,54 @@
         <div id="games-container" class="premium-grid pb-20"></div>
     </div>
 
-    <div id="workspace" class="fixed inset-0 z-[100000] hidden bg-black"><div id="render-target" class="w-full h-full"></div></div>
+    <div id="music-layer" class="ui-layer">
+        <div class="flex justify-between items-start mb-10">
+            <div>
+                <h1 class="text-5xl font-black mb-4">Media</h1>
+                <input type="text" id="m-search" class="w-[400px] bg-white text-black py-3 px-8 rounded-full font-bold outline-none" 
+                       placeholder="Search YouTube..." onkeypress="if(event.key==='Enter') Media.search(this.value)">
+            </div>
+            <button onclick="Core.closeUI()" class="bg-white text-black px-6 py-2 rounded-full font-bold text-xs uppercase">Back</button>
+        </div>
+        <div id="music-results" class="premium-grid pb-32"></div>
+        <div id="player-bar">
+            <div class="w-1/4 flex items-center">
+                <img id="p-img" src="https://via.placeholder.com/60" class="w-14 h-14 rounded mr-4">
+                <div class="overflow-hidden"><div id="p-title" class="text-sm font-bold truncate">Standby</div><div id="p-artist" class="text-[10px] text-[#b3b3b3] uppercase">YouTube Engine</div></div>
+            </div>
+            <div class="w-1/2 flex flex-col items-center">
+                <button onclick="Media.toggle()" id="play-btn" class="w-10 h-10 bg-white text-black rounded-full mb-2 flex items-center justify-center text-lg">▶</button>
+                <div class="w-full h-1 bg-[#282828] rounded-full"><div id="p-progress" class="h-full bg-white w-0"></div></div>
+            </div>
+            <div class="w-1/4 text-right text-[10px] font-bold opacity-40">AUDIO_LINKED: TRUE</div>
+        </div>
+    </div>
+
+    <div id="workspace" class="fixed inset-0 z-[100000] hidden bg-black">
+        <div class="absolute top-4 right-4 z-[100002]">
+            <button onclick="Core.exitSession()" class="bg-red-600 text-white px-6 py-2 rounded-full font-black text-xs uppercase shadow-xl hover:bg-red-500">Close Application</button>
+        </div>
+        <div id="render-target" class="w-full h-full"></div>
+    </div>
 
     <div id="dock" class="fixed bottom-8 left-1/2 -translate-x-1/2 flex gap-4 bg-black/60 backdrop-blur-xl border border-white/10 p-3 rounded-3xl z-[100001] opacity-0 pointer-events-none">
+        <button onclick="Core.closeUI()" class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl hover:bg-[#1DB954]">🏠</button>
         <button onclick="Core.openUI('games')" class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl hover:bg-[#1DB954]">🎮</button>
+        <button onclick="Core.openUI('music')" class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl hover:bg-[#1DB954]">🎵</button>
         <button onclick="Core.aboutBlankCloak()" class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl hover:bg-white/20">🕵️</button>
     </div>
 
     <script>
         const GamesList = [
-            { name: "FNAF 1", url: "https://cdn.jsdelivr.net/gh/sk160/FNAF-1@main/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/319510/capsule_616x353.jpg" },
-            { name: "FNAF 2", url: "https://cdn.jsdelivr.net/gh/sk160/FNAF-2@main/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/332800/capsule_616x353.jpg" },
-            { name: "FNAF 3", url: "https://cdn.jsdelivr.net/gh/sk160/FNAF-3@main/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/354140/capsule_616x353.jpg" },
-            { name: "FNAF 4", url: "https://cdn.jsdelivr.net/gh/sk160/FNAF-4@main/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/388090/capsule_616x353.jpg" },
-            { name: "FNAE", url: "https://cdn.jsdelivr.net/gh/sk160/fnae@main/", img: "https://tr.rbxcdn.com/180da1d02c77609240899066601b0dfa/420/420/Image/Png" },
-            { name: "1v1.lol", url: "https://cdn.jsdelivr.net/gh/n-101-1/1@main/", img: "https://cdn-bgp.bluestacks.com/BGP/us/gametiles_lol.onevone.jpg" },
-            { name: "Difficult Climbing", url: "https://cdn.jsdelivr.net/gh/web-ports/adgac@main/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2178460/capsule_616x353.jpg" },
-            { name: "10 Mins Till Dawn", url: "https://cdn.jsdelivr.net/gh/a456pur/seraph@ae2fcc6d6a9cd051654fcc0519080db1f79cf2a7/games/10minutestilldawn/", img: "https://img.itch.zone/aW1nLzg5MTM1NzUucG5n/original/YpY6X0.png" }
+            { name: "FNAF 1", url: "https://useridk758.github.io/somethingislikereallyreallyreallywrongwithmerightnow/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/319510/capsule_616x353.jpg" },
+            { name: "FNAF 2", url: "https://markakopian-sudo.github.io/understandme/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/332800/capsule_616x353.jpg" },
+            { name: "FNAF 3", url: "https://markakopian-sudo.github.io/wtfgng/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/354140/capsule_616x353.jpg" },
+            { name: "FNAF 4", url: "https://markakopian-sudo.github.io/anasun/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/388090/capsule_616x353.jpg" },
+            { name: "Five Nights at Epstein's", url: "https://useridk758.github.io/underestimatablepig/", img: "https://cdn.jsdelivr.net/gh/gn-math/covers@main/710.png" },
+            { name: "Geometry Dash Lite", url: "https://markakopian-sudo.github.io/eureka/", img: "https://pbs.twimg.com/profile_images/1963796314237648897/cS6pffoT_400x400.jpg" },
+            { name: "1v1.lol", url: "https://useridk758.github.io/my-html-games/", img: "https://cdn-bgp.bluestacks.com/BGP/us/gametiles_lol.onevone.jpg" },
+            { name: "A Difficult Game About Climbing", url: "https://useridk758.github.io/hardtoclimb/", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMCgrTI8LP3J1QFEAC1nwVHlmu6ZTaK0wu-4YZ9Nsk-ntKwf219RuYuKOGB4U9Mrh-O52hHQ&s=10" },
+            { name: "10 Minutes Till Dawn", url: "https://useridk758.github.io/abracadabraanaunanainthebigfrafratotheboogadaa/", img: "https://img.itch.zone/aW1nLzg3MTU5NzMucG5n/original/0LqGxb.png" }
         ];
 
         const Core = {
@@ -92,6 +125,7 @@
                 document.getElementById('workspace').classList.remove('hidden');
             },
             exitSession() { document.getElementById('workspace').classList.add('hidden'); document.getElementById('render-target').innerHTML = ""; },
+            toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); },
             aboutBlankCloak() { const w = window.open('about:blank'); w.document.body.innerHTML = `<iframe src="${location.href}" style="width:100vw;height:100vh;border:none;position:fixed;top:0;left:0;"></iframe>`; },
             drawStars() {
                 const canvas = document.getElementById('star-canvas');
@@ -104,6 +138,21 @@
             }
         };
 
+        const Media = {
+            search(q) {
+                const res = document.getElementById('music-results');
+                res.innerHTML = `<div class="premium-card" onclick="Media.play('dQw4w9WgXcQ', '${q}', 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg')">
+                    <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg"><div class="font-bold text-sm">${q}</div></div>`;
+            },
+            play(v, t, i) {
+                document.getElementById('p-img').src = i;
+                document.getElementById('p-title').innerText = t;
+                document.getElementById('play-btn').innerText = "⏸";
+                document.getElementById('yt-api').innerHTML = `<iframe id="player-core" src="https://www.youtube.com/embed/${v}?autoplay=1&enablejsapi=1" allow="autoplay"></iframe>`;
+            },
+            toggle() { /* Pause Logic */ }
+        };
+
         document.getElementById('games-container').innerHTML = GamesList.map(g => `
             <div class="premium-card" onclick="Core.launch('${g.url}')">
                 <img src="${g.img}">
@@ -113,5 +162,6 @@
 
         window.onmousemove = e => { const dot = document.getElementById('dot'); dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px'; };
     </script>
+    <div id="yt-api" class="hidden"></div>
 </body>
 </html>
