@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | PLATINUM v74.0</title>
+    <title>NEBULA | PLATINUM v75.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     
@@ -12,7 +12,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* 5. TRANSITIONS & ANIMATIONS */
         .fade-in { animation: fadeIn 0.8s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
@@ -22,7 +21,6 @@
         #star-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
         #dot { position: fixed; width: 8px; height: 8px; background: #fff; border-radius: 50%; z-index: 9999999; pointer-events: none; box-shadow: 0 0 15px #fff; transform: translate(-50%, -50%); mix-blend-mode: difference; transition: width 0.2s, height 0.2s; }
         
-        /* LAYERS */
         .ui-layer { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-blur: 20px; z-index: 105000; display: none; flex-direction: column; padding: 60px; overflow-y: auto; opacity: 0; }
         .ui-layer.active { display: flex; opacity: 1; }
 
@@ -105,7 +103,7 @@
     </div>
 
     <script>
-        // 1 & 2. PRESERVED DATA
+        // DATA LOCKDOWN (NO CHANGES PERMITTED)
         const GamesList = [
             { name: "FNAF 1", url: "https://useridk758.github.io/somethingislikereallyreallyreallywrongwithmerightnow/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/319510/capsule_616x353.jpg" },
             { name: "FNAF 2", url: "https://markakopian-sudo.github.io/understandme/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/332800/capsule_616x353.jpg" },
@@ -113,6 +111,7 @@
             { name: "FNAF 4", url: "https://markakopian-sudo.github.io/anasun/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/388090/capsule_616x353.jpg" },
             { name: "Five Nights at Epstein's", url: "https://useridk758.github.io/underestimatablepig/", img: "https://cdn.jsdelivr.net/gh/gn-math/covers@main/710.png" },
             { name: "Geometry Dash Lite", url: "https://markakopian-sudo.github.io/eureka/", img: "https://pbs.twimg.com/profile_images/1963796314237648897/cS6pffoT_400x400.jpg" },
+            { name: "Block Blast", url: "https://markakopian-sudo.github.io/sevakanaxperutsun/", img: "https://imgs.crazygames.com/block-puzzle-master_1x1/20250924025352/block-puzzle-master_1x1-cover?format=auto&quality=70&metadata=none" },
             { name: "1v1.lol", url: "https://useridk758.github.io/my-html-games/", img: "https://cdn-bgp.bluestacks.com/BGP/us/gametiles_lol.onevone.jpg" },
             { name: "A Difficult Game About Climbing", url: "https://useridk758.github.io/hardtoclimb/", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMCgrTI8LP3J1QFEAC1nwVHlmu6ZTaK0wu-4YZ9Nsk-ntKwf219RuYuKOGB4U9Mrh-O52hHQ&s=10" },
             { name: "10 Minutes Till Dawn", url: "https://useridk758.github.io/abracadabraanaunanainthebigfrafratotheboogadaa/", img: "https://img.itch.zone/aW1nLzg3MTU5NzMucG5n/original/0LqGxb.png" }
@@ -156,7 +155,6 @@
                 ws.classList.remove('hidden');
                 setTimeout(() => { ws.style.scale = "1"; ws.style.opacity = "1"; }, 50);
             },
-            // 4. FUNCTIONAL EXIT
             exitSession() { 
                 const ws = document.getElementById('workspace');
                 ws.style.scale = "0.95";
@@ -189,22 +187,21 @@
             search(q) {
                 const res = document.getElementById('music-results');
                 res.innerHTML = `<div class="premium-card fade-in" onclick="Media.play('dQw4w9WgXcQ', '${q}', 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg')">
-                    <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg"><div class="font-bold text-sm truncate">${q}</div><div class="text-[10px] opacity-40 uppercase mt-1">Found Signal</div></div>`;
+                    <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg"><div class="font-bold text-sm truncate">${q}</div></div>`;
             },
             play(v, t, i) {
                 document.getElementById('p-img').src = i;
                 document.getElementById('p-title').innerText = t;
                 document.getElementById('play-btn').innerText = "⏸";
-                document.getElementById('yt-api').innerHTML = `<iframe id="player-core" src="https://www.youtube.com/embed/${v}?autoplay=1&enablejsapi=1" allow="autoplay"></iframe>`;
+                document.getElementById('yt-api').innerHTML = `<iframe src="https://www.youtube.com/embed/${v}?autoplay=1" allow="autoplay"></iframe>`;
             },
-            toggle() { /* Toggle Audio Logic */ }
+            toggle() {}
         };
 
         document.getElementById('games-container').innerHTML = GamesList.map(g => `
             <div class="premium-card fade-in" onclick="Core.launch('${g.url}')">
                 <img src="${g.img}">
                 <div class="font-bold text-sm truncate uppercase tracking-tighter">${g.name}</div>
-                <div class="text-[9px] text-white/20 mt-2 tracking-[0.2em]">STABLE_BUILD</div>
             </div>
         `).join('');
 
@@ -213,8 +210,6 @@
             dot.style.left = e.clientX + 'px'; 
             dot.style.top = e.clientY + 'px'; 
         };
-        document.addEventListener('mousedown', () => { document.getElementById('dot').style.width = '15px'; document.getElementById('dot').style.height = '15px'; });
-        document.addEventListener('mouseup', () => { document.getElementById('dot').style.width = '8px'; document.getElementById('dot').style.height = '8px'; });
     </script>
     <div id="yt-api" class="hidden"></div>
 </body>
