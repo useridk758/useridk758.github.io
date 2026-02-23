@@ -3,107 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | PLATINUM v75.0</title>
+    <title>NEBULA | PLATINUM v76.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     
     <style>
         :root { --accent: #1DB954; --bg: #000; --card: #181818; --hover: #282828; }
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
         body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
+        /* 5. SMOOTH TRANSITIONS */
         .fade-in { animation: fadeIn 0.8s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        @keyframes windowFlash { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; filter: brightness(1.5); } }
-        .window-glow { animation: windowFlash 4s infinite; }
+        .layer-transition { transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s; }
         
         #star-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-        #dot { position: fixed; width: 8px; height: 8px; background: #fff; border-radius: 50%; z-index: 9999999; pointer-events: none; box-shadow: 0 0 15px #fff; transform: translate(-50%, -50%); mix-blend-mode: difference; transition: width 0.2s, height 0.2s; }
+        #dot { position: fixed; width: 8px; height: 8px; background: #fff; border-radius: 50%; z-index: 9999999; pointer-events: none; box-shadow: 0 0 15px #fff; transform: translate(-50%, -50%); mix-blend-mode: difference; }
         
-        .ui-layer { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-blur: 20px; z-index: 105000; display: none; flex-direction: column; padding: 60px; overflow-y: auto; opacity: 0; }
-        .ui-layer.active { display: flex; opacity: 1; }
+        .ui-layer { position: fixed; inset: 0; background: rgba(0,0,0,0.98); backdrop-blur: 30px; z-index: 105000; display: none; flex-direction: column; padding: 60px; overflow-y: auto; opacity: 0; transform: scale(1.05); }
+        .ui-layer.active { display: flex; opacity: 1; transform: scale(1); }
 
-        .premium-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 30px; }
-        .premium-card { background: var(--card); padding: 20px; border-radius: 16px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); }
-        .premium-card:hover { background: var(--hover); transform: scale(1.05); border-color: var(--accent); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-        .premium-card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; margin-bottom: 15px; }
+        .premium-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 30px; }
+        .premium-card { background: var(--card); padding: 20px; border-radius: 20px; cursor: pointer; border: 1px solid rgba(255,255,255,0.03); position: relative; overflow: hidden; }
+        .premium-card:hover { background: var(--hover); transform: translateY(-10px) scale(1.02); border-color: var(--accent); box-shadow: 0 30px 60px rgba(0,0,0,0.6); }
+        .premium-card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; margin-bottom: 15px; }
 
-        #player-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 100px; background: #000; border-top: 1px solid #222; display: flex; align-items: center; padding: 0 40px; }
+        #player-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 100px; background: #000; border-top: 1px solid #111; display: flex; align-items: center; padding: 0 40px; }
 
         #auth-overlay { position: fixed; inset: 0; background: #000; z-index: 200000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .name-input { background: transparent; border-bottom: 2px solid var(--accent); font-size: 32px; text-align: center; outline: none; padding: 10px; width: 350px; font-weight: 900; color: white; letter-spacing: -1px; }
+        .name-input { background: transparent; border-bottom: 2px solid var(--accent); font-size: 36px; text-align: center; outline: none; padding: 10px; width: 400px; font-weight: 900; color: white; letter-spacing: -2px; }
     </style>
 </head>
 <body oncontextmenu="return false">
 
     <div id="auth-overlay">
-        <h2 class="text-xs tracking-[0.6em] opacity-40 mb-6 uppercase font-bold fade-in">Nebula Protocol Initializing</h2>
-        <input type="text" id="user-name" class="name-input" placeholder="IDENTIFY" autocomplete="off" onkeypress="if(event.key==='Enter') Core.initialize(this.value)">
+        <h2 class="text-[10px] tracking-[0.8em] opacity-30 mb-8 uppercase font-bold fade-in">Nebula Platinum | Secure Boot</h2>
+        <input type="text" id="user-name" class="name-input" placeholder="ACCESS KEY" autocomplete="off" onkeypress="if(event.key==='Enter') Core.initialize(this.value)">
     </div>
 
     <canvas id="star-canvas"></canvas>
     <div id="dot"></div>
     
-    <div id="top-bar" class="fixed top-0 left-0 w-full h-20 flex items-center px-10 z-[110000] opacity-0 pointer-events-none transition-opacity duration-1000">
-        <div class="font-black text-2xl italic tracking-tighter window-glow">NEBULA<span class="text-[#1DB954]">OS</span></div>
-        <div class="ml-auto flex gap-8 text-[11px] font-bold tracking-widest items-center">
-            <span id="display-name" class="opacity-40 uppercase border-r border-white/10 pr-8"></span>
-            <div id="system-time" class="opacity-40">00:00:00</div>
+    <div id="top-bar" class="fixed top-0 left-0 w-full h-24 flex items-center px-12 z-[110000] opacity-0 pointer-events-none">
+        <div class="font-black text-2xl italic tracking-tighter">NEBULA<span class="text-[#1DB954]">OS</span></div>
+        <div class="ml-auto flex gap-10 text-[10px] font-bold tracking-[0.3em] items-center opacity-40">
+            <span id="display-name" class="uppercase"></span>
+            <div id="system-time">00:00:00</div>
         </div>
     </div>
 
-    <div id="games-layer" class="ui-layer">
-        <div class="flex justify-between items-end mb-12">
-            <div>
-                <p class="text-[#1DB954] font-bold text-xs tracking-widest uppercase mb-2">Stored Modules</p>
-                <h1 class="text-6xl font-black tracking-tighter">Archive</h1>
-            </div>
-            <button onclick="Core.closeUI()" class="bg-white text-black px-8 py-3 rounded-full font-bold text-xs uppercase hover:scale-110">Return</button>
+    <div id="games-layer" class="ui-layer layer-transition">
+        <div class="flex justify-between items-end mb-16">
+            <h1 class="text-7xl font-black tracking-tighter">Archive</h1>
+            <button onclick="Core.closeUI()" class="bg-white text-black px-10 py-4 rounded-full font-black text-[10px] uppercase hover:invert">Close</button>
         </div>
         <div id="games-container" class="premium-grid pb-24"></div>
     </div>
 
-    <div id="music-layer" class="ui-layer">
-        <div class="flex justify-between items-start mb-12">
-            <div>
-                <h1 class="text-6xl font-black tracking-tighter mb-6">Media</h1>
-                <input type="text" id="m-search" class="w-[450px] bg-white text-black py-4 px-10 rounded-full font-bold outline-none focus:ring-4 ring-[#1DB954]/20" 
-                       placeholder="Search Signal..." onkeypress="if(event.key==='Enter') Media.search(this.value)">
-            </div>
-            <button onclick="Core.closeUI()" class="bg-white text-black px-8 py-3 rounded-full font-bold text-xs uppercase hover:scale-110">Return</button>
+    <div id="music-layer" class="ui-layer layer-transition">
+        <div class="flex justify-between items-start mb-16">
+            <h1 class="text-7xl font-black tracking-tighter">Media</h1>
+            <button onclick="Core.closeUI()" class="bg-white text-black px-10 py-4 rounded-full font-black text-[10px] uppercase">Close</button>
         </div>
         <div id="music-results" class="premium-grid pb-40"></div>
         <div id="player-bar">
             <div class="w-1/4 flex items-center">
-                <img id="p-img" src="https://via.placeholder.com/80" class="w-16 h-16 rounded-lg mr-5 shadow-2xl">
-                <div class="overflow-hidden"><div id="p-title" class="text-sm font-bold truncate">Awaiting Signal</div><div id="p-artist" class="text-[10px] text-white/40 uppercase tracking-widest">Global Layer</div></div>
+                <img id="p-img" src="https://via.placeholder.com/100" class="w-16 h-16 rounded-xl mr-6">
+                <div class="overflow-hidden"><div id="p-title" class="text-sm font-bold truncate">Standby</div><div id="p-artist" class="text-[10px] opacity-30">SYSTEM_AUDIO</div></div>
             </div>
             <div class="w-1/2 flex flex-col items-center">
-                <button onclick="Media.toggle()" id="play-btn" class="w-12 h-12 bg-white text-black rounded-full mb-3 flex items-center justify-center text-xl hover:scale-110">▶</button>
-                <div class="w-full h-1 bg-white/10 rounded-full overflow-hidden"><div id="p-progress" class="h-full bg-white w-0 transition-none"></div></div>
+                <button class="w-12 h-12 bg-white text-black rounded-full mb-3 flex items-center justify-center text-xl">▶</button>
+                <div class="w-full h-1 bg-white/5 rounded-full"><div class="h-full bg-white w-1/3"></div></div>
             </div>
-            <div class="w-1/4 text-right text-[10px] font-bold opacity-30 tracking-widest">SECURE_LINK // ACTIVE</div>
         </div>
     </div>
 
-    <div id="workspace" class="fixed inset-0 z-[120000] hidden bg-black transform scale-95 opacity-0 transition-all duration-500">
-        <div class="absolute top-6 right-8 z-[130000] flex gap-3">
-            <button onclick="Core.toggleFullscreen()" class="bg-white/10 backdrop-blur-md text-white px-5 py-2.5 rounded-xl font-bold text-[10px] uppercase border border-white/10 hover:bg-white/20">Fullscreen</button>
-            <button onclick="Core.exitSession()" class="bg-red-500 text-white px-5 py-2.5 rounded-xl font-bold text-[10px] uppercase shadow-lg hover:bg-red-600 hover:scale-105 active:scale-95">Close Application</button>
+    <div id="suggestions-layer" class="ui-layer layer-transition">
+        <div class="flex justify-between items-center mb-16">
+            <h1 class="text-7xl font-black tracking-tighter">Request</h1>
+            <button onclick="Core.closeUI()" class="bg-white text-black px-10 py-4 rounded-full font-black text-[10px] uppercase">Close</button>
+        </div>
+        <div class="max-w-3xl bg-white/5 p-12 rounded-[2.5rem] border border-white/5">
+            <p class="text-xl font-medium mb-8 opacity-60">Submit game titles or UI features to the developer queue.</p>
+            <textarea class="w-full bg-black/50 border border-white/10 p-6 rounded-2xl outline-none focus:border-[#1DB954] text-lg mb-6" rows="4" placeholder="Message content..."></textarea>
+            <button class="bg-[#1DB954] text-black px-12 py-5 rounded-2xl font-black text-xs uppercase hover:scale-105">Broadcast Signal</button>
+        </div>
+    </div>
+
+    <div id="workspace" class="fixed inset-0 z-[120000] hidden bg-black opacity-0 transition-all duration-700">
+        <div class="absolute top-8 right-10 z-[130000] flex gap-4">
+            <button onclick="Core.toggleFullscreen()" class="bg-white/10 backdrop-blur-xl text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase border border-white/10">Fullscreen</button>
+            <button onclick="Core.exitSession()" class="bg-red-500 text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase shadow-2xl hover:bg-red-600">Close Application</button>
         </div>
         <div id="render-target" class="w-full h-full"></div>
     </div>
 
-    <div id="dock" class="fixed bottom-10 left-1/2 -translate-x-1/2 flex gap-5 bg-black/40 backdrop-blur-2xl border border-white/5 p-4 rounded-[2.5rem] z-[100001] opacity-0 translate-y-20 pointer-events-none transition-all duration-1000">
-        <button onclick="Core.closeUI()" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black hover:-translate-y-2">🏠</button>
-        <button onclick="Core.openUI('games')" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black hover:-translate-y-2">🎮</button>
-        <button onclick="Core.openUI('music')" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black hover:-translate-y-2">🎵</button>
-        <button onclick="Core.aboutBlankCloak()" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-white/20 hover:-translate-y-2">🕵️</button>
+    <div id="dock" class="fixed bottom-12 left-1/2 -translate-x-1/2 flex gap-6 bg-black/40 backdrop-blur-3xl border border-white/5 p-5 rounded-[3rem] z-[100001] opacity-0 translate-y-20 pointer-events-none">
+        <button onclick="Core.closeUI()" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🏠</button>
+        <button onclick="Core.openUI('games')" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🎮</button>
+        <button onclick="Core.openUI('music')" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🎵</button>
+        <button onclick="Core.openUI('suggestions')" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">💡</button>
+        <button onclick="Core.aboutBlankCloak()" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-white/20">🕵️</button>
     </div>
 
     <script>
-        // DATA LOCKDOWN (NO CHANGES PERMITTED)
+        // 1 & 2. HARD-LOCKED GAME DATA (NO CHANGES)
         const GamesList = [
             { name: "FNAF 1", url: "https://useridk758.github.io/somethingislikereallyreallyreallywrongwithmerightnow/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/319510/capsule_616x353.jpg" },
             { name: "FNAF 2", url: "https://markakopian-sudo.github.io/understandme/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/332800/capsule_616x353.jpg" },
@@ -112,6 +117,7 @@
             { name: "Five Nights at Epstein's", url: "https://useridk758.github.io/underestimatablepig/", img: "https://cdn.jsdelivr.net/gh/gn-math/covers@main/710.png" },
             { name: "Geometry Dash Lite", url: "https://markakopian-sudo.github.io/eureka/", img: "https://pbs.twimg.com/profile_images/1963796314237648897/cS6pffoT_400x400.jpg" },
             { name: "Block Blast", url: "https://markakopian-sudo.github.io/sevakanaxperutsun/", img: "https://imgs.crazygames.com/block-puzzle-master_1x1/20250924025352/block-puzzle-master_1x1-cover?format=auto&quality=70&metadata=none" },
+            { name: "AdVenture Capitalist", url: "https://useridk758.github.io/adventcapital/", img: "https://cdn.mobygames.com/covers/7866638-adventure-capitalist-android-front-cover.jpg" },
             { name: "1v1.lol", url: "https://useridk758.github.io/my-html-games/", img: "https://cdn-bgp.bluestacks.com/BGP/us/gametiles_lol.onevone.jpg" },
             { name: "A Difficult Game About Climbing", url: "https://useridk758.github.io/hardtoclimb/", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMCgrTI8LP3J1QFEAC1nwVHlmu6ZTaK0wu-4YZ9Nsk-ntKwf219RuYuKOGB4U9Mrh-O52hHQ&s=10" },
             { name: "10 Minutes Till Dawn", url: "https://useridk758.github.io/abracadabraanaunanainthebigfrafratotheboogadaa/", img: "https://img.itch.zone/aW1nLzg3MTU5NzMucG5n/original/0LqGxb.png" }
@@ -125,15 +131,14 @@
                 setTimeout(() => {
                     document.getElementById('auth-overlay').style.display = "none";
                     document.getElementById('top-bar').style.opacity = "1";
-                    document.getElementById('top-bar').style.pointerEvents = "all";
                     document.getElementById('dock').style.opacity = "1";
                     document.getElementById('dock').style.transform = "translate(-50%, 0)";
                     document.getElementById('dock').style.pointerEvents = "all";
-                }, 800);
+                }, 600);
                 this.drawStars();
                 setInterval(() => {
                     const now = new Date();
-                    document.getElementById('system-time').innerText = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0') + ":" + now.getSeconds().toString().padStart(2, '0');
+                    document.getElementById('system-time').innerText = now.toLocaleTimeString();
                 }, 1000);
             },
             openUI(id) { 
@@ -145,7 +150,7 @@
             closeUI() { 
                 document.querySelectorAll('.ui-layer').forEach(l => {
                     l.classList.remove('active');
-                    setTimeout(() => { if(!l.classList.contains('active')) l.style.display = "none"; }, 400);
+                    setTimeout(() => { if(!l.classList.contains('active')) l.style.display = "none"; }, 500);
                 });
             },
             launch(url) {
@@ -153,16 +158,12 @@
                 const ws = document.getElementById('workspace');
                 document.getElementById('render-target').innerHTML = `<iframe src="${url}" class="w-full h-full border-none"></iframe>`;
                 ws.classList.remove('hidden');
-                setTimeout(() => { ws.style.scale = "1"; ws.style.opacity = "1"; }, 50);
+                setTimeout(() => { ws.style.opacity = "1"; }, 50);
             },
             exitSession() { 
                 const ws = document.getElementById('workspace');
-                ws.style.scale = "0.95";
                 ws.style.opacity = "0";
-                setTimeout(() => {
-                    ws.classList.add('hidden');
-                    document.getElementById('render-target').innerHTML = ""; 
-                }, 400);
+                setTimeout(() => { ws.classList.add('hidden'); document.getElementById('render-target').innerHTML = ""; }, 700);
             },
             toggleFullscreen() {
                 if (!document.fullscreenElement) document.documentElement.requestFullscreen();
@@ -176,26 +177,11 @@
                 const canvas = document.getElementById('star-canvas');
                 const ctx = canvas.getContext('2d');
                 canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-                for(let i=0; i<250; i++) {
+                for(let i=0; i<300; i++) {
                     ctx.fillStyle = `rgba(255,255,255,${Math.random()})`;
-                    ctx.beginPath(); ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*1.2, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*1, 0, Math.PI*2); ctx.fill();
                 }
             }
-        };
-
-        const Media = {
-            search(q) {
-                const res = document.getElementById('music-results');
-                res.innerHTML = `<div class="premium-card fade-in" onclick="Media.play('dQw4w9WgXcQ', '${q}', 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg')">
-                    <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg"><div class="font-bold text-sm truncate">${q}</div></div>`;
-            },
-            play(v, t, i) {
-                document.getElementById('p-img').src = i;
-                document.getElementById('p-title').innerText = t;
-                document.getElementById('play-btn').innerText = "⏸";
-                document.getElementById('yt-api').innerHTML = `<iframe src="https://www.youtube.com/embed/${v}?autoplay=1" allow="autoplay"></iframe>`;
-            },
-            toggle() {}
         };
 
         document.getElementById('games-container').innerHTML = GamesList.map(g => `
@@ -211,6 +197,5 @@
             dot.style.top = e.clientY + 'px'; 
         };
     </script>
-    <div id="yt-api" class="hidden"></div>
 </body>
 </html>
