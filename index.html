@@ -3,33 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | PLATINUM v76.0</title>
+    <title>NEBULA | PLATINUM v78.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     
     <style>
-        :root { --accent: #1DB954; --bg: #000; --card: #181818; --hover: #282828; }
+        :root { --accent: #1DB954; --bg: #000; --card: #121212; --hover: #1f1f1f; }
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
         body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* 5. SMOOTH TRANSITIONS */
         .fade-in { animation: fadeIn 0.8s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .layer-transition { transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s; }
         
         #star-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
         #dot { position: fixed; width: 8px; height: 8px; background: #fff; border-radius: 50%; z-index: 9999999; pointer-events: none; box-shadow: 0 0 15px #fff; transform: translate(-50%, -50%); mix-blend-mode: difference; }
         
-        .ui-layer { position: fixed; inset: 0; background: rgba(0,0,0,0.98); backdrop-blur: 30px; z-index: 105000; display: none; flex-direction: column; padding: 60px; overflow-y: auto; opacity: 0; transform: scale(1.05); }
+        .ui-layer { position: fixed; inset: 0; background: rgba(0,0,0,0.98); backdrop-blur: 40px; z-index: 105000; display: none; flex-direction: column; padding: 60px; overflow-y: auto; opacity: 0; transform: scale(1.1); }
         .ui-layer.active { display: flex; opacity: 1; transform: scale(1); }
 
         .premium-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 30px; }
-        .premium-card { background: var(--card); padding: 20px; border-radius: 20px; cursor: pointer; border: 1px solid rgba(255,255,255,0.03); position: relative; overflow: hidden; }
-        .premium-card:hover { background: var(--hover); transform: translateY(-10px) scale(1.02); border-color: var(--accent); box-shadow: 0 30px 60px rgba(0,0,0,0.6); }
-        .premium-card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; margin-bottom: 15px; }
+        .premium-card { background: var(--card); padding: 20px; border-radius: 24px; cursor: pointer; border: 1px solid rgba(255,255,255,0.03); }
+        .premium-card:hover { background: var(--hover); transform: translateY(-12px) scale(1.03); border-color: var(--accent); box-shadow: 0 40px 80px rgba(0,0,0,0.8); }
+        .premium-card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 16px; margin-bottom: 15px; }
 
-        #player-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 100px; background: #000; border-top: 1px solid #111; display: flex; align-items: center; padding: 0 40px; }
+        /* AI CHAT STYLES */
+        #chat-container { max-width: 800px; margin: 0 auto; width: 100%; height: 60vh; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; padding: 20px; }
+        .bubble { padding: 16px 24px; border-radius: 20px; max-width: 80%; font-size: 15px; line-height: 1.6; }
+        .ai-bubble { background: #1a1a1a; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
+        .user-bubble { background: var(--accent); color: black; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: 600; }
+        .ai-input-area { max-width: 800px; margin: 20px auto 0; width: 100%; position: relative; }
 
         #auth-overlay { position: fixed; inset: 0; background: #000; z-index: 200000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         .name-input { background: transparent; border-bottom: 2px solid var(--accent); font-size: 36px; text-align: center; outline: none; padding: 10px; width: 400px; font-weight: 900; color: white; letter-spacing: -2px; }
@@ -38,7 +40,7 @@
 <body oncontextmenu="return false">
 
     <div id="auth-overlay">
-        <h2 class="text-[10px] tracking-[0.8em] opacity-30 mb-8 uppercase font-bold fade-in">Nebula Platinum | Secure Boot</h2>
+        <h2 class="text-[10px] tracking-[0.8em] opacity-30 mb-8 uppercase font-bold fade-in">Nebula Platinum | Initialize</h2>
         <input type="text" id="user-name" class="name-input" placeholder="ACCESS KEY" autocomplete="off" onkeypress="if(event.key==='Enter') Core.initialize(this.value)">
     </div>
 
@@ -53,41 +55,51 @@
         </div>
     </div>
 
-    <div id="games-layer" class="ui-layer layer-transition">
+    <div id="games-layer" class="ui-layer">
         <div class="flex justify-between items-end mb-16">
             <h1 class="text-7xl font-black tracking-tighter">Archive</h1>
-            <button onclick="Core.closeUI()" class="bg-white text-black px-10 py-4 rounded-full font-black text-[10px] uppercase hover:invert">Close</button>
+            <button onclick="Core.closeUI()" class="bg-white text-black px-10 py-4 rounded-full font-black text-[10px] uppercase">Return</button>
         </div>
         <div id="games-container" class="premium-grid pb-24"></div>
     </div>
 
-    <div id="music-layer" class="ui-layer layer-transition">
-        <div class="flex justify-between items-start mb-16">
+    <div id="music-layer" class="ui-layer">
+        <div class="flex justify-between items-center mb-16">
             <h1 class="text-7xl font-black tracking-tighter">Media</h1>
-            <button onclick="Core.closeUI()" class="bg-white text-black px-10 py-4 rounded-full font-black text-[10px] uppercase">Close</button>
+            <button onclick="Core.closeUI()" class="bg-white text-black px-10 py-4 rounded-full font-black text-[10px] uppercase">Return</button>
         </div>
-        <div id="music-results" class="premium-grid pb-40"></div>
-        <div id="player-bar">
-            <div class="w-1/4 flex items-center">
-                <img id="p-img" src="https://via.placeholder.com/100" class="w-16 h-16 rounded-xl mr-6">
-                <div class="overflow-hidden"><div id="p-title" class="text-sm font-bold truncate">Standby</div><div id="p-artist" class="text-[10px] opacity-30">SYSTEM_AUDIO</div></div>
-            </div>
-            <div class="w-1/2 flex flex-col items-center">
-                <button class="w-12 h-12 bg-white text-black rounded-full mb-3 flex items-center justify-center text-xl">▶</button>
-                <div class="w-full h-1 bg-white/5 rounded-full"><div class="h-full bg-white w-1/3"></div></div>
-            </div>
+        <div class="bg-white/5 p-12 rounded-[3rem] border border-white/5 text-center"><p class="text-xl opacity-40">Standby</p></div>
+    </div>
+
+    <div id="suggestions-layer" class="ui-layer">
+        <div class="flex justify-between items-center mb-16">
+            <h1 class="text-7xl font-black tracking-tighter">Request</h1>
+            <button onclick="Core.closeUI()" class="bg-white text-black px-10 py-4 rounded-full font-black text-[10px] uppercase">Return</button>
+        </div>
+        <div class="max-w-3xl bg-white/5 p-12 rounded-[2.5rem] border border-white/5">
+            <textarea class="w-full bg-black/50 border border-white/10 p-6 rounded-2xl outline-none focus:border-[#1DB954] text-lg mb-6" rows="4" placeholder="Suggestion..."></textarea>
+            <button class="bg-[#1DB954] text-black px-12 py-5 rounded-2xl font-black text-xs uppercase">Submit</button>
         </div>
     </div>
 
-    <div id="suggestions-layer" class="ui-layer layer-transition">
-        <div class="flex justify-between items-center mb-16">
-            <h1 class="text-7xl font-black tracking-tighter">Request</h1>
-            <button onclick="Core.closeUI()" class="bg-white text-black px-10 py-4 rounded-full font-black text-[10px] uppercase">Close</button>
+    <div id="ai-layer" class="ui-layer">
+        <div class="flex justify-between items-center mb-10">
+            <h1 id="ai-header" class="text-5xl font-black tracking-tighter text-[#1DB954]">Nexus AI</h1>
+            <button onclick="Core.closeUI()" class="bg-white/10 text-white px-8 py-3 rounded-full font-black text-[10px] uppercase">Return</button>
         </div>
-        <div class="max-w-3xl bg-white/5 p-12 rounded-[2.5rem] border border-white/5">
-            <p class="text-xl font-medium mb-8 opacity-60">Submit game titles or UI features to the developer queue.</p>
-            <textarea class="w-full bg-black/50 border border-white/10 p-6 rounded-2xl outline-none focus:border-[#1DB954] text-lg mb-6" rows="4" placeholder="Message content..."></textarea>
-            <button class="bg-[#1DB954] text-black px-12 py-5 rounded-2xl font-black text-xs uppercase hover:scale-105">Broadcast Signal</button>
+        
+        <div id="ai-setup" class="flex-1 flex flex-col items-center justify-center">
+            <p class="text-xs tracking-[0.5em] opacity-40 mb-4 uppercase">Assistant Designation Required</p>
+            <input type="text" id="ai-name-input" class="bg-transparent border-b-2 border-white/20 text-4xl text-center outline-none py-4 w-[500px] font-black focus:border-[#1DB954]" placeholder="NAME YOUR AI">
+            <button onclick="AI.setup()" class="mt-10 bg-white text-black px-12 py-4 rounded-full font-black text-xs uppercase hover:scale-110">Initialize Assistant</button>
+        </div>
+
+        <div id="ai-interface" class="hidden flex-1 flex flex-col">
+            <div id="chat-container"></div>
+            <div class="ai-input-area">
+                <input type="text" id="chat-input" class="w-full bg-white/5 border border-white/10 rounded-3xl py-6 px-10 outline-none focus:border-[#1DB954] pr-20 text-lg" placeholder="Ask anything..." onkeypress="if(event.key==='Enter') AI.send()">
+                <button onclick="AI.send()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white text-black w-12 h-12 rounded-full font-black">↑</button>
+            </div>
         </div>
     </div>
 
@@ -103,12 +115,13 @@
         <button onclick="Core.closeUI()" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🏠</button>
         <button onclick="Core.openUI('games')" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🎮</button>
         <button onclick="Core.openUI('music')" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🎵</button>
+        <button onclick="Core.openUI('ai')" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🤖</button>
         <button onclick="Core.openUI('suggestions')" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">💡</button>
         <button onclick="Core.aboutBlankCloak()" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-white/20">🕵️</button>
     </div>
 
     <script>
-        // 1 & 2. HARD-LOCKED GAME DATA (NO CHANGES)
+        // HARD-LOCKED GAME DATA (Meticulously Preserved)
         const GamesList = [
             { name: "FNAF 1", url: "https://useridk758.github.io/somethingislikereallyreallyreallywrongwithmerightnow/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/319510/capsule_616x353.jpg" },
             { name: "FNAF 2", url: "https://markakopian-sudo.github.io/understandme/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/332800/capsule_616x353.jpg" },
@@ -123,6 +136,36 @@
             { name: "10 Minutes Till Dawn", url: "https://useridk758.github.io/abracadabraanaunanainthebigfrafratotheboogadaa/", img: "https://img.itch.zone/aW1nLzg3MTU5NzMucG5n/original/0LqGxb.png" }
         ];
 
+        let assistantName = "";
+
+        const AI = {
+            setup() {
+                const name = document.getElementById('ai-name-input').value;
+                if(!name) return;
+                assistantName = name;
+                document.getElementById('ai-header').innerText = assistantName.toUpperCase();
+                document.getElementById('ai-setup').style.display = "none";
+                document.getElementById('ai-interface').classList.remove('hidden');
+                this.addMessage("ai", `Hello, how can I help you today?`);
+            },
+            send() {
+                const input = document.getElementById('chat-input');
+                if(!input.value) return;
+                this.addMessage("user", input.value);
+                const val = input.value;
+                input.value = "";
+                setTimeout(() => this.addMessage("ai", `I am ${assistantName}, your specialized Nebula OS assistant. I currently have access to your local modules. How would you like to proceed with "${val}"?`), 800);
+            },
+            addMessage(role, text) {
+                const cont = document.getElementById('chat-container');
+                const div = document.createElement('div');
+                div.className = `bubble ${role}-bubble fade-in`;
+                div.innerText = text;
+                cont.appendChild(div);
+                cont.scrollTop = cont.scrollHeight;
+            }
+        };
+
         const Core = {
             initialize(name) {
                 if(!name) return;
@@ -136,10 +179,7 @@
                     document.getElementById('dock').style.pointerEvents = "all";
                 }, 600);
                 this.drawStars();
-                setInterval(() => {
-                    const now = new Date();
-                    document.getElementById('system-time').innerText = now.toLocaleTimeString();
-                }, 1000);
+                setInterval(() => { document.getElementById('system-time').innerText = new Date().toLocaleTimeString(); }, 1000);
             },
             openUI(id) { 
                 this.closeUI(); 
