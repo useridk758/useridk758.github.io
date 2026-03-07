@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | PLATINUM v79.0</title>
+    <title>NEBULA | PLATINUM v80.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
@@ -81,7 +81,7 @@
         <div id="ai-interface" class="hidden flex-1 flex flex-col">
             <div id="chat-container"></div>
             <div class="max-w-[800px] w-full mx-auto relative mt-5">
-                <input type="text" id="chat-input" class="w-full bg-white/5 border border-white/10 rounded-3xl py-6 px-10 outline-none focus:border-[#1DB954] pr-20 text-lg" placeholder="Ask to open a game..." onkeypress="if(event.key==='Enter') AI.send()">
+                <input type="text" id="chat-input" class="w-full bg-white/5 border border-white/10 rounded-3xl py-6 px-10 outline-none focus:border-[#1DB954] pr-20 text-lg" placeholder="Ask math, launch games, or type 'reset'..." onkeypress="if(event.key==='Enter') AI.send()">
                 <button onclick="AI.send()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white text-black w-12 h-12 rounded-full font-black">↑</button>
             </div>
         </div>
@@ -105,7 +105,7 @@
     </div>
 
     <script>
-        // HARD-LOCKED GAME DATA (NO CHANGES)
+        // HARD-LOCKED GAME DATA (UNTOUCHED)
         const GamesList = [
             { name: "FNAF 1", url: "https://useridk758.github.io/somethingislikereallyreallyreallywrongwithmerightnow/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/319510/capsule_616x353.jpg" },
             { name: "FNAF 2", url: "https://markakopian-sudo.github.io/understandme/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/332800/capsule_616x353.jpg" },
@@ -120,7 +120,7 @@
             { name: "10 Minutes Till Dawn", url: "https://useridk758.github.io/abracadabraanaunanainthebigfrafratotheboogadaa/", img: "https://img.itch.zone/aW1nLzg3MTU5NzMucG5n/original/0LqGxb.png" }
         ];
 
-        let assistantName = "Romulus";
+        let assistantName = "";
 
         const AI = {
             setup() {
@@ -139,15 +139,38 @@
                 this.addMessage("user", val);
                 input.value = "";
 
-                // SMART COMMAND CHECKING
+                // RESET COMMAND
+                if(val.toLowerCase() === 'reset') {
+                    setTimeout(() => {
+                        document.getElementById('chat-container').innerHTML = "";
+                        this.addMessage("ai", "Neural pathways cleared. How can I help you today?");
+                    }, 500);
+                    return;
+                }
+
+                // MATH LOGIC
+                if (/[0-9]/.test(val) && (val.includes('+') || val.includes('-') || val.includes('*') || val.includes('/') || val.includes('^') || val.toLowerCase().includes('sqrt'))) {
+                    setTimeout(() => {
+                        try {
+                            const cleanQuery = val.replace(/[^-()\d/*+.]/g, '');
+                            const result = eval(cleanQuery);
+                            this.addMessage("ai", `Calculation complete: The answer is ${result}.`);
+                        } catch {
+                            this.addMessage("ai", "I am processing that math query. Based on advanced grade-level knowledge, please ensure the equation is formatted clearly.");
+                        }
+                    }, 800);
+                    return;
+                }
+
+                // GAME COMMANDS
                 const game = GamesList.find(g => val.toLowerCase().includes(g.name.toLowerCase()));
                 
                 setTimeout(() => {
                     if (game) {
-                        this.addMessage("ai", `Acknowledged. Initializing "${game.name}" module now.`);
+                        this.addMessage("ai", `Initializing ${game.name} module.`);
                         setTimeout(() => Core.launch(game.url), 1000);
                     } else {
-                        this.addMessage("ai", `I am ${assistantName}. I can launch any archive module if you say its name. Try saying "Open FNAF 1" or "Block Blast".`);
+                        this.addMessage("ai", `I am ${assistantName}. I can solve math, launch games, or provide system intel. Type 'reset' to clear our history.`);
                     }
                 }, 800);
             },
