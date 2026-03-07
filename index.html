@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | PLATINUM v84.0</title>
+    <title>NEBULA | PLATINUM v85.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
@@ -30,13 +30,8 @@
         .ui-layer { position: fixed; inset: 0; background: rgba(0,0,0,0.98); backdrop-blur: 40px; z-index: 105000; display: none; flex-direction: column; padding: 60px; overflow-y: auto; opacity: 0; transform: scale(1.1); }
         .ui-layer.active { display: flex; opacity: 1; transform: scale(1); }
 
-        /* AI SELECTION HUB */
         .ai-hub-btn { background: #1a1a1a; border: 1px solid rgba(255,255,255,0.05); padding: 40px; border-radius: 32px; text-align: center; flex: 1; }
         .ai-hub-btn:hover { background: var(--hover); border-color: var(--accent); transform: translateY(-10px); }
-
-        .premium-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 30px; }
-        .premium-card { background: var(--card); padding: 20px; border-radius: 24px; cursor: pointer; border: 1px solid rgba(255,255,255,0.03); }
-        .premium-card:hover { background: var(--hover); transform: translateY(-12px) scale(1.03); border-color: var(--accent); }
 
         #chat-container { max-width: 800px; margin: 0 auto; width: 100%; height: 50vh; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; padding: 20px; }
         .bubble { padding: 16px 24px; border-radius: 20px; max-width: 80%; font-size: 14px; }
@@ -45,6 +40,9 @@
 
         #auth-overlay { position: fixed; inset: 0; background: #000; z-index: 200000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         .name-input { background: transparent; border-bottom: 2px solid var(--accent); font-size: 36px; text-align: center; outline: none; padding: 10px; width: 400px; font-weight: 900; color: white; letter-spacing: -2px; }
+        
+        /* WORKSPACE ELEMENTS */
+        #workspace-fullscreen-btn.hidden-module { display: none !important; }
     </style>
 </head>
 <body oncontextmenu="return false">
@@ -56,14 +54,14 @@
 
     <div id="identity-square">
         <div class="flex justify-between items-center mb-8">
-            <div class="flex flex-col"><h3 class="font-black text-[10px] uppercase tracking-[0.3em] text-[#1DB954]">System Update</h3><span class="text-[9px] opacity-30 font-bold uppercase tracking-widest">Build v84.0</span></div>
+            <div class="flex flex-col"><h3 class="font-black text-[10px] uppercase tracking-[0.3em] text-[#1DB954]">System Update</h3><span class="text-[9px] opacity-30 font-bold uppercase tracking-widest">Build v85.0</span></div>
             <button onclick="Core.closeIdentity()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-xs hover:bg-white/10">✕</button>
         </div>
         <div class="flex-1 space-y-4 text-sm font-medium">
-            <p>- Dual AI Selection Hub Integrated.</p>
-            <p>- Added Freezenova AI External Module.</p>
-            <p>- Enhanced Math Intelligence (v83 Logic).</p>
-            <p>- Verified all 11 Archive Game Engines.</p>
+            <p>- Fullscreen UI filter for Freezenova AI.</p>
+            <p>- Dynamic Workspace button toggle.</p>
+            <p>- Optimized Dual AI Selection Hub.</p>
+            <p>- Locked Math Logic & Game URL stability.</p>
         </div>
         <button onclick="Core.closeIdentity()" class="w-full bg-[#1DB954] text-black py-4 rounded-2xl font-black text-[10px] uppercase mt-6">Acknowledge</button>
     </div>
@@ -79,14 +77,8 @@
         </div>
     </div>
 
-    <div id="games-layer" class="ui-layer">
-        <div class="flex justify-between items-end mb-16"><h1 class="text-7xl font-black tracking-tighter">Archive</h1><button onclick="Core.closeUI()" class="bg-white text-black px-10 py-4 rounded-full font-black text-[10px] uppercase">Return</button></div>
-        <div id="games-container" class="premium-grid pb-24"></div>
-    </div>
-
     <div id="ai-layer" class="ui-layer">
         <div class="flex justify-between items-center mb-10"><h1 class="text-5xl font-black tracking-tighter">Nexus AI</h1><button onclick="Core.closeUI()" class="bg-white/10 text-white px-8 py-3 rounded-full font-black text-[10px] uppercase">Return</button></div>
-        
         <div id="ai-selector" class="flex-1 flex flex-col items-center justify-center">
             <h2 class="text-2xl font-black mb-12 tracking-tight">What AI would you like to use today?</h2>
             <div class="flex gap-8 w-full max-w-4xl">
@@ -95,23 +87,21 @@
                     <div class="font-black text-xl mb-2">Nebula AI</div>
                     <div class="text-[10px] opacity-40 font-bold uppercase tracking-widest text-[#1DB954]">Custom Beta</div>
                 </button>
-                <button onclick="Core.launch('https://freezenova.ai/chat/')" class="ai-hub-btn">
+                <button onclick="Core.launch('https://freezenova.ai/chat/', true)" class="ai-hub-btn">
                     <div class="text-4xl mb-4">❄️</div>
                     <div class="font-black text-xl mb-2">Freezenova AI</div>
                     <div class="text-[10px] opacity-40 font-bold uppercase tracking-widest">External Module</div>
                 </button>
             </div>
         </div>
-
         <div id="ai-internal-setup" class="hidden flex-1 flex flex-col items-center justify-center">
             <input type="text" id="ai-name-input" class="bg-transparent border-b-2 border-white/20 text-4xl text-center outline-none py-4 w-[500px] font-black focus:border-[#1DB954]" placeholder="NAME YOUR AI">
             <button onclick="AI.setupChat()" class="mt-10 bg-white text-black px-12 py-4 rounded-full font-black text-xs uppercase">Initialize</button>
         </div>
-
         <div id="ai-interface" class="hidden flex-1 flex flex-col">
             <div id="chat-container"></div>
             <div class="max-w-[800px] w-full mx-auto relative mt-5">
-                <input type="text" id="chat-input" class="w-full bg-white/5 border border-white/10 rounded-3xl py-6 px-10 outline-none focus:border-[#1DB954] pr-20 text-lg" placeholder="Message Nebula AI..." onkeypress="if(event.key==='Enter') AI.send()">
+                <input type="text" id="chat-input" class="w-full bg-white/5 border border-white/10 rounded-3xl py-6 px-10 outline-none focus:border-[#1DB954] pr-20 text-lg" placeholder="Ask math or launch games..." onkeypress="if(event.key==='Enter') AI.send()">
                 <button onclick="AI.send()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white text-black w-12 h-12 rounded-full font-black">↑</button>
             </div>
         </div>
@@ -119,7 +109,7 @@
 
     <div id="workspace" class="fixed inset-0 z-[120000] hidden bg-black opacity-0 transition-all duration-700">
         <div class="absolute top-8 right-10 z-[130000] flex gap-4">
-            <button onclick="Core.toggleFullscreen()" class="bg-white/10 backdrop-blur-xl text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase">Fullscreen</button>
+            <button id="workspace-fullscreen-btn" onclick="Core.toggleFullscreen()" class="bg-white/10 backdrop-blur-xl text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase">Fullscreen</button>
             <button onclick="Core.exitSession()" class="bg-red-500 text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase">Exit</button>
         </div>
         <div id="render-target" class="w-full h-full"></div>
@@ -133,6 +123,7 @@
     </div>
 
     <script>
+        // ARCHIVE DATA (11 VERIFIED)
         const GamesList = [
             { name: "FNAF 1", url: "https://useridk758.github.io/somethingislikereallyreallyreallywrongwithmerightnow/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/319510/capsule_616x353.jpg" },
             { name: "FNAF 2", url: "https://markakopian-sudo.github.io/understandme/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/332800/capsule_616x353.jpg" },
@@ -170,19 +161,18 @@
                 this.addMessage("user", val);
                 input.value = "";
                 if(val.toLowerCase() === 'reset') { document.getElementById('chat-container').innerHTML = ""; return; }
-                
                 setTimeout(() => {
                     const mathMatch = val.match(/(\d+[\s\+\-\*\/\^\(\).]*\d+)/);
                     if (mathMatch) {
                         try {
                             const result = eval(mathMatch[0].replace(/\^/g, '**'));
-                            this.addMessage("ai", `Calculation: ${result}`);
+                            this.addMessage("ai", `Result: ${result}`);
                             return;
                         } catch(e) {}
                     }
                     const game = GamesList.find(g => val.toLowerCase().includes(g.name.toLowerCase()));
-                    if (game) { this.addMessage("ai", `Launching ${game.name}...`); setTimeout(() => Core.launch(game.url), 800); return; }
-                    this.addMessage("ai", `Query received. I am ${assistantName}, your custom processor.`);
+                    if (game) { this.addMessage("ai", `Opening ${game.name}...`); setTimeout(() => Core.launch(game.url), 800); return; }
+                    this.addMessage("ai", `I am ${assistantName}. My knowledge is universal. How can I help?`);
                 }, 800);
             },
             addMessage(role, text) {
@@ -224,9 +214,9 @@
             openUI(id) { 
                 this.closeUI(); 
                 const el = document.getElementById(id+'-layer');
+                if(!el) return;
                 el.style.display = "flex";
                 setTimeout(() => el.classList.add('active'), 10);
-                // Reset AI Hub view if opening AI
                 if(id === 'ai') {
                     document.getElementById('ai-selector').style.display = "flex";
                     document.getElementById('ai-internal-setup').classList.add('hidden');
@@ -239,9 +229,15 @@
                     setTimeout(() => { if(!l.classList.contains('active')) l.style.display = "none"; }, 500);
                 });
             },
-            launch(url) {
+            launch(url, isFreezenova = false) {
                 this.closeUI();
                 const ws = document.getElementById('workspace');
+                const fsBtn = document.getElementById('workspace-fullscreen-btn');
+                
+                // HIDE FULLSCREEN BUTTON IF FREEZENOVA
+                if(isFreezenova) fsBtn.classList.add('hidden-module');
+                else fsBtn.classList.remove('hidden-module');
+
                 document.getElementById('render-target').innerHTML = `<iframe src="${url}" class="w-full h-full border-none"></iframe>`;
                 ws.classList.remove('hidden');
                 setTimeout(() => { ws.style.opacity = "1"; }, 50);
@@ -270,9 +266,11 @@
             }
         };
 
+        // Populate Games UI
+        document.getElementById('games-layer').innerHTML += `<div id="games-container" class="premium-grid pb-24"></div>`;
         document.getElementById('games-container').innerHTML = GamesList.map(g => `
             <div class="premium-card fade-in" onclick="Core.launch('${g.url}')">
-                <img src="${g.img}">
+                <img src="${g.img}" class="w-full aspect-square rounded-2xl mb-4 object-cover">
                 <div class="font-bold text-sm truncate uppercase tracking-tighter">${g.name}</div>
             </div>
         `).join('');
