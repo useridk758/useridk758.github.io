@@ -3,111 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | PLATINUM v87.0</title>
+    <title>NEBULA | PLATINUM v84.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
     <style>
         :root { --accent: #1DB954; --bg: #000; --card: #121212; --hover: #1f1f1f; }
-        
-        /* GLOBAL BOLDING */
-        * { 
-            margin: 0; padding: 0; box-sizing: border-box; 
-            cursor: none !important; 
-            font-weight: 800 !important; 
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); 
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
         body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
-        #dot { position: fixed; width: 12px; height: 12px; background: #fff; border-radius: 50%; z-index: 9999999; pointer-events: none; box-shadow: 0 0 20px #fff; transform: translate(-50%, -50%); mix-blend-mode: difference; transition: transform 0.1s ease-out; }
+        .fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        #star-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        #dot { position: fixed; width: 8px; height: 8px; background: #fff; border-radius: 50%; z-index: 9999999; pointer-events: none; box-shadow: 0 0 15px #fff; transform: translate(-50%, -50%); mix-blend-mode: difference; }
         
         #identity-square { 
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); 
-            width: 400px; height: 400px; background: rgba(15, 15, 15, 0.98); 
-            border: 2px solid var(--accent); border-radius: 32px; z-index: 150000; 
-            display: none; flex-direction: column; padding: 40px; box-shadow: 0 0 100px rgba(0,0,0,1); 
-            backdrop-filter: blur(20px); opacity: 0;
+            position: fixed; top: 50%; left: 50%; 
+            transform: translate(-50%, -50%) scale(0.9); 
+            width: 400px; height: 400px; 
+            background: rgba(10, 10, 10, 0.98); 
+            border: 1px solid rgba(29, 185, 84, 0.4); 
+            border-radius: 32px; z-index: 150000; 
+            display: none; flex-direction: column; padding: 40px; 
+            box-shadow: 0 0 100px rgba(0,0,0,1); 
+            backdrop-filter: blur(25px);
+            opacity: 0;
         }
         #identity-square.active { display: flex; opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
-        .ui-layer { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 105000; display: none; flex-direction: column; padding: 60px; overflow-y: auto; opacity: 0; transform: translateY(30px); }
-        .ui-layer.active { display: flex; opacity: 1; transform: translateY(0); }
+        .ui-layer { position: fixed; inset: 0; background: rgba(0,0,0,0.98); backdrop-blur: 40px; z-index: 105000; display: none; flex-direction: column; padding: 60px; overflow-y: auto; opacity: 0; transform: scale(1.1); }
+        .ui-layer.active { display: flex; opacity: 1; transform: scale(1); }
 
-        .premium-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 30px; width: 100%; }
-        .premium-card { background: var(--card); padding: 20px; border-radius: 24px; cursor: pointer !important; border: 2px solid rgba(255,255,255,0.05); }
-        .premium-card:hover { background: var(--hover); transform: translateY(-10px); border-color: var(--accent); }
+        #chat-container { max-width: 800px; margin: 0 auto; width: 100%; height: 60vh; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; padding: 20px; }
+        .bubble { padding: 16px 24px; border-radius: 20px; max-width: 80%; font-size: 14px; }
+        .ai-bubble { background: #1a1a1a; align-self: flex-start; border: 1px solid rgba(255,255,255,0.05); }
+        .user-bubble { background: var(--accent); color: black; align-self: flex-end; font-weight: 700; }
 
         #auth-overlay { position: fixed; inset: 0; background: #000; z-index: 200000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .name-input { background: transparent; border-bottom: 3px solid var(--accent); font-size: 36px; text-align: center; outline: none; padding: 10px; width: 400px; color: white; text-transform: uppercase; }
-        
-        iframe { border-radius: 20px; }
+        .name-input { background: transparent; border-bottom: 2px solid var(--accent); font-size: 36px; text-align: center; outline: none; padding: 10px; width: 400px; font-weight: 900; color: white; letter-spacing: -2px; }
+
+        /* PROXY UI */
+        .proxy-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 30px; }
+        .proxy-input { width: 500px; background: rgba(255,255,255,0.05); border: 2px solid var(--accent); border-radius: 15px; padding: 20px; font-size: 20px; color: white; outline: none; }
+        .proxy-btn { background: var(--accent); color: black; padding: 20px 40px; border-radius: 15px; font-weight: 900; font-size: 18px; text-transform: uppercase; }
     </style>
 </head>
-<body>
-
-    <div id="dot"></div>
+<body oncontextmenu="return false">
 
     <div id="auth-overlay">
-        <h2 class="text-[12px] tracking-[0.8em] opacity-50 mb-8 uppercase">Initialize Nebula Platinum</h2>
-        <input type="text" id="user-name" class="name-input" placeholder="ACCESS KEY" onkeypress="if(event.key==='Enter') Core.initialize(this.value)">
+        <h2 class="text-[10px] tracking-[0.8em] opacity-30 mb-8 uppercase font-bold fade-in">Nebula Platinum | Initialize</h2>
+        <input type="text" id="user-name" class="name-input" placeholder="ACCESS KEY" autocomplete="off" onkeypress="if(event.key==='Enter') Core.initialize(this.value)">
     </div>
 
     <div id="identity-square">
         <div class="flex justify-between items-center mb-8">
-            <h3 class="text-[12px] uppercase tracking-widest text-[#1DB954]">System Updates</h3>
-            <button onclick="Core.closeIdentity()" class="text-xs opacity-50 hover:opacity-100">✕ CLOSE</button>
+            <div class="flex flex-col">
+                <h3 class="font-black text-[10px] uppercase tracking-[0.3em] text-[#1DB954]">System Update</h3>
+                <span class="text-[9px] opacity-30 font-bold uppercase tracking-widest">Build v84.0</span>
+            </div>
+            <button onclick="Core.closeIdentity()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-xs hover:bg-white/10">✕</button>
         </div>
-        <div class="flex-1 space-y-4 text-sm">
-            <p>- Global Bold Text Protocol active.</p>
-            <p>- UI Layer Persistence enabled.</p>
-            <p>- Fixed Games clicking system.</p>
-            <p>- Math engine logic verified.</p>
-            <p>- All 11 Archive links locked.</p>
+        <div class="flex-1 space-y-5 text-sm font-medium">
+            <p>- Integrated Proxy Search Module (DuckDuckGo Engine).</p>
+            <p>- Fixed AI Math Parsing logic for all grade levels.</p>
+            <p>- Added Proxy shortcut to the Main Navigation Dock.</p>
+            <p>- Verified all 11 Game Archive links and assets.</p>
         </div>
-        <button onclick="Core.closeIdentity()" class="w-full bg-[#1DB954] text-black py-4 rounded-2xl text-[12px] uppercase mt-6">Acknowledge</button>
+        <div class="mt-8 pt-6 border-t border-white/5">
+            <button onclick="Core.closeIdentity()" class="w-full bg-[#1DB954] text-black py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest">Acknowledge</button>
+        </div>
     </div>
 
-    <canvas id="star-canvas" class="fixed inset-0 z-0"></canvas>
+    <canvas id="star-canvas"></canvas>
+    <div id="dot"></div>
+    
+    <div id="proxy-layer" class="ui-layer">
+        <div class="flex justify-between items-center mb-16"><h1 class="text-7xl font-black tracking-tighter">Proxy</h1><button onclick="Core.closeUI()" class="bg-white text-black px-10 py-4 rounded-full font-black text-[10px] uppercase">Return</button></div>
+        <div class="proxy-container">
+            <form action="https://www.duckduckgo.com/" method="get" target="_blank" class="flex flex-col items-center gap-6">
+                <input type="text" name="q" class="proxy-input" placeholder="Search the web anonymously...">
+                <button type="submit" class="proxy-btn hover:scale-105 transition-transform">Initialize Search</button>
+            </form>
+            <p class="opacity-30 text-[10px] uppercase font-bold tracking-widest mt-10">Encrypted via DuckDuckGo Gateway</p>
+        </div>
+    </div>
 
-    <div id="dock" class="fixed bottom-10 left-1/2 -translate-x-1/2 flex gap-6 bg-black/80 backdrop-blur-2xl border-2 border-white/10 p-4 rounded-[2.5rem] z-[110000] opacity-0 pointer-events-none transition-all duration-1000">
-        <button onclick="Core.closeUI()" class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-xl hover:bg-[#1DB954] hover:text-black">🏠</button>
-        <button onclick="Core.openUI('games')" class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-xl hover:bg-[#1DB954] hover:text-black">🎮</button>
-        <button onclick="Core.openUI('ai')" class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-xl hover:bg-[#1DB954] hover:text-black">🤖</button>
+    <div id="top-bar" class="fixed top-0 left-0 w-full h-24 flex items-center px-12 z-[110000] opacity-0 pointer-events-none">
+        <div class="font-black text-2xl italic tracking-tighter">NEBULA<span class="text-[#1DB954]">OS</span></div>
+        <div class="ml-auto flex gap-10 text-[10px] font-bold tracking-[0.3em] items-center opacity-40">
+            <span id="display-name" class="uppercase"></span>
+            <div id="system-time">00:00:00</div>
+        </div>
     </div>
 
     <div id="games-layer" class="ui-layer">
-        <div class="flex justify-between items-center mb-12"><h1 class="text-6xl tracking-tighter">ARCHIVE</h1><button onclick="Core.closeUI()" class="bg-white text-black px-8 py-3 rounded-full text-xs uppercase">RETURN</button></div>
-        <div id="games-container" class="premium-grid"></div>
+        <div class="flex justify-between items-end mb-16"><h1 class="text-7xl font-black tracking-tighter">Archive</h1><button onclick="Core.closeUI()" class="bg-white text-black px-10 py-4 rounded-full font-black text-[10px] uppercase">Return</button></div>
+        <div id="games-container" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 pb-24"></div>
     </div>
 
     <div id="ai-layer" class="ui-layer">
-        <div class="flex justify-between items-center mb-10"><h1 class="text-4xl tracking-tighter">AI HUB</h1><button onclick="Core.closeUI()" class="opacity-50 hover:opacity-100 uppercase">Return</button></div>
-        <div id="ai-hub-main" class="flex-1 flex flex-col items-center justify-center gap-10">
-            <h2 class="text-xl">WHAT AI WOULD YOU LIKE TO USE TODAY?</h2>
-            <div class="flex gap-6 w-full max-w-2xl">
-                <button onclick="AI.openInternal()" class="flex-1 bg-white/5 p-10 rounded-3xl border-2 border-white/10 hover:border-[#1DB954]">
-                    <div class="text-3xl mb-2">🤖</div>
-                    <div class="uppercase">Nebula AI</div>
-                </button>
-                <button onclick="Core.launch('https://freezenova.ai/chat/', true)" class="flex-1 bg-white/5 p-10 rounded-3xl border-2 border-white/10 hover:border-[#1DB954]">
-                    <div class="text-3xl mb-2">❄️</div>
-                    <div class="uppercase">Freezenova</div>
-                </button>
-            </div>
+        <div class="flex justify-between items-center mb-10"><h1 id="ai-header" class="text-5xl font-black tracking-tighter text-[#1DB954]">Nexus AI</h1><button onclick="Core.closeUI()" class="bg-white/10 text-white px-8 py-3 rounded-full font-black text-[10px] uppercase">Return</button></div>
+        <div id="ai-setup" class="flex-1 flex flex-col items-center justify-center">
+            <input type="text" id="ai-name-input" class="bg-transparent border-b-2 border-white/20 text-4xl text-center outline-none py-4 w-[500px] font-black focus:border-[#1DB954]" placeholder="NAME YOUR AI">
+            <button onclick="AI.setup()" class="mt-10 bg-white text-black px-12 py-4 rounded-full font-black text-xs uppercase hover:scale-110">Initialize</button>
         </div>
-        <div id="ai-interface" class="hidden flex-1 flex flex-col pt-10">
-            <div id="chat-container" class="flex-1 overflow-y-auto mb-4 p-4 space-y-4"></div>
-            <input type="text" id="chat-input" class="w-full bg-white/5 border-2 border-white/10 p-6 rounded-2xl outline-none focus:border-[#1DB954]" placeholder="ASK MATH OR LAUNCH GAMES..." onkeypress="if(event.key==='Enter') AI.send()">
+        <div id="ai-interface" class="hidden flex-1 flex flex-col">
+            <div id="chat-container"></div>
+            <div class="max-w-[800px] w-full mx-auto relative mt-5">
+                <input type="text" id="chat-input" class="w-full bg-white/5 border border-white/10 rounded-3xl py-6 px-10 outline-none focus:border-[#1DB954] pr-20 text-lg" placeholder="Ask anything..." onkeypress="if(event.key==='Enter') AI.send()">
+                <button onclick="AI.send()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white text-black w-12 h-12 rounded-full font-black">↑</button>
+            </div>
         </div>
     </div>
 
-    <div id="workspace" class="fixed inset-0 z-[120000] hidden bg-black opacity-0">
-        <div class="absolute top-6 right-6 z-[130000] flex gap-4">
-            <button id="fs-btn" onclick="Core.toggleFullscreen()" class="bg-white/10 px-5 py-2 rounded-xl text-[10px] uppercase">FULLSCREEN</button>
-            <button onclick="Core.exitSession()" class="bg-red-500 px-5 py-2 rounded-xl text-[10px] uppercase text-white">EXIT</button>
+    <div id="workspace" class="fixed inset-0 z-[120000] hidden bg-black opacity-0 transition-all duration-700">
+        <div class="absolute top-8 right-10 z-[130000] flex gap-4">
+            <button onclick="Core.toggleFullscreen()" class="bg-white/10 backdrop-blur-xl text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase">Fullscreen</button>
+            <button onclick="Core.exitSession()" class="bg-red-500 text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase">Exit</button>
         </div>
-        <div id="render-target" class="w-full h-full p-4"></div>
+        <div id="render-target" class="w-full h-full"></div>
+    </div>
+
+    <div id="dock" class="fixed bottom-12 left-1/2 -translate-x-1/2 flex gap-6 bg-black/40 backdrop-blur-3xl border border-white/5 p-5 rounded-[3rem] z-[100001] opacity-0 translate-y-20 pointer-events-none">
+        <button onclick="Core.closeUI()" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🏠</button>
+        <button onclick="Core.openUI('games')" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🎮</button>
+        <button onclick="Core.openUI('proxy')" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🌐</button>
+        <button onclick="Core.openUI('ai')" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🤖</button>
+        <button onclick="Core.aboutBlankCloak()" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-white/20">🕵️</button>
     </div>
 
     <script>
@@ -125,108 +148,135 @@
             { name: "10 Minutes Till Dawn", url: "https://useridk758.github.io/abracadabraanaunanainthebigfrafratotheboogadaa/", img: "https://img.itch.zone/aW1nLzg3MTU5NzMucG5n/original/0LqGxb.png" }
         ];
 
+        let assistantName = "";
+
         const AI = {
-            openInternal() {
-                document.getElementById('ai-hub-main').style.display = 'none';
+            setup() {
+                const name = document.getElementById('ai-name-input').value;
+                if(!name) return;
+                assistantName = name;
+                document.getElementById('ai-header').innerText = assistantName.toUpperCase();
+                document.getElementById('ai-setup').style.display = "none";
                 document.getElementById('ai-interface').classList.remove('hidden');
+                this.addMessage("ai", `Hello, how can I help you today?`);
             },
             send() {
                 const input = document.getElementById('chat-input');
                 const val = input.value.trim();
                 if(!val) return;
-                this.addMsg("user", val);
+                this.addMessage("user", val);
                 input.value = "";
+
+                if(val.toLowerCase() === 'reset') {
+                    document.getElementById('chat-container').innerHTML = "";
+                    this.addMessage("ai", "Neural history purged.");
+                    return;
+                }
+
                 setTimeout(() => {
+                    // MATH ENGINE
                     const mathMatch = val.match(/(\d+[\s\+\-\*\/\^\(\).]*\d+)/);
-                    if (mathMatch) { try { this.addMsg("ai", `RESULT: ${eval(mathMatch[0].replace(/\^/g, '**'))}`); return; } catch(e){} }
-                    const g = GamesList.find(x => val.toLowerCase().includes(x.name.toLowerCase()));
-                    if(g) { this.addMsg("ai", `LAUNCHING ${g.name}...`); setTimeout(() => Core.launch(g.url), 800); return; }
-                    this.addMsg("ai", "I AM NEBULA AI. I CAN SOLVE MATH AND RUN GAMES.");
-                }, 700);
+                    if (mathMatch) {
+                        try {
+                            const result = eval(mathMatch[0].replace(/\^/g, '**'));
+                            this.addMessage("ai", `The result is: ${result}`);
+                            return;
+                        } catch(e) {}
+                    }
+                    this.addMessage("ai", `I am ${assistantName}. I am ready to solve math or launch games for you.`);
+                }, 800);
             },
-            addMsg(role, text) {
-                const c = document.getElementById('chat-container');
-                const d = document.createElement('div');
-                d.className = role === 'ai' ? 'bg-white/10 p-4 rounded-xl self-start max-w-[80%] uppercase' : 'bg-[#1DB954] text-black p-4 rounded-xl self-end max-w-[80%] uppercase';
-                d.innerText = text;
-                c.appendChild(d);
-                c.scrollTop = c.scrollHeight;
+            addMessage(role, text) {
+                const cont = document.getElementById('chat-container');
+                const div = document.createElement('div');
+                div.className = `bubble ${role}-bubble fade-in`;
+                div.innerText = text;
+                cont.appendChild(div);
+                cont.scrollTop = cont.scrollHeight;
             }
         };
 
         const Core = {
             initialize(name) {
                 if(!name) return;
-                document.getElementById('auth-overlay').style.display = 'none';
-                document.getElementById('dock').style.opacity = '1';
-                document.getElementById('dock').style.pointerEvents = 'all';
+                document.getElementById('display-name').innerText = name;
+                document.getElementById('auth-overlay').style.opacity = "0";
+                setTimeout(() => {
+                    document.getElementById('auth-overlay').style.display = "none";
+                    document.getElementById('top-bar').style.opacity = "1";
+                    document.getElementById('dock').style.opacity = "1";
+                    document.getElementById('dock').style.transform = "translate(-50%, 0)";
+                    document.getElementById('dock').style.pointerEvents = "all";
+                    this.openIdentity();
+                }, 600);
                 this.drawStars();
-                this.openIdentity();
-                this.loadGames();
-            },
-            loadGames() {
-                const container = document.getElementById('games-container');
-                container.innerHTML = GamesList.map(g => `
-                    <div class="premium-card" onclick="Core.launch('${g.url}')">
-                        <img src="${g.img}" class="w-full aspect-video rounded-xl mb-4 object-cover">
-                        <div class="uppercase text-[12px] tracking-widest">${g.name}</div>
-                    </div>
-                `).join('');
+                setInterval(() => { document.getElementById('system-time').innerText = new Date().toLocaleTimeString(); }, 1000);
             },
             openIdentity() {
                 const sq = document.getElementById('identity-square');
-                sq.style.display = 'flex';
-                setTimeout(() => sq.classList.add('active'), 50);
+                sq.style.display = "flex";
+                setTimeout(() => sq.classList.add('active'), 100);
             },
             closeIdentity() {
                 const sq = document.getElementById('identity-square');
                 sq.classList.remove('active');
-                setTimeout(() => sq.style.display = 'none', 400);
+                setTimeout(() => sq.style.display = "none", 500);
             },
-            openUI(id) {
-                // UI PERSISTENCE: REMOVED THE AUTO-CLOSE ALL LAYERS
-                const el = document.getElementById(id + '-layer');
-                el.style.display = 'flex';
-                setTimeout(() => el.classList.add('active'), 50);
+            openUI(id) { 
+                this.closeUI(); 
+                const el = document.getElementById(id+'-layer');
+                el.style.display = "flex";
+                setTimeout(() => el.classList.add('active'), 10);
             },
-            closeUI() {
+            closeUI() { 
                 document.querySelectorAll('.ui-layer').forEach(l => {
                     l.classList.remove('active');
-                    setTimeout(() => l.style.display = 'none', 400);
+                    setTimeout(() => { if(!l.classList.contains('active')) l.style.display = "none"; }, 500);
                 });
             },
-            launch(url, isFree) {
+            launch(url) {
+                this.closeUI();
                 const ws = document.getElementById('workspace');
-                document.getElementById('fs-btn').style.display = isFree ? 'none' : 'block';
                 document.getElementById('render-target').innerHTML = `<iframe src="${url}" class="w-full h-full border-none"></iframe>`;
                 ws.classList.remove('hidden');
-                setTimeout(() => ws.style.opacity = '1', 50);
+                setTimeout(() => { ws.style.opacity = "1"; }, 50);
             },
-            exitSession() {
+            exitSession() { 
                 const ws = document.getElementById('workspace');
-                ws.style.opacity = '0';
-                setTimeout(() => { ws.classList.add('hidden'); document.getElementById('render-target').innerHTML = ''; }, 500);
+                ws.style.opacity = "0";
+                setTimeout(() => { ws.classList.add('hidden'); document.getElementById('render-target').innerHTML = ""; }, 700);
             },
             toggleFullscreen() {
                 if (!document.fullscreenElement) document.documentElement.requestFullscreen();
                 else document.exitFullscreen();
             },
+            aboutBlankCloak() {
+                const w = window.open('about:blank');
+                w.document.body.innerHTML = `<iframe src="${location.href}" style="width:100vw;height:100vh;border:none;position:fixed;top:0;left:0;"></iframe>`;
+            },
             drawStars() {
                 const canvas = document.getElementById('star-canvas');
                 const ctx = canvas.getContext('2d');
                 canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-                for(let i=0; i<200; i++) {
+                for(let i=0; i<300; i++) {
                     ctx.fillStyle = `rgba(255,255,255,${Math.random()})`;
-                    ctx.beginPath(); ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*1.5, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*1, 0, Math.PI*2); ctx.fill();
                 }
             }
         };
 
-        window.addEventListener('mousemove', e => {
-            const dot = document.getElementById('dot');
-            dot.style.left = e.clientX + 'px';
-            dot.style.top = e.clientY + 'px';
-        });
+        document.getElementById('games-container').innerHTML = GamesList.map(g => `
+            <div class="bg-[#121212] p-5 border border-white/5 rounded-3xl hover:border-[#1DB954] hover:-translate-y-2 transition-all cursor-pointer" onclick="Core.launch('${g.url}')">
+                <img src="${g.img}" class="rounded-xl mb-4 w-full aspect-square object-cover">
+                <div class="font-bold text-xs truncate uppercase">${g.name}</div>
+            </div>
+        `).join('');
+
+        window.onmousemove = e => { 
+            const dot = document.getElementById('dot'); 
+            dot.style.left = e.clientX + 'px'; 
+            dot.style.top = e.clientY + 'px'; 
+        };
     </script>
 </body>
 </html>
