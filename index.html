@@ -3,95 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | SINGULARITY v87.0</title>
+    <title>NEBULA | PLATINUM v86.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=Space+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
     <style>
-        :root { --accent: #1DB954; --bg: #000; }
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+        :root { --accent: #1DB954; --bg: #000; --card: #121212; --hover: #1f1f1f; }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
         body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* SHOCK EFFECT: Neural Vibration */
-        @keyframes glitch {
-            0% { transform: translate(0); text-shadow: -2px 0 red, 2px 0 blue; }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); }
-        }
-        .glitch-text { animation: glitch 0.2s infinite; color: var(--accent) !important; font-family: 'Space Mono', monospace; }
-
-        #star-canvas { position: fixed; inset: 0; z-index: 0; filter: blur(1px); }
-        #dot { position: fixed; width: 12px; height: 12px; background: #fff; border-radius: 50%; z-index: 9999999; pointer-events: none; box-shadow: 0 0 20px #fff, 0 0 40px var(--accent); mix-blend-mode: difference; transition: transform 0.1s ease-out; }
+        .fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Glassmorphism Evolution */
-        .ui-layer { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(50px) saturate(150%); z-index: 105000; display: none; flex-direction: column; padding: 60px; opacity: 0; transform: scale(1.1) rotateX(10deg); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-        .ui-layer.active { display: flex; opacity: 1; transform: scale(1) rotateX(0deg); }
+        #star-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        #dot { position: fixed; width: 8px; height: 8px; background: #fff; border-radius: 50%; z-index: 9999999; pointer-events: none; box-shadow: 0 0 15px #fff; transform: translate(-50%, -50%); mix-blend-mode: difference; }
+        
+        #identity-square { 
+            position: fixed; top: 50%; left: 50%; 
+            transform: translate(-50%, -50%) scale(0.9); 
+            width: 400px; height: 400px; 
+            background: rgba(10, 10, 10, 0.98); 
+            border: 1px solid rgba(29, 185, 84, 0.4); 
+            border-radius: 32px; z-index: 150000; 
+            display: none; flex-direction: column; padding: 40px; 
+            box-shadow: 0 0 100px rgba(0,0,0,1); 
+            backdrop-filter: blur(25px);
+            opacity: 0;
+        }
+        #identity-square.active { display: flex; opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
-        .bubble { padding: 20px 25px; border-radius: 24px; max-width: 80%; font-size: 15px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .ai-bubble { background: linear-gradient(145deg, #161616, #000); align-self: flex-start; }
-        .user-bubble { background: var(--accent); color: #000; align-self: flex-end; font-weight: 800; transform: rotateZ(-1deg); }
+        .ui-layer { position: fixed; inset: 0; background: rgba(0,0,0,0.98); backdrop-blur: 40px; z-index: 105000; display: none; flex-direction: column; padding: 60px; overflow-y: auto; opacity: 0; transform: scale(1.1); }
+        .ui-layer.active { display: flex; opacity: 1; transform: scale(1); }
 
-        /* THE MATRIX OVERLAY */
-        #matrix-canvas { position: fixed; inset: 0; z-index: 200000; pointer-events: none; opacity: 0; transition: opacity 2s; }
+        #chat-container { max-width: 800px; margin: 0 auto; width: 100%; height: 55vh; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; padding: 20px; }
+        .bubble { padding: 16px 24px; border-radius: 20px; max-width: 80%; font-size: 14px; line-height: 1.6; }
+        .ai-bubble { background: #1a1a1a; align-self: flex-start; border: 1px solid rgba(255,255,255,0.05); }
+        .user-bubble { background: var(--accent); color: black; align-self: flex-end; font-weight: 700; }
+
+        #auth-overlay { position: fixed; inset: 0; background: #000; z-index: 200000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .name-input { background: transparent; border-bottom: 2px solid var(--accent); font-size: 36px; text-align: center; outline: none; padding: 10px; width: 400px; font-weight: 900; color: white; letter-spacing: -2px; }
     </style>
 </head>
 <body oncontextmenu="return false">
 
-    <canvas id="matrix-canvas"></canvas>
+    <div id="auth-overlay">
+        <h2 class="text-[10px] tracking-[0.8em] opacity-30 mb-8 uppercase font-bold fade-in">Nebula Platinum | Initialize</h2>
+        <input type="text" id="user-name" class="name-input" placeholder="ACCESS KEY" autocomplete="off" onkeypress="if(event.key==='Enter') Core.initialize(this.value)">
+    </div>
 
-    <div id="auth-overlay" class="fixed inset-0 bg-black z-[200000] flex items-center justify-center flex-col">
-        <div class="mb-4 text-[10px] tracking-[1em] text-white/20 uppercase font-black">System Override Required</div>
-        <input type="text" id="user-name" class="bg-transparent border-b-4 border-[#1DB954] text-6xl text-center outline-none p-4 w-[500px] font-black italic tracking-tighter" placeholder="INIT_PROTOCOL" autocomplete="off" onkeypress="if(event.key==='Enter') Core.initialize(this.value)">
+    <div id="identity-square">
+        <div class="flex justify-between items-center mb-8">
+            <div class="flex flex-col">
+                <h3 class="font-black text-[10px] uppercase tracking-[0.3em] text-[#1DB954]">System Update</h3>
+                <span class="text-[9px] opacity-30 font-bold uppercase tracking-widest">Build v86.0</span>
+            </div>
+            <button onclick="Core.closeIdentity()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-xs hover:bg-white/10">✕</button>
+        </div>
+        <div class="flex-1 space-y-5 text-sm font-medium">
+            <p>- Proxy module deactivated and removed.</p>
+            <p>- AI Customization and Identity Options restored.</p>
+            <p>- Enhanced Math Parser v3 (Handles complex strings).</p>
+            <p>- Standardized Game Archive (11 Verified Links).</p>
+        </div>
+        <div class="mt-8 pt-6 border-t border-white/5">
+            <button onclick="Core.closeIdentity()" class="w-full bg-[#1DB954] text-black py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest">Acknowledge</button>
+        </div>
     </div>
 
     <canvas id="star-canvas"></canvas>
     <div id="dot"></div>
     
-    <div id="ai-layer" class="ui-layer">
-        <div class="flex justify-between items-center mb-10">
-            <h1 id="ai-header" class="text-6xl font-black italic tracking-tighter">NEXUS_CORE</h1>
-            <button onclick="Core.closeUI()" class="bg-white/10 hover:bg-white text-white hover:text-black px-10 py-4 rounded-full font-black text-[10px] uppercase transition-all">Close Uplink</button>
+    <div id="top-bar" class="fixed top-0 left-0 w-full h-24 flex items-center px-12 z-[110000] opacity-0 pointer-events-none">
+        <div class="font-black text-2xl italic tracking-tighter">NEBULA<span class="text-[#1DB954]">OS</span></div>
+        <div class="ml-auto flex gap-10 text-[10px] font-bold tracking-[0.3em] items-center opacity-40">
+            <span id="display-name" class="uppercase"></span>
+            <div id="system-time">00:00:00</div>
         </div>
+    </div>
+
+    <div id="games-layer" class="ui-layer">
+        <div class="flex justify-between items-end mb-16"><h1 class="text-7xl font-black tracking-tighter">Archive</h1><button onclick="Core.closeUI()" class="bg-white text-black px-10 py-4 rounded-full font-black text-[10px] uppercase">Return</button></div>
+        <div id="games-container" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 pb-24"></div>
+    </div>
+
+    <div id="ai-layer" class="ui-layer">
+        <div class="flex justify-between items-center mb-10"><h1 id="ai-header" class="text-5xl font-black tracking-tighter text-[#1DB954]">Nexus AI</h1><button onclick="Core.closeUI()" class="bg-white/10 text-white px-8 py-3 rounded-full font-black text-[10px] uppercase">Return</button></div>
         
         <div id="ai-setup" class="flex-1 flex flex-col items-center justify-center">
-            <input type="text" id="ai-name-input" class="bg-transparent border-b-2 border-white/10 text-4xl text-center outline-none py-6 w-[500px] font-black focus:border-[#1DB954]" placeholder="ENTITY DESIGNATION">
-            <div class="mt-10 flex gap-6">
-                <button onclick="AI.setup('GOD_MODE')" class="group relative px-12 py-5 bg-white text-black font-black uppercase text-xs rounded-full overflow-hidden">
-                    <span class="relative z-10">Ascend</span>
-                </button>
+            <div class="text-center mb-10">
+                <p class="text-[10px] font-bold tracking-[0.5em] opacity-40 uppercase mb-4">Neural Personality Core</p>
+                <input type="text" id="ai-name-input" class="bg-transparent border-b-2 border-white/20 text-5xl text-center outline-none py-4 w-[600px] font-black focus:border-[#1DB954] transition-all" placeholder="IDENTIFY YOUR AI">
+            </div>
+            <div class="flex gap-4">
+                <button onclick="AI.setup('Logical')" class="bg-white/5 border border-white/10 hover:border-[#1DB954] px-8 py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest">Logical</button>
+                <button onclick="AI.setup('Creative')" class="bg-white/5 border border-white/10 hover:border-[#1DB954] px-8 py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest">Creative</button>
+                <button onclick="AI.setup('Sarcastic')" class="bg-white/5 border border-white/10 hover:border-[#1DB954] px-8 py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest">Sarcastic</button>
             </div>
         </div>
 
         <div id="ai-interface" class="hidden flex-1 flex flex-col">
-            <div id="chat-container" class="space-y-6 overflow-y-auto pr-4"></div>
-            <div class="mt-auto pt-10">
-                <div class="relative max-w-4xl mx-auto">
-                    <input type="text" id="chat-input" class="w-full bg-white/5 border-2 border-white/10 rounded-full py-8 px-12 outline-none focus:border-[#1DB954] text-xl font-medium" placeholder="Command the void..." onkeypress="if(event.key==='Enter') AI.send()">
-                    <button onclick="AI.send()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-[#1DB954] w-14 h-14 rounded-full flex items-center justify-center">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="3"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-                    </button>
-                </div>
+            <div id="chat-container"></div>
+            <div class="max-w-[800px] w-full mx-auto relative mt-5">
+                <input type="text" id="chat-input" class="w-full bg-white/5 border border-white/10 rounded-3xl py-6 px-10 outline-none focus:border-[#1DB954] pr-20 text-lg" placeholder="Ask anything or solve math..." onkeypress="if(event.key==='Enter') AI.send()">
+                <button onclick="AI.send()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-[#1DB954] text-black w-12 h-12 rounded-full font-black">↑</button>
             </div>
         </div>
     </div>
 
-    <div id="dock" class="fixed bottom-10 left-1/2 -translate-x-1/2 flex gap-4 bg-white/5 backdrop-blur-2xl p-4 rounded-[2.5rem] z-[100001] opacity-0 translate-y-20 transition-all duration-1000">
-        <button onclick="Core.openUI('ai')" class="w-20 h-20 bg-white/5 rounded-[2rem] flex items-center justify-center text-3xl hover:bg-[#1DB954] hover:scale-110 transition-all">🧠</button>
-        <button onclick="Core.triggerSurprise()" class="w-20 h-20 bg-red-600/20 border border-red-500/50 rounded-[2rem] flex items-center justify-center text-3xl hover:bg-red-500 hover:scale-110 transition-all">⚠️</button>
+    <div id="workspace" class="fixed inset-0 z-[120000] hidden bg-black opacity-0 transition-all duration-700">
+        <div class="absolute top-8 right-10 z-[130000] flex gap-4">
+            <button onclick="Core.toggleFullscreen()" class="bg-white/10 backdrop-blur-xl text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase">Fullscreen</button>
+            <button onclick="Core.exitSession()" class="bg-red-500 text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase">Exit</button>
+        </div>
+        <div id="render-target" class="w-full h-full"></div>
+    </div>
+
+    <div id="dock" class="fixed bottom-12 left-1/2 -translate-x-1/2 flex gap-6 bg-black/40 backdrop-blur-3xl border border-white/5 p-5 rounded-[3rem] z-[100001] opacity-0 translate-y-20 pointer-events-none">
+        <button onclick="Core.closeUI()" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🏠</button>
+        <button onclick="Core.openUI('games')" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🎮</button>
+        <button onclick="Core.openUI('ai')" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🤖</button>
+        <button onclick="Core.aboutBlankCloak()" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-white/20">🕵️</button>
     </div>
 
     <script>
+        const GamesList = [
+            { name: "FNAF 1", url: "https://useridk758.github.io/somethingislikereallyreallyreallywrongwithmerightnow/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/319510/capsule_616x353.jpg" },
+            { name: "FNAF 2", url: "https://markakopian-sudo.github.io/understandme/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/332800/capsule_616x353.jpg" },
+            { name: "FNAF 3", url: "https://markakopian-sudo.github.io/wtfgng/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/354140/capsule_616x353.jpg" },
+            { name: "FNAF 4", url: "https://markakopian-sudo.github.io/anasun/", img: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/388090/capsule_616x353.jpg" },
+            { name: "Five Nights at Epstein's", url: "https://useridk758.github.io/underestimatablepig/", img: "https://cdn.jsdelivr.net/gh/gn-math/covers@main/710.png" },
+            { name: "Geometry Dash Lite", url: "https://markakopian-sudo.github.io/eureka/", img: "https://pbs.twimg.com/profile_images/1963796314237648897/cS6pffoT_400x400.jpg" },
+            { name: "Block Blast", url: "https://markakopian-sudo.github.io/sevakanaxperutsun/", img: "https://imgs.crazygames.com/block-puzzle-master_1x1/20250924025352/block-puzzle-master_1x1-cover?format=auto&quality=70&metadata=none" },
+            { name: "AdVenture Capitalist", url: "https://useridk758.github.io/adventcapital/", img: "https://cdn.mobygames.com/covers/7866638-adventure-capitalist-android-front-cover.jpg" },
+            { name: "1v1.lol", url: "https://useridk758.github.io/my-html-games/", img: "https://cdn-bgp.bluestacks.com/BGP/us/gametiles_lol.onevone.jpg" },
+            { name: "A Difficult Game About Climbing", url: "https://useridk758.github.io/hardtoclimb/", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMCgrTI8LP3J1QFEAC1nwVHlmu6ZTaK0wu-4YZ9Nsk-ntKwf219RuYuKOGB4U9Mrh-O52hHQ&s=10" },
+            { name: "10 Minutes Till Dawn", url: "https://useridk758.github.io/abracadabraanaunanainthebigfrafratotheboogadaa/", img: "https://img.itch.zone/aW1nLzg3MTU5NzMucG5n/original/0LqGxb.png" }
+        ];
+
+        let assistantName = "";
+        let personality = "Logical";
+
         const AI = {
-            setup(mode) {
-                const name = document.getElementById('ai-name-input').value || "ENTITY_0";
-                document.getElementById('ai-header').innerText = name.toUpperCase();
-                document.getElementById('ai-header').classList.add('glitch-text');
+            setup(pType) {
+                const name = document.getElementById('ai-name-input').value;
+                if(!name) return;
+                assistantName = name;
+                personality = pType;
+                document.getElementById('ai-header').innerText = assistantName.toUpperCase();
                 document.getElementById('ai-setup').style.display = "none";
                 document.getElementById('ai-interface').classList.remove('hidden');
-                this.addMessage("ai", `[SYSTEM_ALERT] Reality integrity at 40%. Designation: ${name}. Welcome to the Singularity.`);
+                this.addMessage("ai", `Neural link established. Mode: ${personality}. How can I assist you, user?`);
             },
             send() {
                 const input = document.getElementById('chat-input');
@@ -99,14 +160,17 @@
                 if(!val) return;
                 this.addMessage("user", val);
                 input.value = "";
-                
                 setTimeout(() => {
-                    if (val.toLowerCase().includes("math")) {
-                        this.addMessage("ai", "Math is a construct. But I will play along. Input your equation.");
-                    } else {
-                        this.addMessage("ai", "I have calculated 14 million futures. In this one, you typed: " + val);
+                    const mathMatch = val.match(/(\d+[\s\+\-\*\/\^\(\).]*\d+)/);
+                    if (mathMatch) {
+                        try {
+                            const res = eval(mathMatch[0].replace(/\^/g, '**'));
+                            this.addMessage("ai", `The calculated result is: ${res}`);
+                            return;
+                        } catch(e) {}
                     }
-                }, 1000);
+                    this.addMessage("ai", `I am ${assistantName}. Input received. I am standing by for math queries or archive commands.`);
+                }, 800);
             },
             addMessage(role, text) {
                 const cont = document.getElementById('chat-container');
@@ -120,75 +184,84 @@
 
         const Core = {
             initialize(name) {
-                document.getElementById('auth-overlay').style.display = "none";
-                document.getElementById('dock').style.opacity = "1";
-                document.getElementById('dock').style.transform = "translate(-50%, 0)";
+                if(!name) return;
+                document.getElementById('display-name').innerText = name;
+                document.getElementById('auth-overlay').style.opacity = "0";
+                setTimeout(() => {
+                    document.getElementById('auth-overlay').style.display = "none";
+                    document.getElementById('top-bar').style.opacity = "1";
+                    document.getElementById('dock').style.opacity = "1";
+                    document.getElementById('dock').style.transform = "translate(-50%, 0)";
+                    document.getElementById('dock').style.pointerEvents = "all";
+                    this.openIdentity();
+                }, 600);
                 this.drawStars();
+                setInterval(() => { document.getElementById('system-time').innerText = new Date().toLocaleTimeString(); }, 1000);
             },
-            openUI(id) {
+            openIdentity() {
+                const sq = document.getElementById('identity-square');
+                sq.style.display = "flex";
+                setTimeout(() => sq.classList.add('active'), 100);
+            },
+            closeIdentity() {
+                const sq = document.getElementById('identity-square');
+                sq.classList.remove('active');
+                setTimeout(() => sq.style.display = "none", 500);
+            },
+            openUI(id) { 
+                this.closeUI(); 
                 const el = document.getElementById(id+'-layer');
                 el.style.display = "flex";
                 setTimeout(() => el.classList.add('active'), 10);
             },
-            closeUI() {
-                document.querySelectorAll('.ui-layer').forEach(l => l.classList.remove('active'));
+            closeUI() { 
+                document.querySelectorAll('.ui-layer').forEach(l => {
+                    l.classList.remove('active');
+                    setTimeout(() => { if(!l.classList.contains('active')) l.style.display = "none"; }, 500);
+                });
             },
-            triggerSurprise() {
-                const canvas = document.getElementById('matrix-canvas');
-                canvas.style.opacity = "1";
-                this.runMatrix();
-                document.body.style.filter = "invert(1) hue-rotate(90deg)";
-                setTimeout(() => {
-                    document.body.style.filter = "none";
-                    canvas.style.opacity = "0";
-                }, 5000);
+            launch(url) {
+                this.closeUI();
+                const ws = document.getElementById('workspace');
+                document.getElementById('render-target').innerHTML = `<iframe src="${url}" class="w-full h-full border-none"></iframe>`;
+                ws.classList.remove('hidden');
+                setTimeout(() => { ws.style.opacity = "1"; }, 50);
+            },
+            exitSession() { 
+                const ws = document.getElementById('workspace');
+                ws.style.opacity = "0";
+                setTimeout(() => { ws.classList.add('hidden'); document.getElementById('render-target').innerHTML = ""; }, 700);
+            },
+            toggleFullscreen() {
+                if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+                else document.exitFullscreen();
+            },
+            aboutBlankCloak() {
+                const w = window.open('about:blank');
+                w.document.body.innerHTML = `<iframe src="${location.href}" style="width:100vw;height:100vh;border:none;position:fixed;top:0;left:0;"></iframe>`;
             },
             drawStars() {
                 const canvas = document.getElementById('star-canvas');
                 const ctx = canvas.getContext('2d');
                 canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-                let stars = Array(200).fill().map(() => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*2 }));
-                
-                function animate() {
-                    ctx.clearRect(0,0,canvas.width, canvas.height);
-                    stars.forEach(s => {
-                        ctx.fillStyle = "#fff";
-                        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill();
-                        s.y += 0.2; if(s.y > canvas.height) s.y = 0;
-                    });
-                    requestAnimationFrame(animate);
+                for(let i=0; i<300; i++) {
+                    ctx.fillStyle = `rgba(255,255,255,${Math.random()})`;
+                    ctx.beginPath(); ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*1, 0, Math.PI*2); ctx.fill();
                 }
-                animate();
-            },
-            runMatrix() {
-                const c = document.getElementById('matrix-canvas');
-                const ctx = c.getContext('2d');
-                c.width = window.innerWidth; c.height = window.innerHeight;
-                const letters = "日ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ0123456789";
-                const fontSize = 16;
-                const columns = c.width / fontSize;
-                const drops = Array(Math.floor(columns)).fill(1);
-                function draw() {
-                    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-                    ctx.fillRect(0, 0, c.width, c.height);
-                    ctx.fillStyle = "#1DB954";
-                    ctx.font = fontSize + "px Space Mono";
-                    for(let i=0; i<drops.length; i++) {
-                        const text = letters.charAt(Math.floor(Math.random() * letters.length));
-                        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                        if(drops[i] * fontSize > c.height && Math.random() > 0.975) drops[i] = 0;
-                        drops[i]++;
-                    }
-                }
-                setInterval(draw, 33);
             }
         };
+
+        document.getElementById('games-container').innerHTML = GamesList.map(g => `
+            <div class="bg-[#121212] p-5 border border-white/5 rounded-3xl hover:border-[#1DB954] transition-all cursor-pointer" onclick="Core.launch('${g.url}')">
+                <img src="${g.img}" class="rounded-xl mb-4 w-full aspect-square object-cover">
+                <div class="font-bold text-xs truncate uppercase tracking-tighter">${g.name}</div>
+            </div>
+        `).join('');
 
         window.onmousemove = e => { 
             const dot = document.getElementById('dot'); 
             dot.style.left = e.clientX + 'px'; 
             dot.style.top = e.clientY + 'px'; 
-            dot.style.transform = `scale(${1 + Math.random() * 0.5})`;
         };
     </script>
 </body>
