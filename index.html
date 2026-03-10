@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA | PLATINUM v86.0</title>
+    <title>NEBULA | PLATINUM v88.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
@@ -55,15 +55,14 @@
         <div class="flex justify-between items-center mb-8">
             <div class="flex flex-col">
                 <h3 class="font-black text-[10px] uppercase tracking-[0.3em] text-[#1DB954]">System Update</h3>
-                <span class="text-[9px] opacity-30 font-bold uppercase tracking-widest">Build v86.0</span>
+                <span class="text-[9px] opacity-30 font-bold uppercase tracking-widest">Build v88.0</span>
             </div>
             <button onclick="Core.closeIdentity()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-xs hover:bg-white/10">✕</button>
         </div>
         <div class="flex-1 space-y-5 text-sm font-medium">
-            <p>- Proxy module deactivated and removed.</p>
-            <p>- AI Customization and Identity Options restored.</p>
-            <p>- Enhanced Math Parser v3 (Handles complex strings).</p>
-            <p>- Standardized Game Archive (11 Verified Links).</p>
+            <p>- Added Placeholder Music button to the Dock.</p>
+            <p>- Optimized UI stability and clean navigation.</p>
+            <p>- AI logic & Game Archive intact.</p>
         </div>
         <div class="mt-8 pt-6 border-t border-white/5">
             <button onclick="Core.closeIdentity()" class="w-full bg-[#1DB954] text-black py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest">Acknowledge</button>
@@ -88,19 +87,10 @@
 
     <div id="ai-layer" class="ui-layer">
         <div class="flex justify-between items-center mb-10"><h1 id="ai-header" class="text-5xl font-black tracking-tighter text-[#1DB954]">Nexus AI</h1><button onclick="Core.closeUI()" class="bg-white/10 text-white px-8 py-3 rounded-full font-black text-[10px] uppercase">Return</button></div>
-        
         <div id="ai-setup" class="flex-1 flex flex-col items-center justify-center">
-            <div class="text-center mb-10">
-                <p class="text-[10px] font-bold tracking-[0.5em] opacity-40 uppercase mb-4">Neural Personality Core</p>
-                <input type="text" id="ai-name-input" class="bg-transparent border-b-2 border-white/20 text-5xl text-center outline-none py-4 w-[600px] font-black focus:border-[#1DB954] transition-all" placeholder="IDENTIFY YOUR AI">
-            </div>
-            <div class="flex gap-4">
-                <button onclick="AI.setup('Logical')" class="bg-white/5 border border-white/10 hover:border-[#1DB954] px-8 py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest">Logical</button>
-                <button onclick="AI.setup('Creative')" class="bg-white/5 border border-white/10 hover:border-[#1DB954] px-8 py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest">Creative</button>
-                <button onclick="AI.setup('Sarcastic')" class="bg-white/5 border border-white/10 hover:border-[#1DB954] px-8 py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest">Sarcastic</button>
-            </div>
+            <input type="text" id="ai-name-input" class="bg-transparent border-b-2 border-white/20 text-4xl text-center outline-none py-4 w-[500px] font-black focus:border-[#1DB954]" placeholder="IDENTIFY YOUR AI">
+            <button onclick="AI.setup()" class="mt-10 bg-white text-black px-12 py-4 rounded-full font-black text-xs uppercase hover:scale-110">Initialize</button>
         </div>
-
         <div id="ai-interface" class="hidden flex-1 flex flex-col">
             <div id="chat-container"></div>
             <div class="max-w-[800px] w-full mx-auto relative mt-5">
@@ -121,6 +111,7 @@
     <div id="dock" class="fixed bottom-12 left-1/2 -translate-x-1/2 flex gap-6 bg-black/40 backdrop-blur-3xl border border-white/5 p-5 rounded-[3rem] z-[100001] opacity-0 translate-y-20 pointer-events-none">
         <button onclick="Core.closeUI()" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🏠</button>
         <button onclick="Core.openUI('games')" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🎮</button>
+        <button onclick="void(0)" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🎵</button>
         <button onclick="Core.openUI('ai')" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-[#1DB954] hover:text-black">🤖</button>
         <button onclick="Core.aboutBlankCloak()" class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-2xl hover:bg-white/20">🕵️</button>
     </div>
@@ -141,18 +132,16 @@
         ];
 
         let assistantName = "";
-        let personality = "Logical";
 
         const AI = {
-            setup(pType) {
+            setup() {
                 const name = document.getElementById('ai-name-input').value;
                 if(!name) return;
                 assistantName = name;
-                personality = pType;
                 document.getElementById('ai-header').innerText = assistantName.toUpperCase();
                 document.getElementById('ai-setup').style.display = "none";
                 document.getElementById('ai-interface').classList.remove('hidden');
-                this.addMessage("ai", `Neural link established. Mode: ${personality}. How can I assist you, user?`);
+                this.addMessage("ai", `Neural link established. How can I help you today?`);
             },
             send() {
                 const input = document.getElementById('chat-input');
@@ -165,11 +154,11 @@
                     if (mathMatch) {
                         try {
                             const res = eval(mathMatch[0].replace(/\^/g, '**'));
-                            this.addMessage("ai", `The calculated result is: ${res}`);
+                            this.addMessage("ai", `The result is: ${res}`);
                             return;
                         } catch(e) {}
                     }
-                    this.addMessage("ai", `I am ${assistantName}. Input received. I am standing by for math queries or archive commands.`);
+                    this.addMessage("ai", `Input processed by ${assistantName}. Standing by.`);
                 }, 800);
             },
             addMessage(role, text) {
